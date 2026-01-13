@@ -1,0 +1,20 @@
+{
+    "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+    "appId": "com.todo.calendar",
+    "productName": "ToDoCalendar",
+    "directories": {
+        "output": "release"
+    },
+    "files": [
+        "dist/**/*",
+        "electron/**/*"
+    ],
+    "win": {
+        "target": "portable",
+        "icon": "electron/icon.ico",
+        "signAndEditExecutable": false
+    },
+    "portable": {
+        "artifactName": "${productName}-Portable.${ext}"
+    }
+}

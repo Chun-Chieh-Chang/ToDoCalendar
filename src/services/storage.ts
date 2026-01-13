@@ -1,0 +1,137 @@
+import { AppState, Task } from '../types';
+
+const STORAGE_KEYS = {
+  TASKS: 'todo_tasks',
+  SETTINGS: 'todo_settings',
+  SELECTED_DATE: 'todo_selected_date',
+  FILTER: 'todo_filter'
+};
+
+export const storageService = {
+  // Tasks
+  getTasks(): Task[] {
+    try {
+      const tasks = localStorage.getItem(STORAGE_KEYS.TASKS);
+      return tasks ? JSON.parse(tasks) : [];
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
+      return [];
+    }
+  },
+
+  saveTasks(tasks: Task[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+    } catch (error) {
+      console.error('Failed to save tasks:', error);
+    }
+  },
+
+  // Settings
+  getSettings(): Partial<AppState['settings']> {
+    try {
+      const settings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+      return settings ? JSON.parse(settings) : {};
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+      return {};
+    }
+  },
+
+  saveSettings(settings: AppState['settings']): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+    }
+  },
+
+  // Selected Date
+  getSelectedDate(): string | null {
+    return localStorage.getItem(STORAGE_KEYS.SELECTED_DATE);
+  },
+
+  saveSelectedDate(date: string): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.SELECTED_DATE, date);
+    } catch (error) {
+      console.error('Failed to save selected date:', error);
+    }
+  },
+
+  // Filter
+  getFilter(): Partial<AppState['filter']> {
+    try {
+      const filter = localStorage.getItem(STORAGE_KEYS.FILTER);
+      return filter ? JSON.parse(filter) : {};
+    } catch (error) {
+      console.error('Failed to load filter:', error);
+      return {};
+    }
+  },
+
+  saveFilter(filter: AppState['filter']): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.FILTER, JSON.stringify(filter));
+    } catch (error) {
+      console.error('Failed to save filter:', error);
+    }
+  },
+
+  // Clear all data
+  clearAll(): void {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.TASKS);
+      localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+      localStorage.removeItem(STORAGE_KEYS.SELECTED_DATE);
+      localStorage.removeItem(STORAGE_KEYS.FILTER);
+    } catch (error) {
+      console.error('Failed to clear data:', error);
+    }
+  },
+
+  // Export Data
+  exportData(): string {
+    const data = {
+      tasks: this.getTasks(),
+      settings: this.getSettings(),
+      selectedDate: this.getSelectedDate(),
+      filter: this.getFilter(),
+      version: '1.1.0',
+      exportDate: new Date().toISOString()
+    };
+    return JSON.stringify(data, null, 2);
+  },
+
+  // Import Data
+  importData(jsonString: string): boolean {
+    try {
+      const data = JSON.parse(jsonString);
+
+      // Basic validation
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid data format');
+      }
+
+      // Validate tasks structure
+      if (data.tasks && Array.isArray(data.tasks)) {
+        const validTasks = data.tasks.filter((task: any) => 
+          task && typeof task === 'object' && task.id && task.title
+        );
+        if (validTasks.length !== data.tasks.length) {
+          console.warn('Some tasks were invalid and skipped during import');
+        }
+        this.saveTasks(validTasks);
+      }
+
+      if (data.settings) this.saveSettings(data.settings);
+      if (data.selectedDate) this.saveSelectedDate(data.selectedDate);
+      if (data.filter) this.saveFilter(data.filter);
+
+      return true;
+    } catch (error) {
+      console.error('Failed to import data:', error);
+      return false;
+    }
+  }
+};
