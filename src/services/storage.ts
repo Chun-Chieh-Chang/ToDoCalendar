@@ -115,7 +115,7 @@ export const storageService = {
 
       // Validate tasks structure
       if (data.tasks && Array.isArray(data.tasks)) {
-        const validTasks = data.tasks.filter((task: any) => 
+        const validTasks = data.tasks.filter((task: any) =>
           task && typeof task === 'object' && task.id && task.title
         );
         if (validTasks.length !== data.tasks.length) {
@@ -132,6 +132,61 @@ export const storageService = {
     } catch (error) {
       console.error('Failed to import data:', error);
       return false;
+    }
+  },
+
+  // Async Persistence for Electron
+  async loadAllData(): Promise<any> {
+    const isElectron = typeof (window as any).electronAPI !== 'undefined';
+
+    if (isElectron) {
+      try {
+        const result = await (window as any).electronAPI.loadData();
+        if (result.success && result.data) {
+          console.log('Loaded data from file system');
+          // Sync to localStorage
+          if (result.data.tasks) this.saveTasks(result.data.tasks);
+          if (result.data.settings) this.saveSettings(result.data.settings);
+          if (result.data.filter) this.saveFilter(result.data.filter);
+          if (result.data.selectedDate) this.saveSelectedDate(result.data.selectedDate);
+
+          return result.data;
+        }
+      } catch (error) {
+        console.error('Error loading from file system:', error);
+      }
+    }
+
+    // Fallback to localStorage
+    return {
+      tasks: this.getTasks(),
+      settings: this.getSettings(),
+      filter: this.getFilter(),
+      selectedDate: this.getSelectedDate()
+    };
+  },
+
+  async saveAllData(data: { tasks?: Task[], settings?: any, filter?: any, selectedDate?: string }): Promise<void> {
+    // 1. Save to localStorage (Sync)
+    if (data.tasks) this.saveTasks(data.tasks);
+    if (data.settings) this.saveSettings(data.settings);
+    if (data.filter) this.saveFilter(data.filter);
+    if (data.selectedDate) this.saveSelectedDate(data.selectedDate);
+
+    // 2. Save to File System (Async, Electron only)
+    const isElectron = typeof (window as any).electronAPI !== 'undefined';
+    if (isElectron) {
+      try {
+        const fullData = {
+          tasks: data.tasks || this.getTasks(),
+          settings: data.settings || this.getSettings(),
+          filter: data.filter || this.getFilter(),
+          selectedDate: data.selectedDate || this.getSelectedDate()
+        };
+        await (window as any).electronAPI.saveData(fullData);
+      } catch (error) {
+        console.error('Error saving to file system:', error);
+      }
     }
   }
 };

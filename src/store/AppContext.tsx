@@ -112,94 +112,120 @@ export function AppProvider({ children }: AppProviderProps) {
   const [state, dispatch] = (React as any).useReducer(appReducer, initialState);
   const t = useTranslation(state.settings.language);
 
-  // Load data from localStorage on mount
+  const [isLoaded, setIsLoaded] = (React as any).useState(false);
+
+  // Load data from storage (FileSystem or LocalStorage) on mount
   (React as any).useEffect(() => {
-    const savedTasks = storageService.getTasks();
-    const savedSettings = storageService.getSettings();
-    const savedSelectedDate = storageService.getSelectedDate();
-    const savedFilter = storageService.getFilter();
+    const loadData = async () => {
+      const savedData = await storageService.loadAllData();
 
-    if (savedTasks.length > 0) {
-      dispatch({ type: 'SET_TASKS', payload: savedTasks });
-    } else {
-      // 添加示例數據
-      const sampleTasks = [
-        {
-          id: '1',
-          title: '完成項目報告',
-          description: '準備下週的項目進度報告',
-          date: dateUtils.dateToString(new Date()),
-          priority: 'high' as const,
-          category: 'work' as const,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          notes: '需要包含Q1數據分析'
-        },
-        {
-          id: '2',
-          title: '學習React Hooks',
-          description: '深入理解useContext和useReducer',
-          date: dateUtils.dateToString(new Date()),
-          priority: 'medium' as const,
-          category: 'study' as const,
-          completed: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          notes: '觀看官方文檔和教程'
-        },
-        {
-          id: '3',
-          title: '購買生活用品',
-          description: '超市購物清單',
-          date: dateUtils.dateToString(new Date()),
-          priority: 'low' as const,
-          category: 'life' as const,
-          completed: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          notes: '牛奶、麵包、雞蛋'
+      const savedTasks = savedData.tasks || [];
+      const savedSettings = savedData.settings || {};
+      const savedSelectedDate = savedData.selectedDate;
+      const savedFilter = savedData.filter || {};
+
+      if (savedTasks.length > 0) {
+        dispatch({ type: 'SET_TASKS', payload: savedTasks });
+      } else {
+        // Only load samples if strictly no data found and not just empty array from file
+        // note: loadAllData returns [] for tasks if file not found or empty
+        // logic: if user deleted all tasks, we respect that. 
+        // But if it's "first run", we want samples.
+        // Simple heuristic: If settings are also empty/default, it's likely a fresh run.
+        if (Object.keys(savedSettings).length === 0) {
+          const sampleTasks = [
+            {
+              id: '1',
+              title: '完成項目報告',
+              description: '準備下週的項目進度報告',
+              date: dateUtils.dateToString(new Date()),
+              priority: 'high' as const,
+              category: 'work' as const,
+              completed: false,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              notes: '需要包含Q1數據分析'
+            },
+            {
+              id: '2',
+              title: '學習React Hooks',
+              description: '深入理解useContext和useReducer',
+              date: dateUtils.dateToString(new Date()),
+              priority: 'medium' as const,
+              category: 'study' as const,
+              completed: false,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              notes: '觀看官方文檔和教程'
+            },
+            {
+              id: '3',
+              title: '購買生活用品',
+              description: '超市購物清單',
+              date: dateUtils.dateToString(new Date()),
+              priority: 'low' as const,
+              category: 'life' as const,
+              completed: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              notes: '牛奶、麵包、雞蛋'
+            }
+          ];
+          dispatch({ type: 'SET_TASKS', payload: sampleTasks });
+          // We'll save this later when isLoaded becomes true and effects fire? 
+          // No, effects won't fire for this dispatch if isLoaded is false yet.
+          // So we should save immediately? Or let the user make a change?
+          // Let's leave it to "save on change" once loaded.
         }
-      ];
-      dispatch({ type: 'SET_TASKS', payload: sampleTasks });
-      storageService.saveTasks(sampleTasks);
-    }
+      }
 
-    if (Object.keys(savedSettings).length > 0) {
-      dispatch({ type: 'SET_SETTINGS', payload: savedSettings });
-    } else {
-      dispatch({ type: 'SET_SETTINGS', payload: defaultSettings });
-      storageService.saveSettings(defaultSettings);
-    }
+      if (Object.keys(savedSettings).length > 0) {
+        dispatch({ type: 'SET_SETTINGS', payload: savedSettings });
+      } else {
+        dispatch({ type: 'SET_SETTINGS', payload: defaultSettings });
+      }
 
-    if (savedSelectedDate) {
-      dispatch({ type: 'SET_SELECTED_DATE', payload: savedSelectedDate });
-    }
+      if (savedSelectedDate) {
+        dispatch({ type: 'SET_SELECTED_DATE', payload: savedSelectedDate });
+      }
 
-    if (Object.keys(savedFilter).length > 0) {
-      dispatch({ type: 'SET_FILTER', payload: savedFilter });
-    } else {
-      dispatch({ type: 'SET_FILTER', payload: defaultFilter });
-      storageService.saveFilter(defaultFilter);
-    }
+      if (Object.keys(savedFilter).length > 0) {
+        dispatch({ type: 'SET_FILTER', payload: savedFilter });
+      } else {
+        dispatch({ type: 'SET_FILTER', payload: defaultFilter });
+      }
+
+      setIsLoaded(true);
+    };
+
+    loadData();
   }, []);
 
-  // Save to localStorage when state changes
+  // Save to storage when state changes
+  // Only save if data has been loaded to avoid overwriting with initial empty state
   (React as any).useEffect(() => {
-    storageService.saveTasks(state.tasks);
-  }, [state.tasks]);
+    if (isLoaded) {
+      storageService.saveAllData({ tasks: state.tasks });
+    }
+  }, [state.tasks, isLoaded]);
 
   (React as any).useEffect(() => {
-    storageService.saveSelectedDate(state.selectedDate);
-  }, [state.selectedDate]);
+    if (isLoaded) {
+      storageService.saveAllData({ selectedDate: state.selectedDate });
+    }
+  }, [state.selectedDate, isLoaded]);
 
   (React as any).useEffect(() => {
-    storageService.saveFilter(state.filter);
-  }, [state.filter]);
+    if (isLoaded) {
+      storageService.saveAllData({ filter: state.filter });
+    }
+  }, [state.filter, isLoaded]);
 
   (React as any).useEffect(() => {
-    storageService.saveSettings(state.settings);
-  }, [state.settings]);
+    if (isLoaded) {
+      storageService.saveAllData({ settings: state.settings });
+    }
+  }, [state.settings, isLoaded]);
 
   const value = { state, dispatch, t };
 
