@@ -1,9 +1,13 @@
-import * as React from 'react';
+import React from 'react';
 import { AppState, Task } from '../types';
 import { storageService } from '../services/storage';
 import { defaultSettings, defaultFilter } from '../utils/defaults';
 import { dateUtils } from '../utils/dateUtils';
 import { useTranslation } from '../utils/i18n';
+
+// Helpers for broken types in environment
+type Dispatch<A> = (value: A) => void;
+type ReactNode = any;
 
 // Action types
 type AppAction =
@@ -90,7 +94,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 // Context
 interface AppContextType {
   state: AppState;
-  dispatch: React.Dispatch<AppAction>;
+  dispatch: Dispatch<AppAction>;
   t: (key: string) => string;
 }
 
@@ -105,7 +109,7 @@ const AppContext = (React as any).createContext(defaultContextValue);
 
 // Provider
 interface AppProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function AppProvider({ children }: AppProviderProps) {
@@ -229,10 +233,10 @@ export function AppProvider({ children }: AppProviderProps) {
 
   const value = { state, dispatch, t };
 
-  return (React as any).createElement(
-    AppContext.Provider,
-    { value },
-    children
+  return (
+    <AppContext.Provider value={value}>
+      {children}
+    </AppContext.Provider>
   );
 }
 

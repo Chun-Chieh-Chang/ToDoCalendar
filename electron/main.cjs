@@ -58,6 +58,10 @@ ipcMain.handle('load-data', async () => {
     }
 });
 
+ipcMain.handle('get-data-path', () => {
+    return dataFilePath;
+});
+
 // Handle notification requests from renderer process
 ipcMain.on('show-notification', (event, { title, body }) => {
     if (Notification.isSupported()) {
