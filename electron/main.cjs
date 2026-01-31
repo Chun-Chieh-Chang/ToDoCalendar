@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Notification, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 // 禁用硬體加速以避免某些系統上的問題
 app.disableHardwareAcceleration();
@@ -31,6 +32,32 @@ function createWindow() {
     });
 }
 
+// Data persistence
+const dataFilePath = path.join(app.getPath('userData'), 'todo_calendar_data.json');
+
+ipcMain.handle('save-data', async (event, data) => {
+    try {
+        fs.writeFileSync(dataFilePath, JSON.stringify(data));
+        return { success: true };
+    } catch (error) {
+        console.error('Failed to save data:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('load-data', async () => {
+    try {
+        if (fs.existsSync(dataFilePath)) {
+            const data = fs.readFileSync(dataFilePath, 'utf-8');
+            return { success: true, data: JSON.parse(data) };
+        }
+        return { success: true, data: null }; // No data found
+    } catch (error) {
+        console.error('Failed to load data:', error);
+        return { success: false, error: error.message };
+    }
+});
+
 // Handle notification requests from renderer process
 ipcMain.on('show-notification', (event, { title, body }) => {
     if (Notification.isSupported()) {
@@ -39,9 +66,9 @@ ipcMain.on('show-notification', (event, { title, body }) => {
             body,
             timeoutType: 'never'
         });
-        
+
         notification.show();
-        
+
         // When notification is clicked, focus the app window
         notification.on('click', () => {
             if (mainWindow) {
