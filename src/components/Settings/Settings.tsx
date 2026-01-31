@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import Modal from '../Modal/Modal';
 import { storageService } from '../../services/storage';
 import { useAppContext } from '../../store/AppContext';
@@ -18,7 +19,16 @@ const Settings = ({
   onSettingsChange
 }: SettingsProps) => {
   const { t } = useAppContext();
-  
+  const [dataPath, setDataPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof (window as any).electronAPI !== 'undefined') {
+      (window as any).electronAPI.getDataPath().then((path: string) => {
+        setDataPath(path);
+      });
+    }
+  }, []);
+
   const handleSettingChange = (key: string, value: any) => {
     onSettingsChange({ ...settings, [key]: value });
   };
@@ -129,6 +139,16 @@ const Settings = ({
         <div className="setting-group">
           <h3>{t('dataManagement')}</h3>
 
+          {/* Show Data Path if in Electron */}
+          {dataPath && (
+            <div className="setting-item data-path-item">
+              <label>資料儲存路徑</label>
+              <div className="path-display" title={dataPath}>
+                {dataPath}
+              </div>
+            </div>
+          )}
+
           <div className="setting-item">
             <button className="btn-secondary" onClick={() => {
               const jsonStr = storageService.exportData();
@@ -136,8 +156,8 @@ const Settings = ({
               const href = URL.createObjectURL(blob);
               const link = document.createElement('a');
               link.href = href;
-              const dateStr = new Date().toISOString().split('T')[0];
-              link.download = `todo_backup_${dateStr}.json`;
+              // Remove date string from filename
+              link.download = `todo_calendar_backup.json`;
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
@@ -178,18 +198,18 @@ const Settings = ({
 
         <div className="setting-group">
           <h3>User Profile</h3>
-          
+
           <div className="setting-item">
             <label>User Name</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={settings.userName || ''}
               onChange={(e) => handleSettingChange('userName', e.target.value)}
               placeholder="Enter your name"
               className="settings-input"
             />
           </div>
-          
+
           <div className="setting-item profile-avatar-section">
             <label>使用者頭像</label>
             <div className="avatar-preview-container">
@@ -208,17 +228,17 @@ const Settings = ({
                 </div>
               </div>
               <div className="avatar-controls">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={settings.userAvatar || ''}
                   onChange={(e) => handleSettingChange('userAvatar', e.target.value)}
                   placeholder="輸入圖片網址"
                   className="settings-input avatar-url-input"
                 />
                 <div className="avatar-upload-wrapper">
-                  <input 
-                    type="file" 
-                    accept="image/*" 
+                  <input
+                    type="file"
+                    accept="image/*"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
