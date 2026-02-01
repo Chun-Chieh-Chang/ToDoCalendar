@@ -1,8 +1,8 @@
 
 import { format } from 'date-fns';
-import React, { useMemo } from 'react';
+import * as React from 'react';
 import './Calendar.css';
-import { Task } from '../../types';
+import { Task, CategoryConfig } from '../../types';
 
 interface CalendarProps {
   currentMonth: Date;
@@ -11,6 +11,7 @@ interface CalendarProps {
   onDateDoubleClick: (date: Date) => void;
   onMonthChange: (date: Date) => void;
   tasks: Task[];
+  categories: CategoryConfig[];
 }
 
 const Calendar = ({
@@ -19,10 +20,11 @@ const Calendar = ({
   onDateSelect,
   onDateDoubleClick,
   onMonthChange,
-  tasks
+  tasks,
+  categories
 }: CalendarProps) => {
   // 使用 useMemo 優化性能
-  const days = useMemo(() => {
+  const days = (React as any).useMemo(() => {
     const getMonthDays = (date: Date) => {
       const days = [];
       const start = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -45,7 +47,7 @@ const Calendar = ({
     return getMonthDays(currentMonth);
   }, [currentMonth]);
 
-  const tasksByDate = useMemo(() => {
+  const tasksByDate = (React as any).useMemo(() => {
     const map = new Map<string, Task[]>();
     tasks.forEach(task => {
       if (task.date) {
@@ -88,14 +90,23 @@ const Calendar = ({
             return `${status} ${priorityIcon} ${task.title}`;
           }).join('\n');
 
-          // 獲取任務顏色類別（根據分類或優先級）
-          const getTaskColor = (task: any) => {
-            // 根據優先級分配顏色
-            if (task.priority === 'high') return 'task-yellow';
-            if (task.priority === 'medium') return 'task-blue';
-            if (task.priority === 'low') return 'task-green';
-            // 默認顏色
-            return 'task-blue';
+          // 獲取任務顏色樣式
+          const getTaskStyle = (task: any) => {
+            const category = categories.find(c => c.id === task.category);
+            if (category) {
+              return {
+                borderLeftColor: category.color,
+                backgroundColor: `${category.color}20`, // 20% opacity
+                color: category.color
+              };
+            }
+
+            // Fallback to priority colors if category not found
+            if (task.priority === 'high') return { borderLeftColor: '#ef4444' };
+            if (task.priority === 'medium') return { borderLeftColor: '#f59e0b' };
+            if (task.priority === 'low') return { borderLeftColor: '#10b981' };
+
+            return {};
           };
 
           return (
@@ -116,7 +127,8 @@ const Calendar = ({
                   {tasksForDay.slice(0, 2).map((task: any, idx: number) => (
                     <div
                       key={idx}
-                      className={`task-preview-item ${getTaskColor(task)}`}
+                      className="task-preview-item"
+                      style={getTaskStyle(task)}
                       title={task.title}
                     >
                       {task.time && <span className="task-time">{task.time}</span>}

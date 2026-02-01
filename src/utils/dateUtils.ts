@@ -5,7 +5,9 @@ export const dateUtils = {
   // Format date based on user preference
   formatDate(date: Date, formatStr: string, locale: 'zh-TW' | 'en'): string {
     const localeObj = locale === 'zh-TW' ? zhTW : enUS;
-    return format(date, formatStr, { locale: localeObj });
+    // Fix common format mistakes: DD -> dd, YYYY -> yyyy
+    const safeFormat = formatStr.replace(/DD/g, 'dd').replace(/YYYY/g, 'yyyy');
+    return format(date, safeFormat, { locale: localeObj });
   },
 
   // Get month name
@@ -24,18 +26,18 @@ export const dateUtils = {
   getCalendarDays(currentDate: Date): Date[] {
     const start = startOfMonth(currentDate);
     const end = endOfMonth(currentDate);
-    
+
     const calendarStart = startOfWeek(start, { weekStartsOn: 1 }); // Monday
     const calendarEnd = endOfWeek(end, { weekStartsOn: 1 }); // Monday
-    
+
     const days: Date[] = [];
     let current = calendarStart;
-    
+
     while (current <= calendarEnd) {
       days.push(current);
       current = addDays(current, 1);
     }
-    
+
     return days;
   },
 
@@ -59,6 +61,18 @@ export const dateUtils = {
 
   isSameDay(date1: Date, date2: Date): boolean {
     return isSameDay(date1, date2);
+  },
+
+  addDays(date: Date, days: number): Date {
+    return addDays(date, days);
+  },
+
+  addWeeks(date: Date, weeks: number): Date {
+    return addDays(date, weeks * 7);
+  },
+
+  addMonths(date: Date, months: number): Date {
+    return addMonths(date, months);
   },
 
   // Date string conversion

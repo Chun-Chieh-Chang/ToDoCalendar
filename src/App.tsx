@@ -1,23 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppContext } from './store/AppContext';
 import { Task } from './types';
 import { dateUtils } from './utils/dateUtils';
+import { taskUtils } from './utils/taskUtils';
 import { useTranslation, translations } from './utils/i18n';
 import Calendar from './components/Calendar/Calendar';
 import TaskForm from './components/TaskForm/TaskForm';
 import Settings from './components/Settings/Settings';
 import TaskListModal from './components/TaskListModal/TaskListModal';
 import ReminderModal from './components/ReminderModal/ReminderModal';
+import KanbanBoard from './components/KanbanBoard/KanbanBoard';
+import TaskListView from './components/TaskListView/TaskListView';
+import AppGuide from './components/AppGuide/AppGuide';
+import Dashboard from './components/Dashboard/Dashboard';
 import './App.css';
 
 const App = () => {
   const { state, dispatch } = useAppContext();
   const translate = useTranslation(state.settings.language);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [activeView, setActiveView] = useState<'calendar' | 'kanban' | 'tasks' | 'pending' | 'guide' | 'dashboard'>('calendar');
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showTaskList, setShowTaskList] = useState(false);
-  const [showPendingList, setShowPendingList] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input or textarea
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+        return;
+      }
+
+      if (e.key.toLowerCase() === 'n') {
+        setShowTaskForm(true);
+      } else if (e.key.toLowerCase() === 'c') {
+        setActiveView('calendar');
+      } else if (e.key.toLowerCase() === 'k') {
+        setActiveView('kanban');
+      } else if (e.key.toLowerCase() === 't') {
+        setActiveView('tasks');
+      } else if (e.key.toLowerCase() === 'p') {
+        setActiveView('pending');
+      } else if (e.key.toLowerCase() === 'd') {
+        setActiveView('dashboard');
+      } else if (e.key === '/') {
+        e.preventDefault();
+        // We'll need a search ref later, for now just a log
+        console.log('Search focused');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    const handleViewChange = (e: any) => {
+      if (e.detail) setActiveView(e.detail);
+    };
+    window.addEventListener('changeView', handleViewChange);
+    return () => window.removeEventListener('changeView', handleViewChange);
+  }, []);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
   const [reminderQueue, setReminderQueue] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +87,7 @@ const App = () => {
     const checkReminders = () => {
       const now = new Date();
       const currentDate = dateUtils.dateToString(now);
-      
+
       const newReminders: Task[] = [];
       state.tasks.forEach(task => {
         if (task.completed || !task.time) return;
@@ -53,10 +96,10 @@ const App = () => {
         if (task.date === currentDate) {
           // 將時間轉換為可比較的格式
           const taskDateTime = new Date(`${task.date}T${task.time}`);
-          
+
           // 計算提醒時間（提前10分鐘）
           const reminderTime = new Date(taskDateTime.getTime() - 10 * 60 * 1000); // 提前10分鐘
-          
+
           // 檢查是否應該觸發提醒（在提醒時間點或之後，但在任務時間點之後不再提醒）
           if (now >= reminderTime && now < taskDateTime) {
             const key = `${task.id}-${task.time}`;
@@ -70,7 +113,7 @@ const App = () => {
                   title: '任務提醒',
                   body: `任務: ${task.title}${task.time ? `\n時間: ${task.time}` : ''}`
                 });
-                
+
                 // Restore window when reminder is triggered
                 (window as any).electronAPI.restoreWindow();
               }
@@ -103,7 +146,7 @@ const App = () => {
   useEffect(() => {
     if (reminderQueue.length > 0) {
       document.title = `(${reminderQueue.length}) ToDoCalendar`;
-      
+
       // Change favicon to indicate reminders
       const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
       if (favicon) {
@@ -119,15 +162,6 @@ const App = () => {
     }
   }, [reminderQueue.length]);
 
-  // 獲取當天的任務
-  const getTasksForSelectedDate = () => {
-    return state.tasks.filter(task => task.date === state.selectedDate);
-  };
-
-  // 獲取待辦清單 (無日期)
-  const getPendingTasks = () => {
-    return state.tasks.filter(task => !task.date);
-  };
 
   // 添加任務
   const handleAddTask = () => {
@@ -186,18 +220,19 @@ const App = () => {
       // 只有當 editingTask 存在且有 id 時才是真正的「編輯」
       // 如果 editingTask 只是用來傳遞預設值（如 { date: '' }），則視為新增
       if (editingTask && editingTask.id) {
-        dispatch({ 
-          type: 'UPDATE_TASK', 
-          payload: { 
-            ...editingTask, 
+        dispatch({
+          type: 'UPDATE_TASK',
+          payload: {
+            ...editingTask,
             ...taskData,
             updatedAt: new Date().toISOString()
-          } 
+          }
         });
       } else {
         const newTask: Task = {
           ...taskData,
           id: Date.now().toString(),
+          order: state.tasks.length,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           completed: false
@@ -217,6 +252,28 @@ const App = () => {
   // 切換任務完成狀態
   const handleToggleComplete = (taskId: string) => {
     dispatch({ type: 'TOGGLE_TASK_COMPLETION', payload: taskId });
+  };
+
+  // 處理狀態變更 (看板拖拽)
+  const handleStatusChange = (taskId: string, newStatus: any) => {
+    const task = state.tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const isDone = newStatus === 'done';
+    dispatch({
+      type: 'UPDATE_TASK',
+      payload: {
+        ...task,
+        status: newStatus,
+        completed: isDone,
+        updatedAt: new Date().toISOString()
+      }
+    });
+  };
+
+  // 處理重新排序
+  const handleReorderTasks = (updatedTasks: Task[]) => {
+    dispatch({ type: 'REORDER_TASKS', payload: updatedTasks });
   };
 
   // 選擇日期
@@ -270,90 +327,11 @@ const App = () => {
     return years;
   };
 
-  // 過濾任務
-  const filteredDateTasks = (() => {
-    const tasksForDate = state.tasks.filter(task => task.date === state.selectedDate);
-    return tasksForDate.filter(task => {
-      const { filter } = state;
+  const filteredDateTasks = taskUtils.filterTasks(state.tasks.filter(t => t.date === state.selectedDate), state.filter);
+  const filteredAllPlannedTasks = taskUtils.filterTasks(state.tasks.filter(t => t.date), state.filter);
+  const filteredPendingTasks = taskUtils.filterTasks(state.tasks.filter(t => !t.date), state.filter);
 
-      // 按優先級過濾
-      if (filter.priority && task.priority !== filter.priority) {
-        return false;
-      }
 
-      // 按分類過濾
-      if (filter.category && task.category !== filter.category) {
-        return false;
-      }
-
-      // 按狀態過濾
-      if (filter.status && filter.status !== 'all') {
-        if (filter.status === 'completed' && !task.completed) {
-          return false;
-        }
-        if (filter.status === 'pending' && task.completed) {
-          return false;
-        }
-      }
-
-      // 按關鍵字搜索
-      if (filter.search) {
-        const search = filter.search.toLowerCase();
-        const matchesTitle = task.title.toLowerCase().includes(search);
-        const matchesDescription = task.description.toLowerCase().includes(search);
-        const matchesNotes = task.notes?.toLowerCase().includes(search) || false;
-
-        if (!matchesTitle && !matchesDescription && !matchesNotes) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  })();
-
-  const filteredPendingTasks = (() => {
-    const pendingTasks = state.tasks.filter(task => !task.date);
-    return pendingTasks.filter(task => {
-      const { filter } = state;
-
-      // 按優先級過濾
-      if (filter.priority && task.priority !== filter.priority) {
-        return false;
-      }
-
-      // 按分類過濾
-      if (filter.category && task.category !== filter.category) {
-        return false;
-      }
-
-      // 按狀態過濾
-      if (filter.status && filter.status !== 'all') {
-        if (filter.status === 'completed' && !task.completed) {
-          return false;
-        }
-        if (filter.status === 'pending' && task.completed) {
-          return false;
-        }
-      }
-
-      // 按關鍵字搜索
-      if (filter.search) {
-        const search = filter.search.toLowerCase();
-        const matchesTitle = task.title.toLowerCase().includes(search);
-        const matchesDescription = task.description.toLowerCase().includes(search);
-        const matchesNotes = task.notes?.toLowerCase().includes(search) || false;
-
-        if (!matchesTitle && !matchesDescription && !matchesNotes) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  })();
-
-  
 
   return (
     <div className="app" data-theme={state.settings.theme}>
@@ -366,25 +344,70 @@ const App = () => {
           </div>
 
           <nav className="nav-menu">
-            <div className="nav-item active" title="顯示月曆視圖">
+            <div
+              className={`nav-item ${activeView === 'calendar' ? 'active' : ''}`}
+              onClick={() => setActiveView('calendar')}
+              title="顯示月曆視圖"
+            >
               <div className="tooltip">
                 <i className="ri-calendar-2-line"></i>
                 <span>月曆</span>
                 <span className="tooltip-text">顯示月曆主視圖，查看整體排程與每日任務分布</span>
               </div>
             </div>
-            <div className="nav-item">
-              <div className="tooltip" onClick={() => setShowTaskList(true)} title="查看所有任務">
+            <div
+              className={`nav-item ${activeView === 'kanban' ? 'active' : ''}`}
+              onClick={() => setActiveView('kanban')}
+              title="顯示看板視圖"
+            >
+              <div className="tooltip">
+                <i className="ri-layout-column-line"></i>
+                <span>看板</span>
+                <span className="tooltip-text">透過看板管理任務進度，支援拖拉更換狀態</span>
+              </div>
+            </div>
+            <div
+              className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveView('dashboard')}
+              title="查看數據統計"
+            >
+              <div className="tooltip">
+                <i className="ri-bar-chart-fill"></i>
+                <span>數據洞察</span>
+                <span className="tooltip-text">了解任務完成趨勢與分配情況</span>
+              </div>
+            </div>
+            <div
+              className={`nav-item ${activeView === 'tasks' ? 'active' : ''}`}
+              onClick={() => setActiveView('tasks')}
+              title="查看所有任務"
+            >
+              <div className="tooltip">
                 <i className="ri-list-check"></i>
                 <span>我的任務</span>
                 <span className="tooltip-text">查看所有已規劃的任務，包括今日及未來任務</span>
               </div>
             </div>
-            <div className="nav-item">
-              <div className="tooltip" onClick={() => setShowPendingList(true)} title="查看待辦事項">
+            <div
+              className={`nav-item ${activeView === 'pending' ? 'active' : ''}`}
+              onClick={() => setActiveView('pending')}
+              title="查看待辦事項"
+            >
+              <div className="tooltip">
                 <i className="ri-inbox-line"></i>
                 <span>待辦清單</span>
                 <span className="tooltip-text">查看尚未排入日程的待辦事項，可隨時安排執行時間</span>
+              </div>
+            </div>
+            <div
+              className={`nav-item ${activeView === 'guide' ? 'active' : ''}`}
+              onClick={() => setActiveView('guide')}
+              title="使用說明"
+            >
+              <div className="tooltip">
+                <i className="ri-book-open-line"></i>
+                <span>使用說明</span>
+                <span className="tooltip-text">了解工具的核心功能與頁面關聯</span>
               </div>
             </div>
             <div className="nav-item">
@@ -414,74 +437,127 @@ const App = () => {
 
       {/* 主內容區域 */}
       <main className="main-content">
-        {/* 月曆標題列 */}
-        <header className="calendar-header">
-          <div className="month-selector">
-            <div className="date-dropdowns">
-              {/* 年份下拉選單 */}
-              <select 
-                className="year-select" 
-                value={currentMonth.getFullYear()} 
-                onChange={handleYearChange}
-              >
-                {generateYearOptions().map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-              
-              {/* 月份下拉選單 */}
-              <select 
-                className="month-select" 
-                value={currentMonth.getMonth()} 
-                onChange={handleMonthSelectChange}
-              >
-                {translations[state.settings.language].months.map((month: string, index: number) => (
-                  <option key={index} value={index}>{month}</option>
-                ))}
-              </select>
-            </div>
-            <div className="nav-arrows">
-              <button
-                className="nav-btn"
-                onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                title="上個月"
-              >
-                <i className="ri-arrow-left-s-line"></i>
-              </button>
-              <button
-                className="nav-btn"
-                onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                title="下個月"
-              >
-                <i className="ri-arrow-right-s-line"></i>
-              </button>
-            </div>
-          </div>
+        {/* 月曆標題列 - 僅在月曆/看板視圖顯示 */}
+        {(activeView === 'calendar' || activeView === 'kanban') && (
+          <header className="calendar-header">
+            <div className="month-selector">
+              <div className="date-dropdowns">
+                {/* 年份下拉選單 */}
+                <select
+                  className="year-select"
+                  value={currentMonth.getFullYear()}
+                  onChange={handleYearChange}
+                >
+                  {generateYearOptions().map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
 
-          <div className="header-actions">
-            <button className="action-btn btn-today" onClick={handleTodayClick}>
-              今天
-            </button>
-          </div>
-        </header>
+                {/* 月份下拉選單 */}
+                <select
+                  className="month-select"
+                  value={currentMonth.getMonth()}
+                  onChange={handleMonthSelectChange}
+                >
+                  {translations[state.settings.language].months.map((month: string, index: number) => (
+                    <option key={index} value={index}>{month}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="nav-arrows">
+                <button
+                  className="nav-btn"
+                  onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+                  title="上個月"
+                >
+                  <i className="ri-arrow-left-s-line"></i>
+                </button>
+                <button
+                  className="nav-btn"
+                  onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+                  title="下個月"
+                >
+                  <i className="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
 
-        {/* 月曆容器 */}
+            <div className="header-actions">
+              <button className="action-btn btn-today" onClick={handleTodayClick}>
+                <i className="ri-focus-3-line"></i> {translate('today')}
+              </button>
+            </div>
+          </header>
+        )}
+
+        {/* 主內容區域容器 */}
         <div className="calendar-wrapper">
-          <Calendar
-            currentMonth={currentMonth}
-            selectedDate={state.selectedDate}
-            onDateSelect={handleDateSelect}
-            onDateDoubleClick={handleDateDoubleClick}
-            onMonthChange={handleMonthChange}
-            tasks={state.tasks}
-          />
+          {activeView === 'calendar' && (
+            <Calendar
+              currentMonth={currentMonth}
+              selectedDate={state.selectedDate}
+              onDateSelect={handleDateSelect}
+              onDateDoubleClick={handleDateDoubleClick}
+              onMonthChange={handleMonthChange}
+              tasks={state.tasks}
+              categories={state.settings.categories}
+            />
+          )}
+          {activeView === 'kanban' && (
+            <KanbanBoard
+              tasks={state.tasks}
+              onToggleComplete={handleToggleComplete}
+              onEdit={handleEditTask}
+              onDelete={handleDeleteTask}
+              onStatusChange={handleStatusChange}
+              onReorder={handleReorderTasks}
+              t={translate}
+            />
+          )}
+          {activeView === 'tasks' && (
+            <TaskListView
+              title="📅 我的任務日程"
+              tasks={filteredAllPlannedTasks}
+              filter={state.filter}
+              onFilterChange={handleFilterChange}
+              onClearFilter={handleClearFilter}
+              onToggleComplete={handleToggleComplete}
+              onEdit={handleEditTask}
+              onDelete={handleDeleteTask}
+              onAddTask={handleAddTask}
+            />
+          )}
+          {activeView === 'pending' && (
+            <TaskListView
+              title="📝 靈感待辦牆"
+              tasks={filteredPendingTasks}
+              filter={state.filter}
+              onFilterChange={handleFilterChange}
+              onClearFilter={handleClearFilter}
+              onToggleComplete={handleToggleComplete}
+              onEdit={handleEditTask}
+              onDelete={handleDeleteTask}
+              onAddTask={() => {
+                setEditingTask(taskUtils.createDefaultTask({
+                  priority: state.settings.defaultPriority || 'medium',
+                  category: 'work'
+                }));
+                setShowTaskForm(true);
+              }}
+              viewMode="sticky"
+            />
+          )}
+          {activeView === 'guide' && <AppGuide />}
+          {activeView === 'dashboard' && <Dashboard />}
         </div>
 
         {/* 底部提示 */}
-        <div className="bottom-hint">
-          <span className="hint-dot"></span>
-          <span>提示：雙擊日期可查看該日任務詳情</span>
-        </div>
+        {activeView === 'calendar' && (
+          <div className="bottom-hint">
+            <span className="hint-dot"></span>
+            <span>{translate('hint')}</span>
+          </div>
+        )}
 
         {/* 底部狀態欄 (淺色主題) */}
         <footer className="status-bar">
@@ -495,7 +571,7 @@ const App = () => {
           </div>
           <div className="status-item">
             <span className="status-dot dot-yellow"></span>
-            待處理 ({getPendingTasks().length})
+            待處理 ({state.tasks.filter(t => !t.date).length})
           </div>
 
           <div className="progress-wrapper">
@@ -529,33 +605,6 @@ const App = () => {
         onAddTask={handleAddTask}
       />
 
-      {/* 待辦清單彈窗 (無日期) */}
-      <TaskListModal
-        isOpen={showPendingList}
-        onClose={() => setShowPendingList(false)}
-        selectedDate=""
-        title="📝 待辦事項清單"
-        tasks={filteredPendingTasks}
-        filter={state.filter}
-        onFilterChange={handleFilterChange}
-        onClearFilter={handleClearFilter}
-        onToggleComplete={handleToggleComplete}
-        onEdit={handleEditTask}
-        onDelete={handleDeleteTask}
-        onAddTask={() => {
-          setEditingTask({
-            title: '',
-            description: '',
-            date: '',
-            time: '',
-            priority: state.settings.defaultPriority || 'medium',
-            category: 'work',
-            notes: ''
-          } as Task);
-          setShowTaskForm(true);
-        }}
-      />
-
       <TaskForm
         isOpen={showTaskForm}
         onClose={() => setShowTaskForm(false)}
@@ -586,8 +635,8 @@ const App = () => {
         <div className="error-toast" role="alert" aria-live="polite">
           <span className="error-icon">⚠️</span>
           <span className="error-message">{error}</span>
-          <button 
-            className="error-close" 
+          <button
+            className="error-close"
             onClick={() => setError(null)}
             aria-label="關閉錯誤提示"
           >

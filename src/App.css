@@ -7,79 +7,104 @@
    CSS Variables - Light Theme (Default)
    ============================================ */
 :root {
-  /* Background Colors */
-  --bg-color: #F5F7FA;
+  /* Fibonacci Spacing */
+  --space-xs: 5px;
+  --space-sm: 8px;
+  --space-md: 13px;
+  --space-lg: 21px;
+  --space-xl: 34px;
+  --space-xxl: 55px;
+
+  /* Fibonacci Spacing System (Base 8) */
+  --space-xs: 5px;
+  /* Fibonacci 5 */
+  --space-sm: 8px;
+  /* Fibonacci 8 */
+  --space-md: 13px;
+  /* Fibonacci 13 - The Golden Mid */
+  --space-lg: 21px;
+  /* Fibonacci 21 */
+  --space-xl: 34px;
+  /* Fibonacci 34 */
+  --space-xxl: 55px;
+  /* Fibonacci 55 */
+
+  /* Golden Ratio Typography */
+  --font-base: 16px;
+  --font-md: 18px;
+  --font-lg: 26px;
+  --font-xl: 42px;
+  --font-xxl: 68px;
+
+  /* Artist's Palette (Ethereal Light) - Enhanced Contrast */
+  --bg-color: #F8FAFC;
+  /* Cleaner, more neutral light background */
   --surface-color: #FFFFFF;
+  --primary-color: #6D28D9;
+  /* Slightly deeper violet for better readability */
+  --primary-gradient: linear-gradient(135deg, #6D28D9 0%, #DB2777 100%);
 
-  /* Text Colors */
-  --text-primary: #1F2937;
-  --text-secondary: #6B7280;
-  --text-tertiary: #9CA3AF;
+  --sidebar-bg: rgba(255, 255, 255, 0.85);
+  --text-primary: #0F172A;
+  /* Deep Slate for maximum readability */
+  --text-secondary: #475569;
+  /* Darker grey for secondary information */
+  --border-color: #E2E8F0;
+  /* Better definition between areas */
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --accent-glow: rgba(124, 58, 237, 0.15);
 
-  /* Border & Dividers */
-  --border-color: #E5E7EB;
-
-  /* Primary Color */
-  --primary-color: #3B82F6;
-
-  /* Task Colors - Blue */
+  /* Pigment Colors - Task Semantics */
   --task-blue-bg: #EFF6FF;
-  --task-blue-text: #1D4ED8;
-  --task-blue-border: #DBEAFE;
+  --task-blue-text: #2563EB;
+  --task-green-bg: #F0FDF4;
+  --task-green-text: #166534;
+  --task-yellow-bg: #FEFCE8;
+  --task-yellow-text: #854D0E;
+  --task-purple-bg: #FAF5FF;
+  --task-purple-text: #6B21A8;
 
-  /* Task Colors - Green */
-  --task-green-bg: #ECFDF5;
-  --task-green-text: #047857;
-  --task-green-border: #D1FAE5;
+  --shadow-premium:
+    0 10px 30px -5px rgba(0, 0, 0, 0.05),
+    0 5px 15px -5px rgba(0, 0, 0, 0.02);
 
-  /* Task Colors - Yellow */
-  --task-yellow-bg: #FFFBEB;
-  --task-yellow-text: #B45309;
-  --task-yellow-border: #FEF3C7;
-
-  /* Task Colors - Purple */
-  --task-purple-bg: #F5F3FF;
-  --task-purple-text: #6D28D9;
-  --task-purple-border: #E9D5FF;
-
-  /* Highlights */
-  --highlight-current: #F0FDF4;
-  /* Light Green for Today */
-  --highlight-selected: #EFF6FF;
-  /* Light Blue for Selected */
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Glass Refinements */
+  --glass-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 /* Dark Theme Variables */
 [data-theme="dark"] {
-  --bg-color: #121212;
-  --surface-color: #1E1E1E;
-  --text-primary: #FFFFFF;
-  --text-secondary: #CCCCCC;
-  --text-tertiary: #AAAAAA;
-  --border-color: #333333;
-  --primary-color: #64B5F6;
-  --task-blue-bg: #151E3D;
-  --task-blue-text: #90CAF9;
-  --task-blue-border: #294D8B;
-  --task-green-bg: #1B3A2F;
-  --task-green-text: #81C784;
-  --task-green-border: #388E3C;
-  --task-yellow-bg: #3B3622;
-  --task-yellow-text: #FFD54F;
-  --task-yellow-border: #FBC02D;
-  --task-purple-bg: #2D1B3D;
-  --task-purple-text: #CE93D8;
-  --task-purple-border: #7B1FA2;
-  --highlight-current: #1B5E20;
-  --highlight-selected: #0D47A1;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  /* Obsidian & Ether Palette */
+  --bg-color: #020617;
+  /* Deepest Night */
+  --surface-color: #0F172A;
+  /* Midnight Slate */
+  --sidebar-bg: rgba(2, 6, 23, 0.85);
+
+  /* Gemstone Textures */
+  --text-primary: #E2E8F0;
+  /* Softer White */
+  --text-secondary: #94A3B8;
+  --border-color: #1E293B;
+  --border-glass: rgba(255, 255, 255, 0.04);
+
+  /* Luminescence */
+  --primary-color: #C084FC;
+  /* Soft Violet Spark */
+  --primary-gradient: linear-gradient(135deg, #C084FC 0%, #F472B6 100%);
+  --accent-glow: rgba(192, 132, 252, 0.2);
+
+  /* Dark Semantic Pigments */
+  --task-blue-bg: rgba(30, 58, 138, 0.4);
+  --task-blue-text: #93C5FD;
+  --task-green-bg: rgba(6, 78, 59, 0.4);
+  --task-green-text: #6EE7B7;
+  --task-yellow-bg: rgba(120, 53, 15, 0.4);
+  --task-yellow-text: #FDE68A;
+  --task-purple-bg: rgba(88, 28, 135, 0.4);
+  --task-purple-text: #D8B4FE;
+
+  --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
 }
 
 /* Accent Colors (for dark theme) */
@@ -116,25 +141,31 @@ body {
    Sidebar Styles
    ============================================ */
 .sidebar {
-  width: 280px;
-  background: linear-gradient(180deg, #1F2937 0%, #111827 100%);
-  color: white;
+  width: 300px;
+  /* Adjusted for Golden Ratio on standard widths */
+  background-color: var(--sidebar-bg);
+  background-image: var(--glass-noise);
+  background-blend-mode: soft-light;
+  backdrop-filter: blur(34px);
+  /* Fibonacci 34 */
+  -webkit-backdrop-filter: blur(34px);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-lg);
+  border-right: 1px solid var(--border-glass);
   z-index: 100;
-  transition: all 0.3s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="dark"] .sidebar {
-  background: linear-gradient(180deg, #111827 0%, #000000 100%);
+  background-color: var(--sidebar-bg);
 }
 
 .sidebar-top {
-  padding: 32px 24px 24px;
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: var(--space-xl);
 }
 
 .logo {
@@ -142,8 +173,9 @@ body {
   align-items: center;
   gap: 12px;
   font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--text-primary);
 }
 
 .logo i {
@@ -158,33 +190,38 @@ body {
 }
 
 .nav-item {
-  padding: 14px 16px;
-  border-radius: 12px;
+  padding: 12px 18px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 500;
-  position: relative;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(4px);
+  background-color: rgba(99, 102, 241, 0.08);
+  color: var(--primary-color);
+  transform: translateX(6px);
 }
 
 .nav-item.active {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: var(--primary-color);
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: var(--shadow-md);
 }
 
 .nav-item.active:hover {
-  background-color: rgba(59, 130, 246, 0.25);
+  transform: translateX(6px);
+  filter: brightness(1.1);
 }
 
 .nav-item i {
-  font-size: 20px;
+  font-size: 22px;
   width: 24px;
   text-align: center;
 }
@@ -205,14 +242,14 @@ body {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  background: var(--primary-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: 700;
   font-size: 18px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 10px var(--accent-glow);
 }
 
 [data-theme="dark"] .avatar {
@@ -232,9 +269,22 @@ body {
   margin-top: 2px;
 }
 
-/* ============================================
-   Main Content Styles
-   ============================================ */
+.main-content>* {
+  animation: viewTransition 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes viewTransition {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .main-content {
   flex: 1;
   display: flex;
@@ -242,6 +292,12 @@ body {
   padding: 32px 40px;
   background-color: var(--bg-color);
   overflow-y: auto;
+}
+
+.calendar-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 [data-theme="dark"] .main-content {
@@ -263,10 +319,11 @@ body {
 }
 
 .month-title {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: var(--font-lg);
+  /* Golden Ratio */
+  font-weight: 800;
   color: var(--text-primary);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.03em;
 }
 
 .date-dropdowns {
@@ -352,16 +409,34 @@ body {
 }
 
 .btn-today {
-  background-color: var(--surface-color);
-  color: var(--text-primary);
-  border: 2px solid var(--border-color) !important;
+  background-color: var(--sidebar-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color) !important;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  /* Fix vertical stacking */
+  border-radius: 10px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
 }
 
 .btn-today:hover {
-  background-color: var(--primary-color);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  background-color: var(--surface-color);
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.btn-today:active {
+  transform: scale(0.95);
 }
 
 [data-theme="dark"] .btn-today {
@@ -375,15 +450,18 @@ body {
 }
 
 .btn-add {
-  background-color: var(--primary-color);
+  background: var(--primary-gradient);
   color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 15px var(--accent-glow);
+  padding: 12px 28px;
+  font-size: 15px;
+  border-radius: 14px;
 }
 
 .btn-add:hover {
-  background-color: #2563EB;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px var(--accent-glow);
+  filter: brightness(1.1);
 }
 
 [data-theme="dark"] .btn-add {
@@ -673,9 +751,37 @@ body {
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes shine {
+  0% {
+    left: -100%;
+    top: -100%;
+  }
+
+  100% {
+    left: 100%;
+    top: 100%;
+  }
+}
+
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 40px;
+  height: 300%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(35deg);
+  pointer-events: none;
+}
+
+.shine-effect:hover::after {
+  animation: shine 0.8s ease-in-out;
 }
 
 .text {
@@ -707,6 +813,7 @@ body {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -877,13 +984,13 @@ body {
     padding: 16px;
     border-radius: 16px;
   }
-  
+
   .date-dropdowns {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .year-select,
   .month-select {
     min-width: auto;

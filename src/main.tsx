@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { AppProvider } from './store/AppContext'
 import App from './App.tsx'
+import 'remixicon/fonts/remixicon.css'
 import './index.css'
 
 const StrictMode = (React as any).StrictMode;

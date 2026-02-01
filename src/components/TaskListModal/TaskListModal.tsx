@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import TaskCard from '../TaskCard/TaskCard';
 import Filter from '../Filter/Filter';
 import Modal from '../Modal/Modal';
 import { Task } from '../../types';
+import { taskUtils } from '../../utils/taskUtils';
 import './TaskListModal.css';
 
 interface TaskListModalProps {
@@ -18,6 +19,7 @@ interface TaskListModalProps {
     onDelete: (id: string) => void;
     onAddTask: () => void;
     title?: string;
+    viewMode?: 'list' | 'sticky';
 }
 
 const TaskListModal = ({
@@ -32,7 +34,8 @@ const TaskListModal = ({
     onEdit,
     onDelete,
     onAddTask,
-    title
+    title,
+    viewMode = 'list'
 }: TaskListModalProps) => {
     const formatDate = (dateStr: string) => {
         if (!dateStr) return '';
@@ -45,16 +48,8 @@ const TaskListModal = ({
         });
     };
 
-    const sortedTasks = useMemo(() => {
-        return [...tasks].sort((a, b) => {
-            // 首先按完成狀態排序（未完成的在前）
-            if (a.completed !== b.completed) {
-                return a.completed ? 1 : -1;
-            }
-            // 然後按優先級排序（高->中->低）
-            const priorityOrder: { [key: string]: number } = { high: 0, medium: 1, low: 2 };
-            return priorityOrder[a.priority] - priorityOrder[b.priority];
-        });
+    const sortedTasks = (React as any).useMemo(() => {
+        return taskUtils.sortTasks(tasks);
     }, [tasks]);
 
     const modalTitle = (
@@ -104,8 +99,8 @@ const TaskListModal = ({
                         <p>{selectedDate ? '點擊「新增當日任務」來開始添加您的第一個任務吧！' : '點擊「新增待辦」開始添加您的第一個待辦吧！'}</p>
                     </div>
                 ) : (
-                    <div className="task-modal-items">
-                        {sortedTasks.map(task => (
+                    <div className={`task-modal-items ${viewMode === 'sticky' ? 'sticky-wall' : ''}`}>
+                        {sortedTasks.map((task: Task) => (
                             <TaskCard
                                 key={task.id}
                                 task={task}

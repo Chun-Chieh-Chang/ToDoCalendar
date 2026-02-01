@@ -46,14 +46,14 @@
 
 /* Day Cell */
 .calendar-day {
-  background-color: #F9FAFB; /* 調整背景色，使其與主背景略有區別 */
+  background-color: var(--surface-color);
   border-radius: 12px;
   padding: 12px;
   position: relative;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  border: 1px solid #E5E7EB; /* 添加邊框以提高可見性 */
+  border: 1px solid var(--border-color);
   transition: all 0.2s ease;
   min-height: 100px;
   overflow: hidden;

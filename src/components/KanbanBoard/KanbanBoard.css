@@ -1,0 +1,106 @@
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    height: 100%;
+    padding: 10px;
+    background: transparent;
+    overflow-x: auto;
+}
+
+.kanban-column {
+    background: var(--surface-color);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    min-width: 320px;
+    max-height: calc(100vh - 200px);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+}
+
+.kanban-column:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+}
+
+.column-header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: inherit;
+    border-radius: 16px 16px 0 0;
+    z-index: 10;
+}
+
+.column-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.task-count {
+    background: var(--bg-color);
+    color: var(--text-secondary);
+    padding: 4px 12px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1px solid var(--border-color);
+}
+
+.column-content {
+    padding: 12px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Custom scrollbar for columns */
+.column-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.column-content::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 10px;
+}
+
+.draggable-task {
+    cursor: grab;
+}
+
+.draggable-task:active {
+    cursor: grabbing;
+}
+
+.draggable-task .task-card {
+    margin: 0;
+    pointer-events: auto;
+}
+
+/* Dark mode and general colors are handled via variables in App.css */
+[data-theme="dark"] .kanban-column {
+    background: var(--surface-color);
+    border-color: var(--border-color);
+}
+
+@media (max-width: 1024px) {
+    .kanban-board {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        height: auto;
+    }
+
+    .kanban-column {
+        max-height: none;
+    }
+}
