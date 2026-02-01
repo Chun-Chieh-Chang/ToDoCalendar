@@ -10,6 +10,7 @@ const StrictMode = (React as any).StrictMode;
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppProvider>
+      {console.log('ToDoCalendar Loaded: v1.3.0 ' + new Date().toISOString())}
       <App />
     </AppProvider>
   </StrictMode>,
