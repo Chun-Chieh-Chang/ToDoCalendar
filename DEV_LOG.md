@@ -213,6 +213,15 @@ This section documents critical failures encountered during the v1.3.0 developme
     - **Optimization**: Simplifed animation triggers.
     - **Fallback**: Ensured container has default visibility and explicit dimensions/backgrounds to prevent collapsing.
 
+### 5. Sticky Browser Cache on Deployment
+- **Symptom**: After successfully deploying v1.3.0 changes via GitHub Actions (Green ticks all around), visiting the GitHub Pages URL still showed the old v1.2.0 interface, even after hard refreshing (`Ctrl+F5`) and waiting for 20+ minutes.
+- **Root Cause**: 
+    - **Aggressive Caching**: Modern browsers and CDNs aggressively cache `index.html` and JS bundles if the filenames remain identical or similar. Standard Vite hashing sometimes isn't enough to force a re-fetch if the bundle structure doesn't change significantly, or if the CDN serves a cached version of `index.html` pointing to old assets.
+- **Corrective Action**:
+    - **Cache Busting Strategy**: Modified `vite.config.ts` to enforce a strict hashing strategy.
+    - **Implementation**: Added `rollupOptions.output` configuration to append the current timestamp (`Date.now()`) to every single entry, chunk, and asset file name (e.g., `assets/[name].[hash].170000000.js`).
+    - **Result**: This forces every new deployment to be treated as a completely new set of files, bypassing all layers of browser and CDN cache. Updates are now visible immediately after deployment.
+
 ---
 **Standard Operating Procedure (SOP) Actions Taken:**
 - [x] **Precise Modification**: Only touched `Dashboard.tsx`, `dateUtils.ts`, and `index.html` for fixes.
