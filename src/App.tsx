@@ -429,7 +429,7 @@ const App = () => {
             )}
             <div className="user-info">
               <h4>{state.settings.userName || 'User Name'}</h4>
-              <p>Professional Member</p>
+              <p>v1.3.0 Professional</p>
             </div>
           </div>
         </div>
