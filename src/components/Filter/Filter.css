@@ -1,16 +1,17 @@
 .filter-container {
-  background: white;
-  border: 2px solid #eef2f7;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 21px;
+  /* Fibonacci */
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
 
 .filter-container:hover {
-  border-color: #d6e3f0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
 }
 
 .filter-group {
@@ -33,19 +34,19 @@
 .search-input {
   width: 100%;
   padding: 12px 40px 12px 14px;
-  border: 2px solid #eef2f7;
-  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
   font-size: 14px;
-  background: white;
-  color: #2c3e50;
-  transition: all 0.2s ease;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px var(--accent-glow);
   transform: translateY(-1px);
 }
 
@@ -61,12 +62,12 @@
 
 .filter-item select {
   padding: 12px 14px;
-  border: 2px solid #eef2f7;
-  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
   font-size: 14px;
-  background: white;
-  color: #2c3e50;
-  transition: all 0.2s ease;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
   min-width: 140px;
   cursor: pointer;
@@ -74,8 +75,8 @@
 
 .filter-item select:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px var(--accent-glow);
   transform: translateY(-1px);
 }
 
@@ -182,69 +183,32 @@
   transform: scale(1.1);
 }
 
-/* 深色主題 */
-@media (prefers-color-scheme: dark) {
-  .filter-container {
-    background: #1f2937;
-    border-color: #374151;
-  }
+/* Dark Theme (Consolidated) */
+[data-theme="dark"] .filter-container {
+  background: var(--surface-color);
+  border-color: var(--border-color);
+}
 
-  .filter-container:hover {
-    border-color: #4b5563;
-  }
+[data-theme="dark"] .search-input,
+[data-theme="dark"] .filter-item select {
+  background: var(--bg-color);
+  border-color: var(--border-color);
+}
 
-  .search-input {
-    background: #0b1220;
-    border-color: #374151;
-    color: #e5e7eb;
-  }
+[data-theme="dark"] .filter-btn {
+  background: var(--bg-color);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
 
-  .search-input:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
-  }
+[data-theme="dark"] .filter-btn:hover {
+  background: var(--surface-color);
+  color: var(--text-primary);
+}
 
-  .filter-item select {
-    background: #0b1220;
-    border-color: #374151;
-    color: #e5e7eb;
-  }
-
-  .filter-item select:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
-  }
-
-  .filter-btn {
-    background: #1f2937;
-    color: #9ca3af;
-    border-color: #374151;
-  }
-
-  .filter-btn:hover {
-    background: #374151;
-    border-color: #4b5563;
-    color: #e5e7eb;
-  }
-
-  .active-filters {
-    border-top-color: #374151;
-  }
-
-  .filter-label {
-    color: #9ca3af;
-  }
-
-  .filter-chip {
-    background: #374151;
-    border-color: #4b5563;
-    color: #9ca3af;
-  }
-
-  .filter-chip:hover {
-    background: #4b5563;
-    border-color: #6b7280;
-  }
+[data-theme="dark"] .filter-chip {
+  background: var(--bg-color);
+  border-color: var(--border-color);
 }
 
 /* 響應式設計 */

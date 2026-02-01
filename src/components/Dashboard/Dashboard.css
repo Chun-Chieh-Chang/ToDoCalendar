@@ -1,0 +1,249 @@
+.dashboard-container {
+    padding: var(--space-xl);
+    max-width: 1200px;
+    margin: 0 auto;
+    display: block;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    margin-bottom: var(--space-xxl);
+}
+
+.dashboard-header h1 {
+    font-size: var(--font-lg);
+    font-weight: 800;
+    margin-bottom: var(--space-xs);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.dashboard-header p {
+    color: var(--text-secondary);
+}
+
+/* Overview Cards */
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xxl);
+}
+
+.stat-card {
+    background: var(--surface-color);
+    padding: var(--space-xl);
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-premium);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card.primary {
+    background: var(--primary-gradient);
+}
+
+.stat-card.primary .stat-value,
+.stat-card.primary .stat-label {
+    color: white;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.stat-card.success .stat-value {
+    color: #10B981;
+}
+
+.stat-card.warning .stat-value {
+    color: #F59E0B;
+}
+
+/* Grid Sections */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+}
+
+.dashboard-section {
+    background: var(--surface-color);
+    padding: var(--space-xl);
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+}
+
+.dashboard-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: var(--space-xl);
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.dashboard-section h3 i {
+    color: var(--primary-color);
+}
+
+/* Bar Chart */
+.bar-chart {
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 20px;
+}
+
+.bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+}
+
+.bar {
+    width: 100%;
+    max-width: 40px;
+    background: var(--primary-gradient);
+    border-radius: 8px 8px 4px 4px;
+    transition: height 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    min-height: 4px;
+}
+
+.bar-count {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.bar-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+/* Cat List */
+.cat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cat-stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cat-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.cat-count {
+    margin-left: auto;
+    color: var(--text-secondary);
+}
+
+.progress-bg {
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease-out;
+}
+
+/* Priority Section */
+.priority-section {
+    grid-column: span 2;
+}
+
+.priority-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.priority-box {
+    padding: var(--space-lg);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.priority-box.high {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+}
+
+.priority-box.medium {
+    background: rgba(245, 158, 11, 0.1);
+    color: #F59E0B;
+}
+
+.priority-box.low {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+}
+
+.p-label {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.p-value {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .priority-section {
+        grid-column: span 1;
+    }
+}

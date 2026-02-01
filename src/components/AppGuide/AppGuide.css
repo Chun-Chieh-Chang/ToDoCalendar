@@ -1,0 +1,210 @@
+.guide-container {
+    padding: var(--space-xl);
+    max-width: 1000px;
+    margin: 0 auto;
+    animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.guide-header {
+    text-align: center;
+    margin-bottom: var(--space-xxl);
+}
+
+.guide-main-icon {
+    font-size: 64px;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: var(--space-md);
+    display: inline-block;
+}
+
+.guide-header h1 {
+    font-size: var(--font-lg);
+    font-weight: 800;
+    margin-bottom: var(--space-sm);
+    letter-spacing: -0.02em;
+}
+
+.guide-header p {
+    color: var(--text-secondary);
+    font-size: var(--font-md);
+}
+
+.guide-section {
+    margin-bottom: var(--space-xxl);
+}
+
+.guide-section h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-size: 22px;
+    margin-bottom: var(--space-lg);
+    border-bottom: 2px solid var(--surface-3);
+    padding-bottom: var(--space-sm);
+}
+
+.guide-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-lg);
+}
+
+.guide-card {
+    background: var(--surface-color);
+    padding: var(--space-lg);
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.guide-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.card-icon {
+    font-size: 32px;
+    color: var(--primary-color);
+    margin-bottom: var(--space-md);
+}
+
+.guide-card h3 {
+    margin-bottom: var(--space-sm);
+    font-size: 18px;
+}
+
+.guide-card p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+/* Flow Section */
+.flow-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    background: var(--surface-2);
+    padding: var(--space-xl);
+    border-radius: 24px;
+    gap: var(--space-md);
+}
+
+.flow-step {
+    flex: 1;
+    text-align: center;
+}
+
+.step-num {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: var(--space-sm);
+}
+
+.flow-connector {
+    padding-top: var(--space-xl);
+    font-size: 24px;
+    color: var(--text-secondary);
+}
+
+/* Tips Section */
+.tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.tip-item {
+    background: rgba(124, 58, 237, 0.05);
+    padding: var(--space-md) var(--space-lg);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 0 12px 12px 0;
+    font-size: 15px;
+}
+
+[data-theme="dark"] .guide-card {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .flow-content {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .flow-content {
+        flex-direction: column;
+    }
+
+    .flow-connector {
+        display: none;
+    }
+}
+
+/* CTA Section */
+.cta-section {
+    text-align: center;
+    border-top: none !important;
+}
+
+.cta-box {
+    background: var(--primary-gradient);
+    padding: var(--space-xl);
+    border-radius: 24px;
+    color: white;
+    box-shadow: 0 15px 40px rgba(124, 58, 237, 0.3);
+}
+
+.cta-box h3 {
+    font-size: 24px;
+    margin-bottom: var(--space-sm);
+    color: white !important;
+}
+
+.cta-box p {
+    margin-bottom: var(--space-lg);
+    opacity: 0.9;
+}
+
+.cta-button {
+    background: white;
+    color: var(--primary-color);
+    border: none;
+    padding: var(--space-md) var(--space-xl);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cta-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}

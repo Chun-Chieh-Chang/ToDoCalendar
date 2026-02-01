@@ -44,9 +44,9 @@ const Settings = ({
   ];
 
   const dateOptions = [
-    { value: 'YYYY-MM-DD', label: '2024-01-01' },
-    { value: 'DD/MM/YYYY', label: '01/01/2024' },
-    { value: 'MM/DD/YYYY', label: '01/01/2024' }
+    { value: 'yyyy-MM-dd', label: '2024-01-01' },
+    { value: 'dd/MM/yyyy', label: '01/01/2024' },
+    { value: 'MM/dd/yyyy', label: '01/01/2024' }
   ];
 
   const priorityOptions = [
@@ -263,11 +263,78 @@ const Settings = ({
             <div className="setting-item-note">上傳圖片檔案或輸入圖片網址</div>
           </div>
         </div>
+        <div className="setting-group">
+          <h3>分類與標籤設定</h3>
+          <div className="category-manager">
+            {settings.categories.map((cat, index) => (
+              <div key={cat.id} className="category-config-item">
+                <input
+                  type="color"
+                  value={cat.color}
+                  onChange={(e) => {
+                    const newCats = [...settings.categories];
+                    newCats[index] = { ...cat, color: e.target.value };
+                    handleSettingChange('categories', newCats);
+                  }}
+                  className="cat-color-picker"
+                />
+                <input
+                  type="text"
+                  value={cat.name}
+                  onChange={(e) => {
+                    const newCats = [...settings.categories];
+                    newCats[index] = { ...cat, name: e.target.value };
+                    handleSettingChange('categories', newCats);
+                  }}
+                  className="cat-name-input"
+                />
+                <button
+                  className="btn-icon-delete"
+                  onClick={() => {
+                    const newCats = settings.categories.filter(c => c.id !== cat.id);
+                    handleSettingChange('categories', newCats);
+                  }}
+                  title="刪除分類"
+                >
+                  <i className="ri-delete-bin-line"></i>
+                </button>
+              </div>
+            ))}
+            <button
+              className="btn-secondary btn-add-cat"
+              onClick={() => {
+                const newCat = {
+                  id: `cat_${Date.now()}`,
+                  name: '新分類',
+                  color: '#94A3B8'
+                };
+                handleSettingChange('categories', [...settings.categories, newCat]);
+              }}
+            >
+              <i className="ri-add-line"></i> 新增分類
+            </button>
+          </div>
+        </div>
 
         <div className="setting-actions">
           <button onClick={onClose} className="btn-cancel">
             {t('close')}
           </button>
+        </div>
+
+        <div className="setting-group privacy-shield">
+          <div className="privacy-shield-header">
+            <i className="ri-shield-check-line"></i>
+            <h3>隱私與安全防護</h3>
+          </div>
+          <p className="privacy-note">
+            此應用程式採用 <strong>「本地優先 (Local-First)」</strong> 架構：
+          </p>
+          <ul className="privacy-features">
+            <li><i className="ri-checkbox-circle-line"></i> 數據僅儲存於您的目前設備，不傳送至雲端。</li>
+            <li><i className="ri-checkbox-circle-line"></i> 不同使用者即使開啟相同網址，也無法存取彼此的紀錄。</li>
+            <li><i className="ri-checkbox-circle-line"></i> 您的隱私受瀏覽器沙盒技術嚴格隔離。</li>
+          </ul>
         </div>
       </div>
     </Modal>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Task } from '../../types';
 import './TaskCard.css';
 
@@ -33,7 +32,10 @@ const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) =
   };
 
   return (
-    <div className={`task-card ${task.completed ? 'completed' : ''}`}>
+    <div
+      className={`task-card ${task.completed ? 'completed' : ''}`}
+      data-priority={task.priority}
+    >
       <div className="task-card-header">
         <div className="task-checkbox">
           <input
@@ -81,7 +83,14 @@ const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) =
       </div>
 
       <div className="task-content">
-        <h3 className="task-title">{task.title}</h3>
+        <div className="task-title-row">
+          <h3 className="task-title">{task.title}</h3>
+          {task.subtasks && task.subtasks.length > 0 && (
+            <span className="subtask-badge">
+              {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
+            </span>
+          )}
+        </div>
         {task.description && (
           <p className="task-description">{task.description}</p>
         )}
@@ -94,7 +103,7 @@ const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) =
       </div>
 
       <div className="task-footer">
-        <span className="task-date">📅 {formatDate(task.date)}</span>
+        <span className="task-date">📅 {task.date ? formatDate(task.date) : '無日期'}</span>
         <span className="task-time">
           建立時間：{new Date(task.createdAt).toLocaleString('zh-TW')}
         </span>

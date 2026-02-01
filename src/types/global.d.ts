@@ -11,7 +11,24 @@ declare module 'react' {
     key: string;
     preventDefault(): void;
   }
-  
+  export interface ChangeEvent<T = Element> {
+    target: {
+      name: string;
+      value: string;
+      checked?: boolean;
+    };
+  }
+  export interface FormEvent<T = Element> {
+    preventDefault(): void;
+  }
+  export interface DragEvent<T = Element> {
+    preventDefault(): void;
+    dataTransfer: {
+      setData(key: string, value: string): void;
+      getData(key: string): string;
+    };
+  }
+
   export function createElement(
     type: any,
     props: any,
@@ -26,10 +43,10 @@ declare module 'react' {
   ): [TState, (action: TAction) => void];
   export const Fragment: any;
   export type FC<P = {}> = (props: P) => ReactElement | null;
-  
+
   // JSX 類型定義
   namespace JSX {
-    interface Element {}
+    interface Element { }
     interface IntrinsicElements {
       [elem: string]: any;
     }
@@ -70,7 +87,7 @@ declare module 'date-fns/locale' {
 
 // JSX 命名空間
 declare namespace JSX {
-  interface Element {}
+  interface Element { }
   interface IntrinsicElements {
     [elem: string]: any;
   }

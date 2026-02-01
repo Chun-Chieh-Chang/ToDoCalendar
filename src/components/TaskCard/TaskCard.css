@@ -1,23 +1,43 @@
 .task-card {
-  background: white;
-  border: 2px solid #eef2f7;
-  border-radius: 16px;
-  padding: 16px;
-  transition: all 0.3s ease;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
 }
 
 .task-card:hover {
-  border-color: #d6e3f0;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary-color);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: var(--shadow-premium);
+}
+
+.task-card::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 60px;
+  height: 300%;
+  background: rgba(255, 255, 255, 0.08);
+  transform: rotate(35deg);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.task-card:hover::after {
+  animation: shine 1s ease-in-out;
 }
 
 .task-card.completed {
-  opacity: 0.8;
-  background: linear-gradient(135deg, #f8fafd, #ffffff);
+  opacity: 0.6;
+  filter: grayscale(0.5);
+  background: var(--bg-color);
 }
 
 .task-card.completed::after {
@@ -26,8 +46,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #27ae60, #2ecc71);
+  height: 4px;
+  background: linear-gradient(90deg, #10B981, #34D399);
 }
 
 .task-card-header {
@@ -57,26 +77,28 @@
   left: 0;
   height: 20px;
   width: 20px;
-  background: white;
-  border: 2px solid #eef2f7;
-  border-radius: 6px;
+  background: var(--surface-color);
+  border: 2px solid var(--border-color);
+  border-radius: 7px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.task-checkbox input:checked + .checkbox-label {
-  background: #27ae60;
-  border-color: #27ae60;
-  animation: checkmark 0.2s ease-out;
+.task-checkbox input:checked+.checkbox-label {
+  background: #10B981;
+  border-color: #10B981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  animation: checkmark 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes checkmark {
   from {
     transform: scale(0.8);
   }
+
   to {
     transform: scale(1);
   }
@@ -100,31 +122,30 @@
   }
 }
 
-.task-checkbox input:hover + .checkbox-label {
+.task-checkbox input:hover+.checkbox-label {
   border-color: #3498db;
   transform: scale(1.05);
 }
 
 .task-priority {
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 13px;
-  /* 從 12px 增加到 13px */
-  font-weight: 700;
-  border: 1px solid;
-  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  border: 1px solid transparent;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
 }
 
 .task-category {
-  padding: 4px 10px;
-  background: #f0f3f7;
-  color: #7f8c8d;
-  border-radius: 999px;
-  font-size: 13px;
-  /* 從 12px 增加到 13px */
-  font-weight: 600;
-  border: 1px solid #eef2f7;
+  padding: 4px 12px;
+  background: var(--bg-color);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
 }
 
 .task-actions {
@@ -153,7 +174,8 @@
 }
 
 .action-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.9);
+  background: rgba(99, 102, 241, 0.15);
 }
 
 .edit-btn:hover {
@@ -168,13 +190,31 @@
   margin: 8px 0 12px 32px;
 }
 
+.task-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
 .task-title {
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: 18px;
-  /* 從 16px 增加到 18px */
-  font-weight: 700;
-  color: #2c3e50;
+  font-weight: 800;
+  color: var(--text-primary);
   line-height: 1.4;
+  flex: 1;
+}
+
+.subtask-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .task-card.completed .task-title {
@@ -185,8 +225,7 @@
 .task-description {
   margin: 0 0 12px 0;
   font-size: 15px;
-  /* 從 14px 增加到 15px */
-  color: #555;
+  color: var(--text-secondary);
   line-height: 1.6;
   font-weight: 500;
 }
@@ -222,152 +261,16 @@
   align-items: center;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #eef2f7;
+  border-top: 1px solid var(--border-color);
+  opacity: 0.8;
   font-size: 13px;
-  /* 從 12px 增加到 13px */
-  color: #7f8c8d;
+  color: var(--text-secondary);
   flex-wrap: wrap;
   gap: 8px;
   font-weight: 500;
 }
 
-/* 深色主题 */
-@media (prefers-color-scheme: dark) {
-  .task-card {
-    background: #1f2937;
-    border-color: #374151;
-  }
-
-  .task-card:hover {
-    border-color: #4b5563;
-  }
-
-  .task-card.completed {
-    background: linear-gradient(135deg, #111827, #1f2937);
-  }
-
-  .checkbox-label {
-    background: #0b1220;
-    border-color: #374151;
-  }
-
-  .task-checkbox input:checked + .checkbox-label {
-    background: #22c55e;
-    border-color: #22c55e;
-  }
-
-  .task-title {
-    color: #ffffff;
-    /* 純白色，提升對比度 */
-    font-weight: 700;
-  }
-
-  .task-card.completed .task-title {
-    color: #d1d5db;
-    /* 亮灰色，保持可讀性 */
-  }
-
-  .task-description,
-  .task-notes p {
-    color: #f3f4f6;
-    /* 更亮的白色，提升對比度 */
-    font-weight: 500;
-  }
-
-  .task-category {
-    background: #374151;
-    color: #ffffff;
-    /* 純白色文字 */
-    border-color: #4b5563;
-    font-weight: 600;
-  }
-
-  .task-notes {
-    background: #111827;
-    border-color: #374151;
-  }
-
-  .task-notes h4 {
-    color: #ffffff;
-    /* 純白色標題 */
-    font-weight: 700;
-  }
-
-  .task-footer {
-    border-top-color: #374151;
-    color: #f3f4f6;
-    /* 更亮的白色 */
-    font-weight: 600;
-  }
-}
-
-/* 深色主題下的任務卡片樣式 */
-[data-theme="dark"] .task-card {
-  background: #000000;
-  border-color: #333333;
-}
-
-[data-theme="dark"] .task-card:hover {
-  border-color: #444444;
-}
-
-[data-theme="dark"] .task-card.completed {
-  background: #000000;
-}
-
-[data-theme="dark"] .checkbox-label {
-  background: #000000;
-  border-color: #333333;
-}
-
-[data-theme="dark"] .task-checkbox input:checked + .checkbox-label {
-  background: #22c55e;
-  border-color: #22c55e;
-}
-
-[data-theme="dark"] .task-title {
-  color: #ffffff;
-  /* 純白色，提升對比度 */
-  font-weight: 700;
-}
-
-[data-theme="dark"] .task-card.completed .task-title {
-  color: #d1d5db;
-  /* 亮灰色，保持可讀性 */
-}
-
-[data-theme="dark"] .task-description,
-[data-theme="dark"] .task-notes p {
-  color: #f3f4f6;
-  /* 更亮的白色，提升對比度 */
-  font-weight: 500;
-}
-
-[data-theme="dark"] .task-category {
-  background: #374151;
-  color: #ffffff;
-  /* 純白色文字 */
-  border-color: #4b5563;
-  font-weight: 600;
-}
-
-[data-theme="dark"] .task-notes {
-  background: #111827;
-  border-color: #374151;
-}
-
-[data-theme="dark"] .task-notes h4 {
-  color: #ffffff;
-  /* 純白色標題 */
-  font-weight: 700;
-}
-
-[data-theme="dark"] .task-footer {
-  border-top-color: #374151;
-  color: #f3f4f6;
-  /* 更亮的白色 */
-  font-weight: 600;
-}
+/* The consolidated Dark Theme is handled via CSS variables in App.css */
 
 /* 响应式设计 */
 @media (max-width: 768px) {

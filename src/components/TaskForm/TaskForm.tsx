@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../Modal/Modal';
-import { Task } from '../../types';
+import { Task, Subtask, RecurrenceType } from '../../types';
+import { useAppContext } from '../../store/AppContext';
+import { parseTaskTitle } from '../../utils/nlpUtils';
 import './TaskForm.css';
 
 interface TaskFormProps {
@@ -18,16 +20,21 @@ const TaskForm = ({
   initialTask,
   selectedDate
 }: TaskFormProps) => {
+  const { state } = useAppContext();
   const [formData, setFormData] = useState<Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'completed'>>({
     title: '',
     description: '',
     date: selectedDate,
     time: '',
     priority: 'medium',
-    category: 'work',
-    notes: ''
+    category: state.settings.categories[0]?.id || 'other',
+    notes: '',
+    subtasks: [],
+    status: 'todo',
+    recurrence: 'none'
   });
 
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -38,11 +45,20 @@ const TaskForm = ({
         date: initialTask.date !== undefined ? initialTask.date : selectedDate,
         time: initialTask.time || '',
         priority: initialTask.priority || 'medium',
-        category: initialTask.category || 'work',
-        notes: initialTask.notes || ''
+        category: initialTask.category || (state.settings.categories[0]?.id || 'other'),
+        notes: initialTask.notes || '',
+        subtasks: initialTask.subtasks || [],
+        status: initialTask.status || (initialTask.completed ? 'done' : 'todo'),
+        recurrence: initialTask.recurrence || 'none'
       });
     } else {
-      setFormData(prev => ({ ...prev, date: selectedDate, time: '' }));
+      setFormData(prev => ({
+        ...prev,
+        date: selectedDate,
+        time: '',
+        subtasks: [],
+        status: 'todo'
+      }));
     }
     setErrors({});
   }, [initialTask, selectedDate]);
@@ -55,6 +71,48 @@ const TaskForm = ({
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const applyMagicParsing = () => {
+    const parsed = parseTaskTitle(formData.title);
+    setFormData(prev => ({
+      ...prev,
+      title: parsed.title,
+      priority: parsed.priority || prev.priority,
+      category: parsed.category || prev.category,
+      time: parsed.time || prev.time,
+      date: parsed.date || prev.date
+    }));
+  };
+
+  const handleAddSubtask = () => {
+    if (!newSubtaskTitle.trim()) return;
+    const newSubtask: Subtask = {
+      id: Date.now().toString(),
+      title: newSubtaskTitle.trim(),
+      completed: false
+    };
+    setFormData(prev => ({
+      ...prev,
+      subtasks: [...(prev.subtasks || []), newSubtask]
+    }));
+    setNewSubtaskTitle('');
+  };
+
+  const toggleSubtask = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      subtasks: prev.subtasks?.map(st =>
+        st.id === id ? { ...st, completed: !st.completed } : st
+      )
+    }));
+  };
+
+  const removeSubtask = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      subtasks: prev.subtasks?.filter(st => st.id !== id)
+    }));
   };
 
   const validateForm = () => {
@@ -82,9 +140,12 @@ const TaskForm = ({
       return;
     }
 
-    const taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'> = {
+    const taskData: Task = {
       ...formData,
-      completed: initialTask?.completed || false
+      id: initialTask?.id || '',
+      completed: initialTask?.completed || false,
+      createdAt: initialTask?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     onSave(taskData);
@@ -114,16 +175,26 @@ const TaskForm = ({
       <form onSubmit={handleSubmit} className="task-form">
         <div className="form-group">
           <label htmlFor="title">任務標題 *</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            className={errors.title ? 'error' : ''}
-            placeholder="請輸入任務標題"
-            maxLength={100}
-          />
+          <div className="title-input-wrapper">
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              className={errors.title ? 'error' : ''}
+              placeholder="請輸入任務標題 (可用 !high #work @14:00 ^today 解析)"
+              maxLength={100}
+            />
+            <button
+              type="button"
+              className="magic-btn"
+              onClick={applyMagicParsing}
+              title="智慧解析標籤"
+            >
+              🪄
+            </button>
+          </div>
           {errors.title && <span className="error-message">{errors.title}</span>}
           <div className="char-count">{formData.title.length}/100</div>
         </div>
@@ -211,12 +282,54 @@ const TaskForm = ({
               value={formData.category}
               onChange={handleInputChange}
             >
-              {categoryOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
+              {state.settings.categories.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="recurrence">重複頻率</label>
+            <select
+              id="recurrence"
+              name="recurrence"
+              value={formData.recurrence || 'none'}
+              onChange={handleInputChange}
+            >
+              <option value="none">不重複</option>
+              <option value="daily">每日</option>
+              <option value="weekly">每週</option>
+              <option value="monthly">每月</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>子任務</label>
+          <div className="subtask-input-row">
+            <input
+              type="text"
+              value={newSubtaskTitle}
+              onChange={(e) => setNewSubtaskTitle(e.target.value)}
+              placeholder="新增子任務..."
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSubtask())}
+            />
+            <button type="button" onClick={handleAddSubtask} className="btn-add-subtask">新增</button>
+          </div>
+          <div className="subtasks-list">
+            {formData.subtasks?.map(st => (
+              <div key={st.id} className="subtask-item">
+                <input
+                  type="checkbox"
+                  checked={st.completed}
+                  onChange={() => toggleSubtask(st.id)}
+                />
+                <span className={st.completed ? 'completed' : ''}>{st.title}</span>
+                <button type="button" onClick={() => removeSubtask(st.id)} className="btn-remove-subtask">×</button>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -225,13 +338,13 @@ const TaskForm = ({
           <textarea
             id="notes"
             name="notes"
-            value={formData.notes}
+            value={formData.notes || ''}
             onChange={handleInputChange}
             placeholder="在這裡記錄相關的記事或備忘"
             rows={4}
             maxLength={1000}
           />
-          <div className="char-count">{formData.notes.length}/1000</div>
+          <div className="char-count">{(formData.notes || '').length}/1000</div>
         </div>
 
         <div className="form-actions">

@@ -18,6 +18,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -31,7 +32,7 @@
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 
+  box-shadow:
     0 25px 80px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -44,6 +45,7 @@
     opacity: 0;
     transform: translateY(30px) scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -129,9 +131,13 @@
 }
 
 .task-modal-filter {
-  padding: 16px 28px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(0, 0, 0, 0.2);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border-glass);
+  background: var(--bg-color);
+  background-image: var(--glass-noise);
+  border-radius: 12px;
+  margin: var(--space-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .task-modal-body {
@@ -142,21 +148,26 @@
 
 .task-modal-stats {
   display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding: 14px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-color);
+  border-radius: 34px;
+  /* Fibonacci */
+  border: 1px solid var(--border-glass);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .task-modal-stats .stat-item {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 4px 12px;
 }
 
 .task-modal-stats .stat-item::before {
@@ -164,55 +175,175 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
 }
 
 .task-modal-empty {
   text-align: center;
-  padding: 60px 24px;
-  color: rgba(255, 255, 255, 0.6);
+  padding: var(--space-xxl) var(--space-lg);
+  color: var(--text-secondary);
 }
 
 .task-modal-empty .empty-icon {
-  font-size: 64px;
-  margin-bottom: 20px;
-  opacity: 0.8;
+  font-size: 80px;
+  margin-bottom: var(--space-lg);
+  opacity: 0.3;
+  filter: drop-shadow(0 0 20px var(--accent-glow));
 }
 
 .task-modal-empty h3 {
-  margin: 0 0 8px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 var(--space-sm) 0;
+  font-size: var(--font-lg);
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
 }
 
 .task-modal-empty p {
-  margin: 0 0 24px 0;
-  font-size: 14px;
+  margin: 0 0 var(--space-xl) 0;
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .empty-add-btn {
-  padding: 14px 28px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: var(--space-md) var(--space-xl);
+  background: var(--primary-gradient);
   color: white;
   border: none;
   border-radius: 14px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px var(--accent-glow);
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-add-btn::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 40px;
+  height: 300%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(35deg);
+  pointer-events: none;
+}
+
+.empty-add-btn:hover::after {
+  animation: shine 0.8s ease-in-out;
 }
 
 .empty-add-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px var(--accent-glow);
 }
 
 .task-modal-items {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* Sticky Wall Mode */
+.task-modal-items.sticky-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-lg);
+  padding: var(--space-md);
+  perspective: 1000px;
+}
+
+.sticky-wall .task-card {
+  aspect-ratio: 1 / 1;
+  padding: var(--space-md);
+  border-radius: 2px;
+  /* Sharp paper edges */
+  position: relative;
+  background: #fff9c4;
+  /* Default Post-it Yellow */
+  color: #1e293b;
+  transform: rotate(var(--rotation, -1deg));
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    2px 2px 5px rgba(0, 0, 0, 0.1),
+    0 10px 20px rgba(0, 0, 0, 0.05);
+  border: none;
+}
+
+.sticky-wall .task-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  z-index: 20;
+}
+
+.sticky-wall .task-card:nth-child(even) {
+  --rotation: 2deg;
+}
+
+.sticky-wall .task-card:nth-child(3n) {
+  --rotation: -1.5deg;
+}
+
+.sticky-wall .task-card:nth-child(4n) {
+  --rotation: 1deg;
+}
+
+.sticky-wall .task-card:hover {
+  transform: scale(1.1) rotate(0deg) translateY(-10px);
+  z-index: 50;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.sticky-wall .task-card .task-footer,
+.sticky-wall .task-card .task-description {
+  display: none;
+  /* Simplify for sticky wall */
+}
+
+/* Gemstone Sticky Note Colors */
+.sticky-wall .task-card[data-priority="high"] {
+  background: #fee2e2;
+  border-top: 4px solid #ef4444;
+}
+
+.sticky-wall .task-card[data-priority="medium"] {
+  background: #fef3c7;
+  border-top: 4px solid #f59e0b;
+}
+
+.sticky-wall .task-card[data-priority="low"] {
+  background: #dcfce7;
+  border-top: 4px solid #10b981;
+}
+
+[data-theme="dark"] .sticky-wall .task-card {
+  color: #f1f5f9;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .sticky-wall .task-card[data-priority="high"] {
+  background: #450a0a;
+}
+
+[data-theme="dark"] .sticky-wall .task-card[data-priority="medium"] {
+  background: #451a03;
+}
+
+[data-theme="dark"] .sticky-wall .task-card[data-priority="low"] {
+  background: #064e3b;
 }
 
 /* 響應式設計 */

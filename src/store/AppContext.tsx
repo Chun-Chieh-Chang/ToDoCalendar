@@ -19,6 +19,7 @@ type AppAction =
   | { type: 'SET_SELECTED_DATE'; payload: string }
   | { type: 'SET_FILTER'; payload: Partial<AppState['filter']> }
   | { type: 'SET_SETTINGS'; payload: Partial<AppState['settings']> }
+  | { type: 'REORDER_TASKS'; payload: Task[] }
   | { type: 'RESET_STATE' };
 
 // Initial state
@@ -56,13 +57,46 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
 
     case 'TOGGLE_TASK_COMPLETION':
+      const taskToToggle = state.tasks.find(t => t.id === action.payload);
+      if (!taskToToggle) return state;
+
+      const newCompletedStatus = !taskToToggle.completed;
+      const updatedTaskList = state.tasks.map(task =>
+        task.id === action.payload
+          ? { ...task, completed: newCompletedStatus, updatedAt: new Date().toISOString() }
+          : task
+      );
+
+      // Handle Recurrence spawning
+      if (newCompletedStatus && taskToToggle.recurrence && taskToToggle.recurrence !== 'none' && taskToToggle.date) {
+        const currentDate = new Date(taskToToggle.date);
+        let nextDate = new Date(currentDate);
+
+        if (taskToToggle.recurrence === 'daily') {
+          nextDate.setDate(currentDate.getDate() + 1);
+        } else if (taskToToggle.recurrence === 'weekly') {
+          nextDate.setDate(currentDate.getDate() + 7);
+        } else if (taskToToggle.recurrence === 'monthly') {
+          nextDate.setMonth(currentDate.getMonth() + 1);
+        }
+
+        const nextTask: Task = {
+          ...taskToToggle,
+          id: `rec_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+          date: nextDate.toISOString().split('T')[0],
+          completed: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          parentId: taskToToggle.parentId || taskToToggle.id,
+          recurrence: taskToToggle.recurrence // Keep the recurrence for the next one too
+        };
+
+        updatedTaskList.push(nextTask);
+      }
+
       return {
         ...state,
-        tasks: state.tasks.map(task =>
-          task.id === action.payload
-            ? { ...task, completed: !task.completed, updatedAt: new Date().toISOString() }
-            : task
-        )
+        tasks: updatedTaskList
       };
 
     case 'SET_SELECTED_DATE':
@@ -78,6 +112,16 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         settings: { ...state.settings, ...action.payload }
+      };
+
+    case 'REORDER_TASKS':
+      // Update the entire task list or just the affected ones
+      // Since payload is the new list for a specific group, we merge it
+      const updatedTaskMap = new Map(state.tasks.map(t => [t.id, t]));
+      action.payload.forEach(task => updatedTaskMap.set(task.id, task));
+      return {
+        ...state,
+        tasks: Array.from(updatedTaskMap.values())
       };
 
     case 'RESET_STATE':
@@ -128,63 +172,32 @@ export function AppProvider({ children }: AppProviderProps) {
       const savedSelectedDate = savedData.selectedDate;
       const savedFilter = savedData.filter || {};
 
+      // 判斷是否為「全新啟動」：既沒有任務也沒有任何設定紀錄
+      const isActuallyNewStart = savedTasks.length === 0 && Object.keys(savedSettings).length === 0;
+
       if (savedTasks.length > 0) {
         dispatch({ type: 'SET_TASKS', payload: savedTasks });
-      } else {
-        // Only load samples if strictly no data found and not just empty array from file
-        // note: loadAllData returns [] for tasks if file not found or empty
-        // logic: if user deleted all tasks, we respect that. 
-        // But if it's "first run", we want samples.
-        // Simple heuristic: If settings are also empty/default, it's likely a fresh run.
-        if (Object.keys(savedSettings).length === 0) {
-          const sampleTasks = [
-            {
-              id: '1',
-              title: '完成項目報告',
-              description: '準備下週的項目進度報告',
-              date: dateUtils.dateToString(new Date()),
-              priority: 'high' as const,
-              category: 'work' as const,
-              completed: false,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              notes: '需要包含Q1數據分析'
-            },
-            {
-              id: '2',
-              title: '學習React Hooks',
-              description: '深入理解useContext和useReducer',
-              date: dateUtils.dateToString(new Date()),
-              priority: 'medium' as const,
-              category: 'study' as const,
-              completed: false,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              notes: '觀看官方文檔和教程'
-            },
-            {
-              id: '3',
-              title: '購買生活用品',
-              description: '超市購物清單',
-              date: dateUtils.dateToString(new Date()),
-              priority: 'low' as const,
-              category: 'life' as const,
-              completed: true,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              notes: '牛奶、麵包、雞蛋'
-            }
-          ];
-          dispatch({ type: 'SET_TASKS', payload: sampleTasks });
-          // We'll save this later when isLoaded becomes true and effects fire? 
-          // No, effects won't fire for this dispatch if isLoaded is false yet.
-          // So we should save immediately? Or let the user make a change?
-          // Let's leave it to "save on change" once loaded.
-        }
+      } else if (isActuallyNewStart) {
+        // 只有在全新啟動時才注入歡迎範例
+        const sampleTasks = [
+          {
+            id: '1',
+            title: '✨ 歡迎使用 ToDoCalendar',
+            description: '您的所有紀錄都會自動儲存在本地電腦中。您可以點擊左側導覽列開始規劃任務。',
+            date: dateUtils.dateToString(new Date()),
+            priority: 'high' as const,
+            category: 'work' as const,
+            completed: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            notes: '您可以點擊右側的鉛筆圖示編輯此地標。'
+          }
+        ];
+        dispatch({ type: 'SET_TASKS', payload: sampleTasks });
       }
 
       if (Object.keys(savedSettings).length > 0) {
-        dispatch({ type: 'SET_SETTINGS', payload: savedSettings });
+        dispatch({ type: 'SET_SETTINGS', payload: { ...defaultSettings, ...savedSettings } });
       } else {
         dispatch({ type: 'SET_SETTINGS', payload: defaultSettings });
       }
