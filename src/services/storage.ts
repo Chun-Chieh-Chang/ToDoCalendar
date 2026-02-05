@@ -167,23 +167,27 @@ export const storageService = {
   },
 
   async saveAllData(data: { tasks?: Task[], settings?: any, filter?: any, selectedDate?: string }): Promise<void> {
-    // 1. Save to localStorage (Sync)
-    if (data.tasks) this.saveTasks(data.tasks);
-    if (data.settings) this.saveSettings(data.settings);
-    if (data.filter) this.saveFilter(data.filter);
-    if (data.selectedDate) this.saveSelectedDate(data.selectedDate);
+    // 1. Save to localStorage (Sync) - Always do this first as a reliable backup
+    if (data.tasks !== undefined) this.saveTasks(data.tasks);
+    if (data.settings !== undefined) this.saveSettings(data.settings);
+    if (data.filter !== undefined) this.saveFilter(data.filter);
+    if (data.selectedDate !== undefined) this.saveSelectedDate(data.selectedDate);
 
     // 2. Save to File System (Async, Electron only)
     const isElectron = typeof (window as any).electronAPI !== 'undefined';
     if (isElectron) {
       try {
+        // Use provided data or fall back to what's currently in localStorage to ensure all data is persisted
         const fullData = {
-          tasks: data.tasks || this.getTasks(),
-          settings: data.settings || this.getSettings(),
-          filter: data.filter || this.getFilter(),
-          selectedDate: data.selectedDate || this.getSelectedDate()
+          tasks: data.tasks !== undefined ? data.tasks : this.getTasks(),
+          settings: data.settings !== undefined ? data.settings : this.getSettings(),
+          filter: data.filter !== undefined ? data.filter : this.getFilter(),
+          selectedDate: data.selectedDate !== undefined ? data.selectedDate : this.getSelectedDate()
         };
-        await (window as any).electronAPI.saveData(fullData);
+        const result = await (window as any).electronAPI.saveData(fullData);
+        if (!result.success) {
+          console.error('Electron save failed:', result.error);
+        }
       } catch (error) {
         console.error('Error saving to file system:', error);
       }

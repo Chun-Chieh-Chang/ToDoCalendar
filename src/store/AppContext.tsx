@@ -219,30 +219,24 @@ export function AppProvider({ children }: AppProviderProps) {
   }, []);
 
   // Save to storage when state changes
-  // Only save if data has been loaded to avoid overwriting with initial empty state
+  // Only save if data has been fully loaded to avoid overwriting with initial empty state
   (React as any).useEffect(() => {
     if (isLoaded) {
-      storageService.saveAllData({ tasks: state.tasks });
+      const persistData = async () => {
+        try {
+          await storageService.saveAllData({
+            tasks: state.tasks,
+            settings: state.settings,
+            filter: state.filter,
+            selectedDate: state.selectedDate
+          });
+        } catch (error) {
+          console.error('Auto-save failed:', error);
+        }
+      };
+      persistData();
     }
-  }, [state.tasks, isLoaded]);
-
-  (React as any).useEffect(() => {
-    if (isLoaded) {
-      storageService.saveAllData({ selectedDate: state.selectedDate });
-    }
-  }, [state.selectedDate, isLoaded]);
-
-  (React as any).useEffect(() => {
-    if (isLoaded) {
-      storageService.saveAllData({ filter: state.filter });
-    }
-  }, [state.filter, isLoaded]);
-
-  (React as any).useEffect(() => {
-    if (isLoaded) {
-      storageService.saveAllData({ settings: state.settings });
-    }
-  }, [state.settings, isLoaded]);
+  }, [state, isLoaded]);
 
   const value = { state, dispatch, t };
 

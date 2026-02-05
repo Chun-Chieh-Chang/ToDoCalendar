@@ -3,22 +3,21 @@
 ## 任務目標
 改善「待辦清單」功能，提升互動性與可用性。
 
-## 修改範圍 (Precise Modifications)
-1. **src/components/TaskListView/TaskListView.tsx & .css**:
-   - 加入了「快速新增任務」輸入框。
-   - 加入了「清除已完成」按鈕。
-   - 優化了導覽與佈局。
-2. **src/components/TaskListModal/TaskListModal.tsx & .css**:
-   - 同步加入「快速新增」與「清除已完成」功能，保持 UI 一致性。
-3. **src/components/TaskCard/TaskCard.tsx & .css**:
-   - 為「無日期」任務加入「排到今日」、「明天」的快速排程按鈕。
-4. **src/App.tsx**:
-   - 更新 `handleAddTask` 邏輯，支援 NLP 字串解析。
-   - 實作 `handleClearCompleted` 與 `handleScheduleTask` 核心邏輯並傳遞至子組件。
-5. **src/utils/taskUtils.ts**:
-   - 確保 `createDefaultTask` 支援傳遞預設值。
+## 修改範圍 (Precise Modifications) - 2026-02-05 (Update)
+1. **src/store/AppContext.tsx**:
+   - 整合了多組分散的 `useEffect` 保存邏輯為單一且可靠的監聽器。
+   - 加入了 `persistData` 非同步處理，確保狀態更新後立即序列化。
+2. **src/services/storage.ts**:
+   - 優化了 `saveAllData` 的判斷邏輯，使用 `!== undefined` 取代真假值判斷，避免空陣列 `[]` 無法正確保存的問題。
+   - 強化了 Electron 環境下的錯誤處理與回傳驗證。
 
 ## 問題分析與矯正措施 (Failure Analysis & Correction)
+### 3. 資料保存競爭與遺漏
+- **失敗紀錄**: 使用者反應刪除任務或標記完成後重新開啟，資料會恢復。
+- **原因**: 
+  - 原本多個 `useEffect` 同時監聽 `state.tasks`, `state.settings` 等，可能在短時間內觸發多次非同步存取衝突。
+  - 原本使用 `if (data.tasks)` 判斷，當任務數清空為 `[]` 時，會被判定為 false 而跳過保存，導致最後一筆任務永遠刪不掉。
+- **矯正措施**: 整合監聽邏輯並使用顯式定義檢查，確保「清空」也能被正確保存。
 ### 1. 變數未定義錯誤
 - **失敗紀錄**: 初次修改 `App.tsx` 時未導入 `parseTaskTitle`，導致編譯失敗。
 - **原因**: 為追求「精準修改」，忽略了新的邏輯需要新的工具函數導入。
