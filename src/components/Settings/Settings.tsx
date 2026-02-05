@@ -139,16 +139,17 @@ const Settings = ({
         <div className="setting-group">
           <h3>{t('dataManagement')}</h3>
 
-          {/* Show Data Path if in Electron */}
-          {dataPath && (
+          {/* Show Data Path management ONLY if in Electron */}
+          {typeof (window as any).electronAPI !== 'undefined' ? (
             <div className="setting-item data-path-item">
               <label>資料儲存路徑</label>
               <div className="data-path-control">
-                <div className="path-display" title={dataPath}>
-                  {dataPath}
+                <div className="path-display" title={dataPath || '正在讀取...'}>
+                  {dataPath || '載入中...'}
                 </div>
                 <button
                   className="btn-secondary btn-small"
+                  disabled={!dataPath}
                   onClick={async () => {
                     const dir = await (window as any).electronAPI.selectDirectory();
                     if (dir) {
@@ -165,6 +166,11 @@ const Settings = ({
                   更換路徑
                 </button>
               </div>
+            </div>
+          ) : (
+            <div className="setting-item web-storage-hint">
+              <i className="ri-information-line"></i>
+              <span>目前使用「網頁模式」，資料儲存於瀏覽器 LocalStorage。自定義存放路徑功能僅限於「桌面安裝版」。</span>
             </div>
           )}
 
