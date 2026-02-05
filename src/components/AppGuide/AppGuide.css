@@ -135,11 +135,33 @@
 }
 
 [data-theme="dark"] .guide-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .guide-card h3 {
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .guide-card p {
+    color: rgba(255, 255, 255, 0.85);
 }
 
 [data-theme="dark"] .flow-content {
     background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .guide-header h1 {
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .guide-header p {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .guide-section h2 {
+    color: #FFFFFF;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 @keyframes fadeIn {
