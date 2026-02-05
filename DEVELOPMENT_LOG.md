@@ -1,50 +1,54 @@
-# 開發紀錄 (Development Log) - 2026-02-05
+# 開發紀錄 (Development Log)
 
-## 任務目標
-改善「待辦清單」功能，提升互動性與可用性。
+## 2026-02-05: 專案檔案結構優化與 MECE 整理 (Current)
+- **目標**: 提升專案的可維護性，優化檔案組織，並遵循「不隨意改動原始邏輯」原則。
+- **優化範圍**:
+  - **物理層重整**: 
+    - 建立 `src/constants` 資料夾，將分散的預設配置（如 `defaults.ts`）移至常數目錄。
+    - 重整 `src/types` 資料夾，將原本巨型定義拆分為 `task.ts`, `settings.ts`, `state.ts` 等模組，並透過 `index.ts` 維持相容導出。
+  - **紀錄清理**: 
+    - 刪除冗餘的 `DEV_LOG.md`，將所有歷史紀錄併入 `DEVELOPMENT_LOG.md`。
+  - **邏輯保護**: 
+    - 恢復 `App.tsx` 等核心組件的原始代碼結構（不使用自定義 Hooks），僅更新必要的型別/常數引用路徑。
 
-## 修改範圍 (Precise Modifications) - 2026-02-05 (Update 2)
-1. **electron/main.cjs & preload.cjs**:
-   - 加入了 `select-directory` 與 `set-custom-data-path` IPC 頻道，支援調用系統資料夾選擇視窗。
-   - 實作了 `path_config.json` 導引機制，允許程式從自定義路徑載入/儲存資料。
-2. **src/components/Settings/Settings.tsx & .css**:
-   - 在設定頁面中新增「資料儲存路徑」管理區塊。
-   - 實作了「更換路徑」按鈕與對應的 UI 交互與樣式。
+## 2026-02-05: 存儲機制與路徑管理優化
+- **electron/main.cjs & preload.cjs**:
+  - 加入了 `select-directory` 與 `set-custom-data-path` IPC 頻道。
+- **src/components/Settings**:
+  - 在設定頁面中新增「資料儲存路徑」管理區塊。
+- **src/store/AppContext.tsx**:
+  - 整合多組分散的 `useEffect` 保存邏輯。
+- **src/services/storage.ts**:
+  - 優化 `saveAllData` 判斷邏輯，解決空陣列無法保存問題。
 
-## 修改範圍 (Precise Modifications) - 2026-02-05 (Update)
-1. **src/store/AppContext.tsx**:
-   - 整合了多組分散的 `useEffect` 保存邏輯為單一且可靠的監聽器。
-   - 加入了 `persistData` 非同步處理，確保狀態更新後立即序列化。
-2. **src/services/storage.ts**:
-   - 優化了 `saveAllData` 的判斷邏輯，使用 `!== undefined` 取代真假值判斷，避免空陣列 `[]` 無法正確保存的問題。
-   - 強化了 Electron 環境下的錯誤處理與回傳驗證。
+## 2026-02-01: 看板視圖與智慧解析 (v1.3.0)
+- **Kanban Board**: 實作三欄式看板與拖拽排序。
+- **NLP Magic**: 支援使用 `!`, `#`, `@`, `^` 標籤快速新增任務。
+- **Sticky Wall**: 把「靈感待辦牆」視覺化為便利貼牆效果。
+- **Dashboard**: 加入數據洞察頁面。
 
-## 問題分析與矯正措施 (Failure Analysis & Correction)
-### 3. 資料保存競爭與遺漏
-- **失敗紀錄**: 使用者反應刪除任務或標記完成後重新開啟，資料會恢復。
-- **原因**: 
-  - 原本多個 `useEffect` 同時監聽 `state.tasks`, `state.settings` 等，可能在短時間內觸發多次非同步存取衝突。
-  - 原本使用 `if (data.tasks)` 判斷，當任務數清空為 `[]` 時，會被判定為 false 而跳過保存，導致最後一筆任務永遠刪不掉。
-- **矯正措施**: 整合監聽邏輯並使用顯式定義檢查，確保「清空」也能被正確保存。
-### 1. 變數未定義錯誤
-- **失敗紀錄**: 初次修改 `App.tsx` 時未導入 `parseTaskTitle`，導致編譯失敗。
-- **原因**: 為追求「精準修改」，忽略了新的邏輯需要新的工具函數導入。
-- **矯正措施**: 在 `App.tsx` 加入 `import { parseTaskTitle } from './utils/nlpUtils';`，並通過 `npm run build` 驗證。
+---
 
-### 2. 屬性傳遞遺漏 (Lint Errors)
-- **失敗紀錄**: `App.tsx` 中傳遞 `onSchedule` 至 `TaskListView` 時提示屬性不存在。
-- **原因**: 僅修改了 `App.tsx`，未同步更新組件的 Props 介面定義。
-- **矯正措施**: 修改 `TaskListViewProps` 與 `TaskListModalProps` 的 interface，加入 `onSchedule` 選項。
+## 問題分析與矯正措施 (Retrospective)
 
-## 運行測試 (Running Tests)
-- **靜態分析**: 執行 `npm run build` 成功，無類型錯誤或語法錯誤。
-- **環境限制**: 由於系統 Playwright 環境變數 ($HOME) 未設置，無法開啟自動化瀏覽器進行視覺測試。
-- **手動檢查**: 已仔細校對代碼邏輯，確保輔助功能與 CSS 類標籤正確無誤。
+### 1. 資源加載失敗 (Privacy Block)
+- **失敗紀錄**: RemixIcon 外部 CDN 被瀏覽器 Tracking Prevention 攔截。
+- **原因**: 現代瀏覽器對三方資源限制嚴格。
+- **矯正措施**: 改為本地 `npm install remixicon` 並本地導入，實現 100% 離線可用。
 
-## 檔案整理 (File Management - MECE)
-- **分類**: 組件與樣式表嚴格按照 `components/ElementName/` 目錄放置。
-- **清理**: 移除了開發過程中的臨時變量與測試日誌。
-- **整合**: 核心邏輯集中在 `App.tsx` 處理，保持子組件無狀態化（Stateless/Presentational）。
+### 2. 日期格式錯誤 (RangeError)
+- **失敗紀錄**: Dashboard 出現白屏，console 顯示 `RangeError`。
+- **原因**: `date-fns` v3+ 不再支援 `YYYY` 等舊式 Tokens，必須使用 `yyyy`。
 
-## 總結
-本次更新大幅優化了待辦事項的操作效率，特別是 NLP 智慧解析的引入，使新增任務變得極速且精準。
+### 3. 重構回退 (Logic Rollback)
+- **失敗紀錄**: 檔案整理過程中過度修改 `App.tsx` 結構。
+- **原因**: 意圖導入 Custom Hooks 但超出了單純「整理檔案」的需求。
+- **矯正措施**: 透過 `git checkout` 恢復原始代碼內容，僅保留外部檔案（Types/Constants）的路徑優化。
+
+---
+
+## 檔案管理原則 (MECE)
+- **組件**: `src/components/{ComponentName}/` 包含 TSX 與 CSS。
+- **定義**: 類型拆分於 `src/types/`，常數存於 `src/constants/`。
+- **工具**: 核心工具函式存於 `src/utils/`。
+- **排除**: 備份檔 `backups/` 透過 `.gitignore` 排除提交。
