@@ -175,14 +175,30 @@ const Settings = ({
           )}
 
           <div className="setting-item">
-            <button className="btn-secondary" onClick={() => {
+            <button className="btn-secondary" onClick={async () => {
               const jsonStr = storageService.exportData();
+              const defaultFilename = `todo_calendar_backup.json`;
+
+              // Use native save dialog in Electron
+              if (typeof (window as any).electronAPI !== 'undefined') {
+                const res = await (window as any).electronAPI.saveExportFile({
+                  content: jsonStr,
+                  defaultFilename
+                });
+                if (res.success) {
+                  alert(`數據已成功匯出至: ${res.filePath}`);
+                } else if (res.error) {
+                  alert(`匯出失敗: ${res.error}`);
+                }
+                return;
+              }
+
+              // Fallback for Web version
               const blob = new Blob([jsonStr], { type: 'application/json' });
               const href = URL.createObjectURL(blob);
               const link = document.createElement('a');
               link.href = href;
-              // Remove date string from filename
-              link.download = `todo_calendar_backup.json`;
+              link.download = defaultFilename;
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
