@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Notification, ipcMain } = require('electron');
+const { app, BrowserWindow, Notification, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -33,7 +33,23 @@ function createWindow() {
 }
 
 // Data persistence
-const dataFilePath = path.join(app.getPath('userData'), 'todo_calendar_data.json');
+const configPath = path.join(app.getPath('userData'), 'path_config.json');
+
+function getDataFilePath() {
+    try {
+        if (fs.existsSync(configPath)) {
+            const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+            if (config.customPath && fs.existsSync(path.dirname(config.customPath))) {
+                return config.customPath;
+            }
+        }
+    } catch (e) {
+        console.error('Error reading path config:', e);
+    }
+    return path.join(app.getPath('userData'), 'todo_calendar_data.json');
+}
+
+let dataFilePath = getDataFilePath();
 
 ipcMain.handle('save-data', async (event, data) => {
     try {
@@ -60,6 +76,30 @@ ipcMain.handle('load-data', async () => {
 
 ipcMain.handle('get-data-path', () => {
     return dataFilePath;
+});
+
+ipcMain.handle('select-directory', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory']
+    });
+    if (result.canceled || result.filePaths.length === 0) {
+        return null;
+    }
+    return result.filePaths[0];
+});
+
+ipcMain.handle('set-custom-data-path', async (event, directoryPath) => {
+    try {
+        const newPath = path.join(directoryPath, 'todo_calendar_data.json');
+
+        // If old file exists and new one doesn't, we might want to copy it.
+        // For simplicity, we just update the config.
+        fs.writeFileSync(configPath, JSON.stringify({ customPath: newPath }));
+        dataFilePath = newPath;
+        return { success: true, path: newPath };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
 });
 
 // Handle notification requests from renderer process
