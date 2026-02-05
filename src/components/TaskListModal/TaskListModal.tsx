@@ -82,13 +82,6 @@ const TaskListModal = ({
                     🗑️ 清除已完成
                 </button>
             )}
-            <button
-                className="task-modal-add-btn"
-                onClick={() => onAddTask()}
-                title={selectedDate ? '新增當日任務' : '新增待辦'}
-            >
-                {selectedDate ? '➕ 新增當日任務' : '➕ 新增待辦'}
-            </button>
         </div>
     );
 
