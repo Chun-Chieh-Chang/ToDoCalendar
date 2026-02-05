@@ -218,6 +218,17 @@ h6 {
   border-color: #333333;
 }
 
+[data-theme="dark"] .btn-secondary {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
 /* 響應式設計 */
 @media (max-width: 768px) {
   body {

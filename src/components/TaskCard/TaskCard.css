@@ -321,3 +321,57 @@
     gap: 6px;
   }
 }
+
+/* Dark Mode Overrides for TaskCard */
+[data-theme="dark"] .task-card {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .task-card:hover {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .task-title {
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .task-description {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .task-notes {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .task-notes h4 {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .task-notes p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] .task-category {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .task-quick-schedule button {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .checkbox-label {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .subtask-badge {
+  background: rgba(3, 105, 161, 0.2);
+  color: #7dd3fc;
+}

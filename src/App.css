@@ -107,6 +107,14 @@
   --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
 }
 
+[data-theme="dark"] .exit-modal-content p {
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .exit-modal-content .exit-icon {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+}
+
 /* Accent Colors (for dark theme) */
 :root {
   --accent-blue: #64B5F6;

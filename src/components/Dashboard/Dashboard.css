@@ -247,3 +247,39 @@
         grid-column: span 1;
     }
 }
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .dashboard-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .stat-value {
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .stat-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .dashboard-section h3 {
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .bar-count,
+[data-theme="dark"] .bar-label {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .cat-count {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .cat-info {
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .dashboard-header p {
+    color: rgba(255, 255, 255, 0.7);
+}

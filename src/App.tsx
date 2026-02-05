@@ -443,61 +443,7 @@ const App = () => {
           </div>
 
           <nav className="nav-menu">
-            <div
-              className={`nav-item ${activeView === 'calendar' ? 'active' : ''}`}
-              onClick={() => setActiveView('calendar')}
-              title="顯示月曆視圖"
-            >
-              <div className="tooltip">
-                <i className="ri-calendar-2-line"></i>
-                <span>月曆</span>
-                <span className="tooltip-text">顯示月曆主視圖，查看整體排程與每日任務分布</span>
-              </div>
-            </div>
-            <div
-              className={`nav-item ${activeView === 'kanban' ? 'active' : ''}`}
-              onClick={() => setActiveView('kanban')}
-              title="顯示看板視圖"
-            >
-              <div className="tooltip">
-                <i className="ri-layout-column-line"></i>
-                <span>看板</span>
-                <span className="tooltip-text">透過看板管理任務進度，支援拖拉更換狀態</span>
-              </div>
-            </div>
-            <div
-              className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveView('dashboard')}
-              title="查看數據統計"
-            >
-              <div className="tooltip">
-                <i className="ri-bar-chart-fill"></i>
-                <span>數據洞察</span>
-                <span className="tooltip-text">了解任務完成趨勢與分配情況</span>
-              </div>
-            </div>
-            <div
-              className={`nav-item ${activeView === 'tasks' ? 'active' : ''}`}
-              onClick={() => setActiveView('tasks')}
-              title="查看所有任務"
-            >
-              <div className="tooltip">
-                <i className="ri-list-check"></i>
-                <span>我的任務</span>
-                <span className="tooltip-text">查看所有已規劃的任務，包括今日及未來任務</span>
-              </div>
-            </div>
-            <div
-              className={`nav-item ${activeView === 'pending' ? 'active' : ''}`}
-              onClick={() => setActiveView('pending')}
-              title="查看待辦事項"
-            >
-              <div className="tooltip">
-                <i className="ri-inbox-line"></i>
-                <span>待辦清單</span>
-                <span className="tooltip-text">查看尚未排入日程的待辦事項，可隨時安排執行時間</span>
-              </div>
-            </div>
+            {/* 1. 入門與幫助 */}
             <div
               className={`nav-item ${activeView === 'guide' ? 'active' : ''}`}
               onClick={() => setActiveView('guide')}
@@ -509,13 +455,82 @@ const App = () => {
                 <span className="tooltip-text">了解工具的核心功能與頁面關聯</span>
               </div>
             </div>
+
+            {/* 2. 數據觀察 */}
+            <div
+              className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveView('dashboard')}
+              title="查看數據統計"
+            >
+              <div className="tooltip">
+                <i className="ri-bar-chart-fill"></i>
+                <span>數據洞察</span>
+                <span className="tooltip-text">了解任務完成趨勢與分配情況</span>
+              </div>
+            </div>
+
+            {/* 3. 核心排程 */}
+            <div
+              className={`nav-item ${activeView === 'calendar' ? 'active' : ''}`}
+              onClick={() => setActiveView('calendar')}
+              title="顯示月曆視圖"
+            >
+              <div className="tooltip">
+                <i className="ri-calendar-2-line"></i>
+                <span>月曆視圖</span>
+                <span className="tooltip-text">顯示月曆主視圖，查看整體排程與每日任務分布</span>
+              </div>
+            </div>
+
+            {/* 4. 任務執行 */}
+            <div
+              className={`nav-item ${activeView === 'kanban' ? 'active' : ''}`}
+              onClick={() => setActiveView('kanban')}
+              title="顯示看板視圖"
+            >
+              <div className="tooltip">
+                <i className="ri-layout-column-line"></i>
+                <span>看板管理</span>
+                <span className="tooltip-text">透過看板管理任務進度，支援拖拉更換狀態</span>
+              </div>
+            </div>
+
+            {/* 5. 詳細清單 */}
+            <div
+              className={`nav-item ${activeView === 'tasks' ? 'active' : ''}`}
+              onClick={() => setActiveView('tasks')}
+              title="查看所有任務"
+            >
+              <div className="tooltip">
+                <i className="ri-list-check"></i>
+                <span>我的任務</span>
+                <span className="tooltip-text">查看所有已規劃的任務，包括今日及未來任務</span>
+              </div>
+            </div>
+
+            {/* 6. 收納箱/未排程 */}
+            <div
+              className={`nav-item ${activeView === 'pending' ? 'active' : ''}`}
+              onClick={() => setActiveView('pending')}
+              title="查看待辦事項"
+            >
+              <div className="tooltip">
+                <i className="ri-inbox-line"></i>
+                <span>待辦清單</span>
+                <span className="tooltip-text">查看尚未排入日程的待辦事項，可隨時安排執行時間</span>
+              </div>
+            </div>
+
+            {/* 7. 系統設定 */}
             <div className="nav-item">
               <div className="tooltip" onClick={handleOpenSettings} title="應用程式設定">
                 <i className="ri-settings-4-line"></i>
-                <span>設定</span>
+                <span>系統設定</span>
                 <span className="tooltip-text">調整應用程式外觀、語言及其他個人偏好設定</span>
               </div>
             </div>
+
+            {/* 8. 安全退出 */}
             <div className="nav-item exit-item" onClick={handleExit}>
               <div className="tooltip" title="安全退出系統">
                 <i className="ri-logout-box-r-line"></i>
