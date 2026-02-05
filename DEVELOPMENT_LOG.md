@@ -3,6 +3,14 @@
 ## 任務目標
 改善「待辦清單」功能，提升互動性與可用性。
 
+## 修改範圍 (Precise Modifications) - 2026-02-05 (Update 2)
+1. **electron/main.cjs & preload.cjs**:
+   - 加入了 `select-directory` 與 `set-custom-data-path` IPC 頻道，支援調用系統資料夾選擇視窗。
+   - 實作了 `path_config.json` 導引機制，允許程式從自定義路徑載入/儲存資料。
+2. **src/components/Settings/Settings.tsx & .css**:
+   - 在設定頁面中新增「資料儲存路徑」管理區塊。
+   - 實作了「更換路徑」按鈕與對應的 UI 交互與樣式。
+
 ## 修改範圍 (Precise Modifications) - 2026-02-05 (Update)
 1. **src/store/AppContext.tsx**:
    - 整合了多組分散的 `useEffect` 保存邏輯為單一且可靠的監聽器。

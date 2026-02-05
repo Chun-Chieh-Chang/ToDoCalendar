@@ -143,8 +143,27 @@ const Settings = ({
           {dataPath && (
             <div className="setting-item data-path-item">
               <label>資料儲存路徑</label>
-              <div className="path-display" title={dataPath}>
-                {dataPath}
+              <div className="data-path-control">
+                <div className="path-display" title={dataPath}>
+                  {dataPath}
+                </div>
+                <button
+                  className="btn-secondary btn-small"
+                  onClick={async () => {
+                    const dir = await (window as any).electronAPI.selectDirectory();
+                    if (dir) {
+                      const res = await (window as any).electronAPI.setCustomDataPath(dir);
+                      if (res.success) {
+                        setDataPath(res.path);
+                        alert('儲存路徑已更新！新路徑將於下次存檔時生效。');
+                      } else {
+                        alert(`更換失敗: ${res.error}`);
+                      }
+                    }
+                  }}
+                >
+                  更換路徑
+                </button>
               </div>
             </div>
           )}
