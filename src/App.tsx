@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAppContext } from './store/AppContext';
+import { storageService } from './services/storage';
 import { Task } from './types';
 import { dateUtils } from './utils/dateUtils';
 import { taskUtils } from './utils/taskUtils';
@@ -17,13 +18,55 @@ import Dashboard from './components/Dashboard/Dashboard';
 import './App.css';
 
 const App = () => {
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch, isLoaded } = useAppContext();
   const translate = useTranslation(state.settings.language);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [activeView, setActiveView] = useState<'calendar' | 'kanban' | 'tasks' | 'pending' | 'guide' | 'dashboard'>('calendar');
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showTaskList, setShowTaskList] = useState(false);
+
+  // 網頁版啟動時詢問匯入
+  useEffect(() => {
+    if (isLoaded) {
+      const isElectron = typeof (window as any).electronAPI !== 'undefined';
+      // 判斷是否為「全新狀態」（只有預設的歡迎任務）
+      const isActuallyEmpty = state.tasks.length === 1 && state.tasks[0].id === '1';
+
+      if (!isElectron && isActuallyEmpty && !sessionStorage.getItem('import_prompted')) {
+        sessionStorage.setItem('import_prompted', 'true');
+
+        // 延遲一下待畫面渲染完成再彈窗
+        setTimeout(() => {
+          const shouldImport = window.confirm('✨ 歡迎使用 ToDoCalendar 網頁版！\n\n偵測到您目前尚無個人資料，是否要從電腦匯入先前的備份檔案 (.json)？');
+
+          if (shouldImport) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = (e: any) => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                if (event.target?.result) {
+                  const success = storageService.importData(event.target.result as string);
+                  if (success) {
+                    alert('匯入成功！頁面將重新載入。');
+                    window.location.reload();
+                  } else {
+                    alert('匯入失敗，請檢查檔案格式。');
+                  }
+                }
+              };
+              reader.readAsText(file);
+            };
+            input.click();
+          }
+        }, 800);
+      }
+    }
+  }, [isLoaded, state.tasks]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

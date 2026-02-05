@@ -140,13 +140,15 @@ interface AppContextType {
   state: AppState;
   dispatch: Dispatch<AppAction>;
   t: (key: string) => string;
+  isLoaded: boolean;
 }
 
 // 創建一個默認的context值，避免TypeScript錯誤
 const defaultContextValue: AppContextType = {
   state: initialState,
   dispatch: () => { },
-  t: (key: string) => key
+  t: (key: string) => key,
+  isLoaded: false
 };
 
 const AppContext = (React as any).createContext(defaultContextValue);
@@ -238,7 +240,7 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [state, isLoaded]);
 
-  const value = { state, dispatch, t };
+  const value = { state, dispatch, t, isLoaded };
 
   return (
     <AppContext.Provider value={value}>
