@@ -17,7 +17,9 @@ interface TaskListModalProps {
     onToggleComplete: (id: string) => void;
     onEdit: (task: Task) => void;
     onDelete: (id: string) => void;
-    onAddTask: () => void;
+    onAddTask: (task?: any) => void;
+    onClearCompleted?: () => void;
+    onSchedule?: (id: string, date: string) => void;
     title?: string;
     viewMode?: 'list' | 'sticky';
 }
@@ -34,9 +36,19 @@ const TaskListModal = ({
     onEdit,
     onDelete,
     onAddTask,
+    onClearCompleted,
+    onSchedule,
     title,
     viewMode = 'list'
 }: TaskListModalProps) => {
+    const [quickAddTitle, setQuickAddTitle] = (React as any).useState('');
+
+    const handleQuickAdd = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!quickAddTitle.trim()) return;
+        onAddTask(quickAddTitle);
+        setQuickAddTitle('');
+    };
     const formatDate = (dateStr: string) => {
         if (!dateStr) return '';
         const date = new Date(dateStr);
@@ -60,13 +72,24 @@ const TaskListModal = ({
     );
 
     const headerActions = (
-        <button
-            className="task-modal-add-btn"
-            onClick={onAddTask}
-            title={selectedDate ? '新增當日任務' : '新增待辦'}
-        >
-            {selectedDate ? '➕ 新增當日任務' : '➕ 新增待辦'}
-        </button>
+        <div className="task-modal-header-actions">
+            {onClearCompleted && tasks.some(t => t.completed) && (
+                <button
+                    className="task-modal-clear-btn"
+                    onClick={onClearCompleted}
+                    title="清除已完成"
+                >
+                    🗑️ 清除已完成
+                </button>
+            )}
+            <button
+                className="task-modal-add-btn"
+                onClick={() => onAddTask()}
+                title={selectedDate ? '新增當日任務' : '新增待辦'}
+            >
+                {selectedDate ? '➕ 新增當日任務' : '➕ 新增待辦'}
+            </button>
+        </div>
     );
 
     return (
@@ -86,6 +109,18 @@ const TaskListModal = ({
             </div>
 
             <div className="task-modal-body-content">
+                <form className="task-modal-quick-add" onSubmit={handleQuickAdd}>
+                    <input
+                        type="text"
+                        placeholder="在此日期快速新增任務..."
+                        value={quickAddTitle}
+                        onChange={(e) => setQuickAddTitle(e.target.value)}
+                    />
+                    <button type="submit" disabled={!quickAddTitle.trim()}>
+                        ➕
+                    </button>
+                </form>
+
                 <div className="task-modal-stats">
                     <span className="stat-item">總計：{tasks.length} 項</span>
                     <span className="stat-item">未完成：{tasks.filter(t => !t.completed).length} 項</span>
@@ -107,6 +142,7 @@ const TaskListModal = ({
                                 onToggleComplete={onToggleComplete}
                                 onEdit={onEdit}
                                 onDelete={onDelete}
+                                onSchedule={onSchedule}
                             />
                         ))}
                     </div>

@@ -4,6 +4,7 @@ import { Task } from './types';
 import { dateUtils } from './utils/dateUtils';
 import { taskUtils } from './utils/taskUtils';
 import { useTranslation, translations } from './utils/i18n';
+import { parseTaskTitle } from './utils/nlpUtils';
 import Calendar from './components/Calendar/Calendar';
 import TaskForm from './components/TaskForm/TaskForm';
 import Settings from './components/Settings/Settings';
@@ -164,8 +165,17 @@ const App = () => {
 
 
   // 添加任務
-  const handleAddTask = () => {
-    setEditingTask(undefined);
+  const handleAddTask = (titleOrTask?: any) => {
+    if (typeof titleOrTask === 'string') {
+      const parsed = parseTaskTitle(titleOrTask);
+      const newTask = taskUtils.createDefaultTask({
+        ...parsed,
+        date: activeView === 'pending' ? '' : (parsed.date || state.selectedDate)
+      });
+      handleSaveTask(newTask);
+      return;
+    }
+    setEditingTask(titleOrTask);
     setShowTaskForm(true);
   };
 
@@ -179,6 +189,28 @@ const App = () => {
   const handleDeleteTask = (taskId: string) => {
     // 直接刪除任務（未來可以考慮加入自訂確認彈窗）
     dispatch({ type: 'DELETE_TASK', payload: taskId });
+  };
+
+  // 清除已完成任務
+  const handleClearCompleted = (targetTasks: Task[]) => {
+    const completedTasks = targetTasks.filter(t => t.completed);
+    if (completedTasks.length === 0) return;
+
+    if (confirm(`確定要清除這 ${completedTasks.length} 項已完成的任務嗎？`)) {
+      completedTasks.forEach(task => {
+        dispatch({ type: 'DELETE_TASK', payload: task.id });
+      });
+    }
+  };
+
+  // 快速安排日期
+  const handleScheduleTask = (taskId: string, date: string) => {
+    const task = state.tasks.find(t => t.id === taskId);
+    if (!task) return;
+    dispatch({
+      type: 'UPDATE_TASK',
+      payload: { ...task, date, updatedAt: new Date().toISOString() }
+    });
   };
 
   // 更新過濾條件
@@ -525,6 +557,8 @@ const App = () => {
               onEdit={handleEditTask}
               onDelete={handleDeleteTask}
               onAddTask={handleAddTask}
+              onClearCompleted={() => handleClearCompleted(filteredAllPlannedTasks)}
+              onSchedule={handleScheduleTask}
             />
           )}
           {activeView === 'pending' && (
@@ -537,13 +571,9 @@ const App = () => {
               onToggleComplete={handleToggleComplete}
               onEdit={handleEditTask}
               onDelete={handleDeleteTask}
-              onAddTask={() => {
-                setEditingTask(taskUtils.createDefaultTask({
-                  priority: state.settings.defaultPriority || 'medium',
-                  category: 'work'
-                }));
-                setShowTaskForm(true);
-              }}
+              onAddTask={handleAddTask}
+              onClearCompleted={() => handleClearCompleted(filteredPendingTasks)}
+              onSchedule={handleScheduleTask}
               viewMode="sticky"
             />
           )}
@@ -603,6 +633,8 @@ const App = () => {
         onEdit={handleEditTask}
         onDelete={handleDeleteTask}
         onAddTask={handleAddTask}
+        onClearCompleted={() => handleClearCompleted(filteredDateTasks)}
+        onSchedule={handleScheduleTask}
       />
 
       <TaskForm

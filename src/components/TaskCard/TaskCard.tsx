@@ -6,9 +6,10 @@ interface TaskCardProps {
   onToggleComplete: (id: string) => void;
   onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
+  onSchedule?: (id: string, date: string) => void;
 }
 
-const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) => {
+const TaskCard = ({ task, onToggleComplete, onEdit, onDelete, onSchedule }: TaskCardProps) => {
   const priorityColors: { [key: string]: { bg: string; text: string; border: string } } = {
     high: { bg: '#fee2e2', text: '#dc2626', border: '#fecaca' },
     medium: { bg: '#fef3c7', text: '#d97706', border: '#fde68a' },
@@ -81,6 +82,21 @@ const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) =
           </button>
         </div>
       </div>
+
+      {!task.date && onSchedule && (
+        <div className="task-quick-schedule">
+          <button onClick={() => onSchedule(task.id, new Date().toISOString().split('T')[0])}>
+            📅 排到今日
+          </button>
+          <button onClick={() => {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            onSchedule(task.id, tomorrow.toISOString().split('T')[0]);
+          }}>
+            ⏭️ 明天
+          </button>
+        </div>
+      )}
 
       <div className="task-content">
         <div className="task-title-row">
