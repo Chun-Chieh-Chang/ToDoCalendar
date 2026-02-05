@@ -102,6 +102,26 @@ ipcMain.handle('set-custom-data-path', async (event, directoryPath) => {
     }
 });
 
+ipcMain.handle('save-export-file', async (event, { content, defaultFilename }) => {
+    const result = await dialog.showSaveDialog(mainWindow, {
+        defaultPath: defaultFilename,
+        filters: [
+            { name: 'JSON Files', extensions: ['json'] }
+        ]
+    });
+
+    if (result.canceled || !result.filePath) {
+        return { success: false, canceled: true };
+    }
+
+    try {
+        fs.writeFileSync(result.filePath, content);
+        return { success: true, filePath: result.filePath };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+});
+
 // Handle notification requests from renderer process
 ipcMain.on('show-notification', (event, { title, body }) => {
     if (Notification.isSupported()) {
