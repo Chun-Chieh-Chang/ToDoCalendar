@@ -67,9 +67,6 @@ const TaskListView = ({
                             <i className="ri-delete-bin-line"></i> 清除已完成
                         </button>
                     )}
-                    <button className="add-task-btn" onClick={() => onAddTask()}>
-                        <i className="ri-add-line"></i> 新增任務
-                    </button>
                 </div>
             </header>
 
