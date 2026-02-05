@@ -220,6 +220,30 @@
   white-space: nowrap;
 }
 
+.web-storage-hint {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #3b82f6;
+  font-size: 13px;
+  line-height: 1.5;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.web-storage-hint i {
+  font-size: 18px;
+}
+
+[data-theme="dark"] .web-storage-hint {
+  background: rgba(59, 130, 246, 0.05);
+  color: #60a5fa;
+}
+
 .setting-item-note {
   font-size: 12px;
   color: #555555;
