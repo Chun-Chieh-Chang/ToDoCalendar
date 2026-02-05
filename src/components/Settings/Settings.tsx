@@ -3,6 +3,7 @@ import Modal from '../Modal/Modal';
 import { storageService } from '../../services/storage';
 import { useAppContext } from '../../store/AppContext';
 import { SettingsState } from '../../types';
+import { exportDataWithDialog } from '../../utils/exportUtils';
 import './Settings.css';
 
 interface SettingsProps {
@@ -176,54 +177,18 @@ const Settings = ({
 
           <div className="setting-item">
             <button className="btn-secondary" onClick={async () => {
-              const jsonStr = storageService.exportData();
-              const defaultFilename = `todo_calendar_backup.json`;
-
-              // 1. Electron 桌面版優先處理
-              if (typeof (window as any).electronAPI !== 'undefined') {
-                const res = await (window as any).electronAPI.saveExportFile({
-                  content: jsonStr,
-                  defaultFilename
-                });
-                if (res.success) {
-                  alert(`數據已成功匯出至: ${res.filePath}`);
-                } else if (res.error) {
-                  alert(`匯出失敗: ${res.error}`);
+              try {
+                const result = await exportDataWithDialog();
+                if (result.success) {
+                  if (result.filePath) {
+                    alert(`數據已成功匯出至: ${result.filePath}`);
+                  } else if (result.method !== 'download') {
+                    alert('數據匯出成功！');
+                  }
                 }
-                return;
+              } catch (err: any) {
+                alert(`匯出失敗: ${err.message}`);
               }
-
-              // 2. 網頁版：嘗試使用現代 File System Access API (支援 Chrome/Edge)
-              if ('showSaveFilePicker' in window) {
-                try {
-                  const handle = await (window as any).showSaveFilePicker({
-                    suggestedName: defaultFilename,
-                    types: [{
-                      description: 'JSON Files',
-                      accept: { 'application/json': ['.json'] },
-                    }],
-                  });
-                  const writable = await handle.createWritable();
-                  await writable.write(jsonStr);
-                  await writable.close();
-                  return; // 成功儲存後退出
-                } catch (err: any) {
-                  if (err.name === 'AbortError') return; // 使用者取消則不做事
-                  console.error('File System Access API failed:', err);
-                  // 失敗則繼續執行下方的傳統下載模式
-                }
-              }
-
-              // 3. 傳統下載模式 (Fallback for Safari/Firefox/Mobile)
-              const blob = new Blob([jsonStr], { type: 'application/json' });
-              const href = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = href;
-              link.download = defaultFilename;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(href);
             }}>
               {t('exportData')}
             </button>

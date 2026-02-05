@@ -15,6 +15,7 @@ import KanbanBoard from './components/KanbanBoard/KanbanBoard';
 import TaskListView from './components/TaskListView/TaskListView';
 import AppGuide from './components/AppGuide/AppGuide';
 import Dashboard from './components/Dashboard/Dashboard';
+import { exportDataWithDialog } from './utils/exportUtils';
 import './App.css';
 
 const App = () => {
@@ -256,6 +257,28 @@ const App = () => {
     });
   };
 
+  // 退出系統與備份
+  const handleExit = async () => {
+    const shouldBackup = window.confirm('🚪 您即將退出系統。為了資料安全，建議您在離開前匯出最新的備份檔案。是否現在進行匯出？');
+
+    if (shouldBackup) {
+      try {
+        const result = await exportDataWithDialog();
+        if (result.success) {
+          if (result.filePath) {
+            alert(`數據已成功匯出至: ${result.filePath}\n您可以安全關閉程式了。`);
+          } else {
+            alert('數據匯出完成！您可以安全關閉視窗。');
+          }
+        }
+      } catch (err: any) {
+        alert(`匯出失敗: ${err.message}`);
+      }
+    } else {
+      alert('感謝使用！請手動關閉視窗或分頁以結束作業。');
+    }
+  };
+
   // 更新過濾條件
   const handleFilterChange = (newFilter: any) => {
     dispatch({ type: 'SET_FILTER', payload: newFilter });
@@ -492,11 +515,18 @@ const App = () => {
                 <span className="tooltip-text">調整應用程式外觀、語言及其他個人偏好設定</span>
               </div>
             </div>
+            <div className="nav-item exit-item" onClick={handleExit}>
+              <div className="tooltip" title="安全退出系統">
+                <i className="ri-logout-box-r-line"></i>
+                <span>退出系統</span>
+                <span className="tooltip-text">安全離開系統並提醒備份數據</span>
+              </div>
+            </div>
           </nav>
         </div>
 
-        <div className="sidebar-footer" onClick={() => setShowSettings(true)}>
-          <div className="user-profile">
+        <div className="sidebar-footer">
+          <div className="user-profile" onClick={() => setShowSettings(true)}>
             {state.settings.userAvatar ? (
               <img src={state.settings.userAvatar} alt="User Avatar" className="avatar" />
             ) : (
