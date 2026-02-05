@@ -9,6 +9,7 @@ import { parseTaskTitle } from './utils/nlpUtils';
 import Calendar from './components/Calendar/Calendar';
 import TaskForm from './components/TaskForm/TaskForm';
 import Settings from './components/Settings/Settings';
+import Modal from './components/Modal/Modal';
 import TaskListModal from './components/TaskListModal/TaskListModal';
 import ReminderModal from './components/ReminderModal/ReminderModal';
 import KanbanBoard from './components/KanbanBoard/KanbanBoard';
@@ -26,6 +27,7 @@ const App = () => {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showTaskList, setShowTaskList] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   // 網頁版啟動時詢問匯入
   useEffect(() => {
@@ -258,24 +260,23 @@ const App = () => {
   };
 
   // 退出系統與備份
-  const handleExit = async () => {
-    const shouldBackup = window.confirm('🚪 您即將退出系統。為了資料安全，建議您在離開前匯出最新的備份檔案。是否現在進行匯出？');
+  const handleExit = () => {
+    setShowExitModal(true);
+  };
 
-    if (shouldBackup) {
-      try {
-        const result = await exportDataWithDialog();
-        if (result.success) {
-          if (result.filePath) {
-            alert(`數據已成功匯出至: ${result.filePath}\n您可以安全關閉程式了。`);
-          } else {
-            alert('數據匯出完成！您可以安全關閉視窗。');
-          }
+  const confirmExitWithBackup = async () => {
+    try {
+      const result = await exportDataWithDialog();
+      if (result.success) {
+        if (result.filePath) {
+          alert(`數據已成功匯出至: ${result.filePath}\n您可以安全關閉程式了。`);
+        } else if (result.method !== 'download') {
+          alert('數據匯出完成！您可以安全關閉視窗。');
         }
-      } catch (err: any) {
-        alert(`匯出失敗: ${err.message}`);
+        setShowExitModal(false);
       }
-    } else {
-      alert('感謝使用！請手動關閉視窗或分頁以結束作業。');
+    } catch (err: any) {
+      alert(`匯出失敗: ${err.message}`);
     }
   };
 
@@ -724,6 +725,26 @@ const App = () => {
         settings={state.settings}
         onSettingsChange={handleSettingsChange}
       />
+
+      <Modal
+        isOpen={showExitModal}
+        onClose={() => setShowExitModal(false)}
+        title="退出系統"
+        className="exit-modal"
+      >
+        <div className="exit-modal-content">
+          <div className="exit-icon">🚪</div>
+          <p>您即將退出系統。為了資料安全，建議您在離開前匯出最新的備份檔案存檔。</p>
+          <div className="exit-actions">
+            <button className="btn-primary" onClick={confirmExitWithBackup}>
+              <i className="ri-download-2-line"></i> 匯出數據並退出
+            </button>
+            <button className="btn-secondary" onClick={() => setShowExitModal(false)}>
+              取消
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* 加載狀態 */}
       {isLoading && (
