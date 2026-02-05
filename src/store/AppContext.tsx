@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppState, Task } from '../types';
 import { storageService } from '../services/storage';
-import { defaultSettings, defaultFilter } from '../utils/defaults';
+import { defaultSettings, defaultFilter } from '../constants/defaults';
 import { dateUtils } from '../utils/dateUtils';
 import { useTranslation } from '../utils/i18n';
 
