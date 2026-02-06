@@ -10,5 +10,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getDataPath: () => ipcRenderer.invoke('get-data-path'),
     selectDirectory: () => ipcRenderer.invoke('select-directory'),
     setCustomDataPath: (path) => ipcRenderer.invoke('set-custom-data-path', path),
-    saveExportFile: (args) => ipcRenderer.invoke('save-export-file', args)
+    saveExportFile: (args) => ipcRenderer.invoke('save-export-file', args),
+    quitApp: () => ipcRenderer.invoke('quit-app')
 });

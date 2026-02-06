@@ -23,7 +23,7 @@ const App = () => {
   const { state, dispatch, isLoaded } = useAppContext();
   const translate = useTranslation(state.settings.language);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [activeView, setActiveView] = useState<'calendar' | 'kanban' | 'tasks' | 'pending' | 'guide' | 'dashboard'>('calendar');
+  const [activeView, setActiveView] = useState<'calendar' | 'kanban' | 'tasks' | 'pending' | 'guide' | 'dashboard' | 'all_tasks'>('calendar');
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showTaskList, setShowTaskList] = useState(false);
@@ -269,11 +269,22 @@ const App = () => {
       const result = await exportDataWithDialog();
       if (result.success) {
         if (result.filePath) {
-          alert(`數據已成功匯出至: ${result.filePath}\n您可以安全關閉程式了。`);
+          alert(`數據已成功匯出至: ${result.filePath}\n程式將自動關閉。`);
         } else if (result.method !== 'download') {
-          alert('數據匯出完成！您可以安全關閉視窗。');
+          alert('數據匯出完成！程式將自動關閉。');
         }
         setShowExitModal(false);
+
+        // 自動退出
+        if (typeof (window as any).electronAPI !== 'undefined') {
+          (window as any).electronAPI.quitApp();
+        } else {
+          // 網頁版無法直接關閉，提示關閉分頁
+          window.close(); // 嘗試關閉
+          if (!window.closed) {
+            alert('請手動關閉此分頁。');
+          }
+        }
       }
     } catch (err: any) {
       alert(`匯出失敗: ${err.message}`);
@@ -429,6 +440,7 @@ const App = () => {
   const filteredDateTasks = taskUtils.filterTasks(state.tasks.filter(t => t.date === state.selectedDate), state.filter);
   const filteredAllPlannedTasks = taskUtils.filterTasks(state.tasks.filter(t => t.date), state.filter);
   const filteredPendingTasks = taskUtils.filterTasks(state.tasks.filter(t => !t.date), state.filter);
+  const filteredAllTasks = taskUtils.filterTasks(state.tasks, state.filter);
 
 
 
@@ -443,7 +455,7 @@ const App = () => {
           </div>
 
           <nav className="nav-menu">
-            {/* 1. 入門與幫助 */}
+            {/* 1. 使用說明 */}
             <div
               className={`nav-item ${activeView === 'guide' ? 'active' : ''}`}
               onClick={() => setActiveView('guide')}
@@ -456,20 +468,20 @@ const App = () => {
               </div>
             </div>
 
-            {/* 2. 數據觀察 */}
+            {/* 2. 我的任務 (所有任務) */}
             <div
-              className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveView('dashboard')}
-              title="查看數據統計"
+              className={`nav-item ${activeView === 'all_tasks' ? 'active' : ''}`}
+              onClick={() => setActiveView('all_tasks')}
+              title="查看所有任務"
             >
               <div className="tooltip">
-                <i className="ri-bar-chart-fill"></i>
-                <span>數據洞察</span>
-                <span className="tooltip-text">了解任務完成趨勢與分配情況</span>
+                <i className="ri-task-line"></i>
+                <span>我的任務</span>
+                <span className="tooltip-text">查看系統中的所有任務 (包含待辦與已排程)</span>
               </div>
             </div>
 
-            {/* 3. 核心排程 */}
+            {/* 3. 月曆視圖 */}
             <div
               className={`nav-item ${activeView === 'calendar' ? 'active' : ''}`}
               onClick={() => setActiveView('calendar')}
@@ -482,7 +494,33 @@ const App = () => {
               </div>
             </div>
 
-            {/* 4. 任務執行 */}
+            {/* 4. 待辦清單 (Pending) */}
+            <div
+              className={`nav-item ${activeView === 'pending' ? 'active' : ''}`}
+              onClick={() => setActiveView('pending')}
+              title="查看待辦事項"
+            >
+              <div className="tooltip">
+                <i className="ri-inbox-line"></i>
+                <span>待辦清單</span>
+                <span className="tooltip-text">查看尚未排入日程的待辦事項，可隨時安排執行時間</span>
+              </div>
+            </div>
+
+            {/* 5. 已排程清單 (Scheduled Tasks) */}
+            <div
+              className={`nav-item ${activeView === 'tasks' ? 'active' : ''}`}
+              onClick={() => setActiveView('tasks')}
+              title="查看已排程清單"
+            >
+              <div className="tooltip">
+                <i className="ri-list-check"></i>
+                <span>已排程清單</span>
+                <span className="tooltip-text">查看所有已規劃的任務日程表</span>
+              </div>
+            </div>
+
+            {/* 6. 看板管理 */}
             <div
               className={`nav-item ${activeView === 'kanban' ? 'active' : ''}`}
               onClick={() => setActiveView('kanban')}
@@ -495,29 +533,16 @@ const App = () => {
               </div>
             </div>
 
-            {/* 5. 詳細清單 */}
+            {/* 7. 數據洞察 */}
             <div
-              className={`nav-item ${activeView === 'tasks' ? 'active' : ''}`}
-              onClick={() => setActiveView('tasks')}
-              title="查看所有任務"
+              className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveView('dashboard')}
+              title="查看數據統計"
             >
               <div className="tooltip">
-                <i className="ri-list-check"></i>
-                <span>我的任務</span>
-                <span className="tooltip-text">查看所有已規劃的任務，包括今日及未來任務</span>
-              </div>
-            </div>
-
-            {/* 6. 收納箱/未排程 */}
-            <div
-              className={`nav-item ${activeView === 'pending' ? 'active' : ''}`}
-              onClick={() => setActiveView('pending')}
-              title="查看待辦事項"
-            >
-              <div className="tooltip">
-                <i className="ri-inbox-line"></i>
-                <span>待辦清單</span>
-                <span className="tooltip-text">查看尚未排入日程的待辦事項，可隨時安排執行時間</span>
+                <i className="ri-bar-chart-fill"></i>
+                <span>數據洞察</span>
+                <span className="tooltip-text">了解任務完成趨勢與分配情況</span>
               </div>
             </div>
 
@@ -637,7 +662,7 @@ const App = () => {
           )}
           {activeView === 'tasks' && (
             <TaskListView
-              title="📅 我的任務日程"
+              title="📅 已排程清單"
               tasks={filteredAllPlannedTasks}
               filter={state.filter}
               onFilterChange={handleFilterChange}
@@ -664,6 +689,21 @@ const App = () => {
               onClearCompleted={() => handleClearCompleted(filteredPendingTasks)}
               onSchedule={handleScheduleTask}
               viewMode="sticky"
+            />
+          )}
+          {activeView === 'all_tasks' && (
+            <TaskListView
+              title="📋 我的任務 (總覽)"
+              tasks={filteredAllTasks}
+              filter={state.filter}
+              onFilterChange={handleFilterChange}
+              onClearFilter={handleClearFilter}
+              onToggleComplete={handleToggleComplete}
+              onEdit={handleEditTask}
+              onDelete={handleDeleteTask}
+              onAddTask={handleAddTask}
+              onClearCompleted={() => handleClearCompleted(filteredAllTasks)}
+              onSchedule={handleScheduleTask}
             />
           )}
           {activeView === 'guide' && <AppGuide />}

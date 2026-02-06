@@ -11,6 +11,15 @@
   - **邏輯保護**: 
     - 恢復 `App.tsx` 等核心組件的原始代碼結構（不使用自定義 Hooks），僅更新必要的型別/常數引用路徑。
 
+## 2026-02-06: 側邊欄重整與自動退出機制
+- **Sidebar Organization**: 
+  - 重新排序導航選單以符合使用者工作流 (使用說明 -> 我的任務 -> 月曆 -> 待辦 -> 已排程 -> 看板 -> 數據)。
+  - 新增「我的任務 (All Tasks)」視圖，提供所有任務的總覽。
+  - 將原本的任務視圖重新命名為「已排程清單 (Scheduled Tasks)」以明確區分。
+- **Auto-Exit**:
+  - 實作 Electron IPC `quit-app` 接口。
+  - 在完成數據匯出後自動關閉應用程式，提升退出流程的流暢度。
+
 ## 2026-02-05: 存儲機制與路徑管理優化
 - **electron/main.cjs & preload.cjs**:
   - 加入了 `select-directory` 與 `set-custom-data-path` IPC 頻道。
