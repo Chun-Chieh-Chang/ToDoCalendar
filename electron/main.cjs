@@ -143,6 +143,11 @@ ipcMain.on('show-notification', (event, { title, body }) => {
     }
 });
 
+// Handle quit app request
+ipcMain.handle('quit-app', () => {
+    app.quit();
+});
+
 // Handle requests to restore the window
 ipcMain.on('restore-window', () => {
     if (mainWindow) {
