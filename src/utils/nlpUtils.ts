@@ -1,9 +1,11 @@
+import { Priority } from '../types';
+
 export interface ParsedTask {
     title: string;
     date?: string;
     time?: string;
-    priority?: 'high' | 'medium' | 'low';
-    category?: 'work' | 'study' | 'life' | 'other';
+    priority?: Priority;
+    category?: string;
 }
 
 export const parseTaskTitle = (input: string): ParsedTask => {
