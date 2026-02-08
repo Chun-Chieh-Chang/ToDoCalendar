@@ -49,6 +49,16 @@ const TaskListModal = ({
         onAddTask(quickAddTitle);
         setQuickAddTitle('');
     };
+
+    const handleAddButtonClick = () => {
+        if (!quickAddTitle.trim()) {
+            onAddTask();
+        } else {
+            onAddTask(quickAddTitle);
+            setQuickAddTitle('');
+        }
+    };
+
     const formatDate = (dateStr: string) => {
         if (!dateStr) return '';
         const date = new Date(dateStr);
@@ -73,13 +83,6 @@ const TaskListModal = ({
 
     const headerActions = (
         <div className="task-modal-header-actions">
-            <button
-                className="task-modal-add-btn"
-                onClick={() => onAddTask()}
-                title="新增當日任務"
-            >
-                <i className="ri-add-line"></i> <span>新增任務</span>
-            </button>
             {onClearCompleted && tasks.some(t => t.completed) && (
                 <button
                     className="task-modal-clear-btn"
@@ -117,8 +120,13 @@ const TaskListModal = ({
                         value={quickAddTitle}
                         onChange={(e) => setQuickAddTitle(e.target.value)}
                     />
-                    <button type="submit" disabled={!quickAddTitle.trim()} title="快速新增">
-                        <i className="ri-add-fill"></i>
+                    <button
+                        type="button"
+                        onClick={handleAddButtonClick}
+                        title={quickAddTitle.trim() ? "快速新增" : "開啟完整表單"}
+                        className="quick-add-submit-btn"
+                    >
+                        <i className={quickAddTitle.trim() ? "ri-add-fill" : "ri-file-add-line"}></i>
                     </button>
                 </form>
 
@@ -132,10 +140,7 @@ const TaskListModal = ({
                     <div className="task-modal-empty">
                         <div className="empty-icon">📝</div>
                         <h3>{selectedDate ? '這個日期還沒有任務' : '目前沒有待辦事項'}</h3>
-                        <p>{selectedDate ? '點擊下方按鈕或使用上方快速欄位來新增您的第一個任務吧！' : '點擊下方按鈕開始添加您的第一個待辦吧！'}</p>
-                        <button className="empty-add-btn" onClick={() => onAddTask()}>
-                            <i className="ri-add-line"></i> {selectedDate ? '新增當日任務' : '新增待辦任務'}
-                        </button>
+                        <p>{selectedDate ? '利用上方欄位快速新增，或點擊右側按鈕開啟詳細排程。' : '點擊上方按鈕開始添加您的第一個待辦吧！'}</p>
                     </div>
                 ) : (
                     <div className={`task-modal-items ${viewMode === 'sticky' ? 'sticky-wall' : ''}`}>
