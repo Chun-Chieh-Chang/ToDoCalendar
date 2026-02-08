@@ -1,3 +1,88 @@
+/* 
+ * ToDoCalendar - Design System Variables
+ * Based on UI_Improved designs (Light & Dark Theme)
+ */
+
+:root {
+  /* Fibonacci Spacing System (Base 8) */
+  --space-xs: 5px;
+  --space-sm: 8px;
+  --space-md: 13px;
+  --space-lg: 21px;
+  --space-xl: 34px;
+  --space-xxl: 55px;
+
+  /* Golden Ratio Typography */
+  --font-base: 16px;
+  --font-md: 18px;
+  --font-lg: 26px;
+  --font-xl: 42px;
+  --font-xxl: 68px;
+
+  /* Artist's Palette (Ethereal Light) - Enhanced Contrast */
+  --bg-color: #F8FAFC;
+  --surface-color: #FFFFFF;
+  --primary-color: #6D28D9;
+  --primary-gradient: linear-gradient(135deg, #6D28D9 0%, #DB2777 100%);
+
+  --sidebar-bg: rgba(255, 255, 255, 0.85);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border-color: #E2E8F0;
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --accent-glow: rgba(124, 58, 237, 0.15);
+
+  /* Pigment Colors - Task Semantics */
+  --task-blue-bg: #EFF6FF;
+  --task-blue-text: #2563EB;
+  --task-green-bg: #F0FDF4;
+  --task-green-text: #166534;
+  --task-yellow-bg: #FEFCE8;
+  --task-yellow-text: #854D0E;
+  --task-purple-bg: #FAF5FF;
+  --task-purple-text: #6B21A8;
+
+  --shadow-premium:
+    0 10px 30px -5px rgba(0, 0, 0, 0.05),
+    0 5px 15px -5px rgba(0, 0, 0, 0.02);
+
+  --glass-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+  --bg-color: #020617;
+  --surface-color: #0F172A;
+  --sidebar-bg: rgba(2, 6, 23, 0.85);
+
+  --text-primary: #E2E8F0;
+  --text-secondary: #94A3B8;
+  --border-color: #1E293B;
+  --border-glass: rgba(255, 255, 255, 0.04);
+
+  --primary-color: #C084FC;
+  --primary-gradient: linear-gradient(135deg, #C084FC 0%, #F472B6 100%);
+  --accent-glow: rgba(192, 132, 252, 0.2);
+
+  --task-blue-bg: rgba(30, 58, 138, 0.4);
+  --task-blue-text: #93C5FD;
+  --task-green-bg: rgba(6, 78, 59, 0.4);
+  --task-green-text: #6EE7B7;
+  --task-yellow-bg: rgba(120, 53, 15, 0.4);
+  --task-yellow-text: #FDE68A;
+  --task-purple-bg: rgba(88, 28, 135, 0.4);
+  --task-purple-text: #D8B4FE;
+
+  --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
+}
+
+:root {
+  --accent-blue: #64B5F6;
+  --accent-green: #81C784;
+  --accent-yellow: #FFD54F;
+  --accent-purple: #CE93D8;
+}
+
 /* 全局重置樣式 */
 * {
   margin: 0;
