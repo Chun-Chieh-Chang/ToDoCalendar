@@ -73,13 +73,20 @@ const TaskListModal = ({
 
     const headerActions = (
         <div className="task-modal-header-actions">
+            <button
+                className="task-modal-add-btn"
+                onClick={() => onAddTask()}
+                title="新增當日任務"
+            >
+                <i className="ri-add-line"></i> <span>新增任務</span>
+            </button>
             {onClearCompleted && tasks.some(t => t.completed) && (
                 <button
                     className="task-modal-clear-btn"
                     onClick={onClearCompleted}
                     title="清除已完成"
                 >
-                    🗑️ 清除已完成
+                    <i className="ri-delete-bin-line"></i> 清除已完成
                 </button>
             )}
         </div>
@@ -103,28 +110,32 @@ const TaskListModal = ({
 
             <div className="task-modal-body-content">
                 <form className="task-modal-quick-add" onSubmit={handleQuickAdd}>
+                    <i className="ri-flashlight-line"></i>
                     <input
                         type="text"
-                        placeholder="在此日期快速新增任務..."
+                        placeholder="在此日期快速新增任務... (輸入後按 Enter)"
                         value={quickAddTitle}
                         onChange={(e) => setQuickAddTitle(e.target.value)}
                     />
-                    <button type="submit" disabled={!quickAddTitle.trim()}>
-                        ➕
+                    <button type="submit" disabled={!quickAddTitle.trim()} title="快速新增">
+                        <i className="ri-add-fill"></i>
                     </button>
                 </form>
 
                 <div className="task-modal-stats">
-                    <span className="stat-item">總計：{tasks.length} 項</span>
-                    <span className="stat-item">未完成：{tasks.filter(t => !t.completed).length} 項</span>
-                    <span className="stat-item">已完成：{tasks.filter(t => t.completed).length} 項</span>
+                    <span className="stat-item">總計：{tasks.length}</span>
+                    <span className="stat-item">未完成：{tasks.filter(t => !t.completed).length}</span>
+                    <span className="stat-item">已完成：{tasks.filter(t => t.completed).length}</span>
                 </div>
 
                 {tasks.length === 0 ? (
                     <div className="task-modal-empty">
                         <div className="empty-icon">📝</div>
                         <h3>{selectedDate ? '這個日期還沒有任務' : '目前沒有待辦事項'}</h3>
-                        <p>{selectedDate ? '點擊「新增當日任務」來開始添加您的第一個任務吧！' : '點擊「新增待辦」開始添加您的第一個待辦吧！'}</p>
+                        <p>{selectedDate ? '點擊下方按鈕或使用上方快速欄位來新增您的第一個任務吧！' : '點擊下方按鈕開始添加您的第一個待辦吧！'}</p>
+                        <button className="empty-add-btn" onClick={() => onAddTask()}>
+                            <i className="ri-add-line"></i> {selectedDate ? '新增當日任務' : '新增待辦任務'}
+                        </button>
                     </div>
                 ) : (
                     <div className={`task-modal-items ${viewMode === 'sticky' ? 'sticky-wall' : ''}`}>
