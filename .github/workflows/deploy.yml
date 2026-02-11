@@ -3,14 +3,25 @@ name: Deploy ToDoCalendar to GitHub Pages
 on:
   push:
     branches:
-      - main  # 或是你的主分支名稱
+      - main  # 主分支觸發部署
+  workflow_dispatch:  # 手動觸發部署
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,8 +38,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          folder: dist
-          branch: gh-pages
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
