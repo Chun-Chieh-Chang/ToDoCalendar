@@ -31,7 +31,22 @@ const Settings = ({
   }, []);
 
   const handleSettingChange = (key: string, value: any) => {
-    onSettingsChange({ ...settings, [key]: value });
+    let newSettings = { ...settings, [key]: value };
+    
+    // 主題切換時自動調整分類顏色
+    if (key === 'theme') {
+      const newCategories = settings.categories.map((category: any) => {
+        if (category.id === 'work') {
+          // 深色主題使用淡黃色，淺色主題使用藍色
+          const newColor = value === 'dark' ? '#FEF3C7' : '#3B82F6';
+          return { ...category, color: newColor };
+        }
+        return category;
+      });
+      newSettings = { ...newSettings, categories: newCategories };
+    }
+    
+    onSettingsChange(newSettings);
   };
 
   const themeOptions = [

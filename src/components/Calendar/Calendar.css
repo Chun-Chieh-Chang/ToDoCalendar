@@ -213,9 +213,9 @@
 
 /* Task Colors - Light Theme */
 .task-preview-item.task-blue {
-  background-color: #EFF6FF;
-  color: #1D4ED8;
-  border-left-color: #3B82F6;
+  background-color: #FFF1F2;
+  color: #DB2777;
+  border-left-color: #F472B6;
 }
 
 .task-preview-item.task-green {
@@ -238,9 +238,9 @@
 
 /* Task Colors - Dark Theme */
 [data-theme="dark"] .task-preview-item.task-blue {
-  background-color: #90CAF9;
-  color: #121212;
-  border-left-color: #1976D2;
+  background-color: rgba(219, 39, 119, 0.2);
+  color: #F472B6;
+  border-left-color: #DB2777;
 }
 
 [data-theme="dark"] .task-preview-item.task-green {
