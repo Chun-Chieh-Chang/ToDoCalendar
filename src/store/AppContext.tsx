@@ -199,7 +199,17 @@ export function AppProvider({ children }: AppProviderProps) {
       }
 
       if (Object.keys(savedSettings).length > 0) {
-        dispatch({ type: 'SET_SETTINGS', payload: { ...defaultSettings, ...savedSettings } });
+        // 只在深色主題時遷移分類顏色：將藍色工作分類更新為淡黃色
+        const migratedSettings = { ...savedSettings };
+        if (migratedSettings.categories && Array.isArray(migratedSettings.categories) && migratedSettings.theme === 'dark') {
+          migratedSettings.categories = migratedSettings.categories.map((category: any) => {
+            if (category.id === 'work' && category.color === '#3B82F6') {
+              return { ...category, color: '#FEF3C7' };
+            }
+            return category;
+          });
+        }
+        dispatch({ type: 'SET_SETTINGS', payload: { ...defaultSettings, ...migratedSettings } });
       } else {
         dispatch({ type: 'SET_SETTINGS', payload: defaultSettings });
       }
