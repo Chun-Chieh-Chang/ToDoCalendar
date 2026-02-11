@@ -555,6 +555,8 @@ const App = () => {
               </div>
             </div>
 
+            <div className="nav-divider"></div>
+
             {/* 8. 安全退出 */}
             <div className="nav-item exit-item" onClick={handleExit}>
               <div className="tooltip" title="安全退出系統">
@@ -791,10 +793,10 @@ const App = () => {
           <div className="exit-icon">🚪</div>
           <p>您即將退出系統。為了資料安全，建議您在離開前匯出最新的備份檔案存檔。</p>
           <div className="exit-actions">
-            <button className="btn-primary" onClick={confirmExitWithBackup}>
+            <button className="btn btn-danger" onClick={confirmExitWithBackup}>
               <i className="ri-download-2-line"></i> 匯出數據並退出
             </button>
-            <button className="btn-secondary" onClick={() => setShowExitModal(false)}>
+            <button className="btn btn-secondary" onClick={() => setShowExitModal(false)}>
               取消
             </button>
           </div>

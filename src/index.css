@@ -56,7 +56,7 @@
   --sidebar-bg: rgba(2, 6, 23, 0.85);
 
   --text-primary: #E2E8F0;
-  --text-secondary: #94A3B8;
+  --text-secondary: #A8B2C3;
   --border-color: #1E293B;
   --border-glass: rgba(255, 255, 255, 0.04);
 
@@ -64,8 +64,8 @@
   --primary-gradient: linear-gradient(135deg, #C084FC 0%, #F472B6 100%);
   --accent-glow: rgba(192, 132, 252, 0.2);
 
-  --task-blue-bg: rgba(30, 58, 138, 0.4);
-  --task-blue-text: #93C5FD;
+  --task-blue-bg: rgba(30, 58, 138, 0.5);
+  --task-blue-text: #C7D2FE;
   --task-green-bg: rgba(6, 78, 59, 0.4);
   --task-green-text: #6EE7B7;
   --task-yellow-bg: rgba(120, 53, 15, 0.4);
