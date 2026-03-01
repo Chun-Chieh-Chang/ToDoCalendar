@@ -56,7 +56,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
-  color: #7f8c8d;
+  color: var(--text-secondary); /* Changed from #7f8c8d */
   pointer-events: none;
 }
 
@@ -82,9 +82,9 @@
 
 .filter-btn {
   padding: 12px 16px;
-  background: #f0f3f7;
-  color: #7f8c8d;
-  border: 2px solid #eef2f7;
+  background: #f1f5f9; /* Soft Slate */
+  color: #475569; /* Slate 600 */
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -97,23 +97,22 @@
 }
 
 .filter-btn:hover {
-  background: #e5e9ef;
-  border-color: #d6e3f0;
-  color: #2c3e50;
+  background: #e2e8f0;
+  color: #1e293b;
   transform: translateY(-1px);
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  background: linear-gradient(135deg, #EF4444, #B91C1C);
   color: white;
-  border-color: #e74c3c;
-  box-shadow: 0 4px 16px rgba(231, 76, 60, 0.3);
+  border: none;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
 }
 
 .filter-btn.active:hover {
-  background: linear-gradient(135deg, #c0392b, #a93226);
+  background: linear-gradient(135deg, #DC2626, #991B1B);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
 }
 
 .active-filters {
@@ -185,30 +184,39 @@
 
 /* Dark Theme (Consolidated) */
 [data-theme="dark"] .filter-container {
-  background: var(--surface-color);
-  border-color: var(--border-color);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="dark"] .search-input,
 [data-theme="dark"] .filter-item select {
-  background: var(--bg-color);
-  border-color: var(--border-color);
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="dark"] .filter-btn {
-  background: var(--bg-color);
-  border-color: var(--border-color);
-  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 [data-theme="dark"] .filter-btn:hover {
-  background: var(--surface-color);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
 }
 
 [data-theme="dark"] .filter-chip {
-  background: var(--bg-color);
-  border-color: var(--border-color);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .filter-label {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .search-icon {
+    color: rgba(255, 255, 255, 0.4);
 }
 
 /* 響應式設計 */

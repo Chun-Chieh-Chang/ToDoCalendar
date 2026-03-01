@@ -57,8 +57,8 @@ const AppGuide = () => {
                     <div className="flow-connector"><i className="ri-arrow-right-line"></i></div>
                     <div className="flow-step">
                         <span className="step-num">3</span>
-                        <h4>流程執行</h4>
-                        <p>在「看板」中追蹤執行狀態，標記為「進行中」或「完成」。</p>
+                        <h4>智能分類</h4>
+                        <p>透過 `#` 與 `!` 等標籤在看板中自動分派類別與優先級，實現自動化管理。</p>
                     </div>
                 </div>
             </section>
@@ -70,10 +70,13 @@ const AppGuide = () => {
                         <strong>快速新增：</strong> 在月曆上連按兩下，系統會自動填入該日期的預設值。
                     </div>
                     <div className="tip-item">
-                        <strong>自動存檔：</strong> 您的每一筆異動都會即時同步到本地儲存，無需手動點擊保存。
+                        <strong>NLP 智慧：</strong> 在標題中使用 `!h` (高優先)、`#work` (類別)、`@14:00` (時間) 即可快速解析任務屬性。
                     </div>
                     <div className="tip-item">
-                        <strong>隱私防護：</strong> 本工具不使用雲端資料庫，您的數據絕對隔離，他人無從存取。
+                        <strong>自動存檔：</strong> 您的每一筆異動都會即時同步到本地，無需手動點擊，斷電不丟失。
+                    </div>
+                    <div className="tip-item">
+                        <strong>數據主權：</strong> 本工具採 100% 本地存儲，您的資料絕不流向雲端，保障隱私安全。
                     </div>
                 </div>
             </section>
