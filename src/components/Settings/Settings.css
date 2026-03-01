@@ -387,6 +387,7 @@
   .setting-item input.settings-input {
     font-size: 13px;
     padding: 10px 12px;
+    min-width: 0; /* Override min-width to prevent overflow */
   }
 
   .btn-cancel,
