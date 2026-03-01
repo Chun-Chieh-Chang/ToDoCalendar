@@ -775,74 +775,67 @@ body {
 /* ============================================
    Responsive Design
    ============================================ */
+/* Mobile Navigation (Bottom) */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background-color: var(--sidebar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: flex-start;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  white-space: nowrap;
+  align-items: center;
+  border-top: 1px solid var(--border-glass);
+  padding: 0 var(--space-xs);
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-nav-item {
+  flex: 0 0 18%; /* Shows 5.5 items to hint at scrolling */
+  min-width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 24px;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-item.active {
+  color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.08); /* Soft primary tint */
+}
+
+.mobile-nav-item i {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mobile-nav-item.active i {
+  transform: translateY(-2px) scale(1.15);
+}
+
 @media (max-width: 1024px) {
   .sidebar {
-    width: 80px;
-  }
-
-  .logo span,
-  .nav-item span,
-  .user-info {
-    display: none;
-  }
-
-  .logo {
-    justify-content: center;
-  }
-
-  .nav-item {
-    justify-content: center;
-    padding: 16px;
-  }
-
-  .sidebar-footer {
-    padding: 16px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .sidebar-top {
-    flex: 1;
-    flex-direction: row;
-    gap: 24px;
-    align-items: center;
-  }
-
-  .logo {
-    font-size: 20px;
-  }
-
-  .logo i {
-    font-size: 24px;
-  }
-
-  .nav-menu {
-    flex-direction: row;
-    flex: 1;
-  }
-
-  .nav-item {
-    flex: 1;
-    justify-content: center;
-  }
-
-  .nav-item span {
-    display: none;
-  }
-
-  .sidebar-footer {
-    padding-top: 0;
-    padding-left: 16px;
-    border-top: none;
-    border-left: 1px solid var(--border-color);
-  }
-
-  .user-info {
-    display: none;
+    display: none; /* Force hide sidebar on small screens to prevent overlap */
   }
 
   .main-content {
     padding: 16px;
+    padding-bottom: 80px; /* Space for mobile nav */
   }
 
   .calendar-header {
@@ -871,6 +864,7 @@ body {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
+    margin-bottom: 20px;
   }
 
   .progress-wrapper {
