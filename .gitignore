@@ -31,3 +31,6 @@ electron/dist
 
 # TS
 *.tsbuildinfo
+
+# Backup Raw Files
+backup/*_raw.json

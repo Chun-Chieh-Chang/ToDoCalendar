@@ -79,3 +79,29 @@
 - **定義**: 類型拆分於 `src/types/`，常數存於 `src/constants/`。
 - **工具**: 核心工具函式存於 `src/utils/`。
 - **排除**: 備份檔 `backups/` 透過 `.gitignore` 排除提交。
+
+---
+
+## 2026-03-04: 環境維護與 Git 權限修正
+
+- **Git 權限修正**:
+  - **問題**: 執行 `git pull` 時出現 `fatal: detected dubious ownership in repository` 錯誤。
+  - **原因**: 專案目錄擁有者與當前使用者不一致（S-1-5-21...）。
+  - **矯正措施**: 使用 `git config --global --add safe.directory D:/Self-developed_Apps/ToDoCalendar` 將目錄加入安全清單。
+  - **結果**: 成功執行 `git pull`，當前代碼已與 GitHub 同步（Already up to date）。
+
+- **備份檔聯集與編碼修復**:
+  - **問題**: `backup/todo_calendar_backup.json` 出現中文亂碼，且需與 GitHub 上的原始資料進行聯集。
+  - **解決方案**:
+    - 將「GitHub 原始版」與「本地變動版」分別另存為 `_origin_raw.json` 與 `_local_raw.json` 作為原始備份。
+    - 使用 Node.js `TextDecoder` 強制以 UTF-8 重新識別並清理損毀字元。
+    - 執行聯集邏輯：以 `id` 為鍵，保留 `updatedAt` 較新的任務，其餘資料採聯集方式整合。
+    - 最終以標準 **UTF-8 (無 BOM)** 格式存回 `todo_calendar_backup.json`，確認中文顯示恢復正常。
+
+- **UI/UX 對比度優化 (Date/Time Icons)**:
+  - **問題**: 深色模式下，日期與時間輸入框右側的圖標（瀏覽器原生）對比度過低，難以辨識。
+  - **解決方案**:
+    - 更新 `src/components/TaskForm/TaskForm.css`，將輸入框配色與「色彩大師規範」對齊（背景使用 `#1E293B`，文字使用 `#F1F5F9`）。
+    - 在 `src/index.css` 與 `TaskForm.css` 中加入 `::-webkit-calendar-picker-indicator` 的樣式設定。
+    - 針對深色模式套用 `filter: invert(1)`，使原生圖標變為淺色，並優化 `opacity` 懸停效果。
+  - **結果**: 圖標在深淺主題下皆清晰可見，符合 WCAG 對比度規範。
