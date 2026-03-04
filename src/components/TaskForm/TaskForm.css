@@ -27,11 +27,11 @@
 .form-group select,
 .form-group textarea {
   padding: 12px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e5e7eb; /* Border/Divider Light */
   border-radius: 12px;
   font-size: 14px;
-  background: #ffffff;
-  color: #111827;
+  background: #ffffff; /* Surface Light */
+  color: #111827; /* Primary Text Light */
   transition: all 0.2s ease;
   font-family: inherit;
 }
@@ -130,24 +130,48 @@
 /* Dark mode styles for Task Form text */
 
 [data-theme="dark"] .form-group label {
-  color: #ffffff;
+  color: #f1f5f9; /* Primary Text Dark */
 }
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
 [data-theme="dark"] .form-group textarea {
-  background: #1a1a1a;
-  color: #ffffff;
-  border-color: #444444;
+  background: #1e293b; /* Surface Dark */
+  color: #f1f5f9; /* Primary Text Dark */
+  border-color: #334155; /* Border/Divider Dark */
+}
+
+/* Fix Date & Time Icon Contrast */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: opacity(0.5);
+  transition: filter 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  filter: opacity(1);
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.7); /* Make icons white in dark mode */
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator:hover,
+[data-theme="dark"]
+  input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) opacity(1);
 }
 
 [data-theme="dark"] .form-group input::placeholder,
 [data-theme="dark"] .form-group textarea::placeholder {
-  color: #aaaaaa;
+  color: #94a3b8; /* Secondary Text Dark */
 }
 
 [data-theme="dark"] .char-count {
-  color: #cccccc;
+  color: #94a3b8; /* Secondary Text Dark */
 }
 
 [data-theme="dark"] .btn-cancel {
@@ -257,13 +281,15 @@
   align-items: center;
   gap: 10px;
   padding: 8px;
-  background: #f9fafb;
+  background: #FFFFFF; /* Surface Light */
+  border: 1px solid #E5E7EB; /* Border Light */
   border-radius: 8px;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .subtask-item:hover {
-  background: #f3f4f6;
+  background: #F9FAFB; /* Background Light */
+  border-color: #D1D5DB;
 }
 
 .subtask-item input[type="checkbox"] {
@@ -279,7 +305,7 @@
 
 .subtask-item span.completed {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: #6B7280; /* Secondary Text Light */
 }
 
 .btn-remove-subtask {
@@ -298,15 +324,20 @@
 }
 
 [data-theme="dark"] .subtask-item {
-  background: #262626;
-  color: #e5e7eb;
+  background: #1E293B; /* Surface Dark */
+  border-color: #334155; /* Border Dark */
+  color: #F1F5F9; /* Primary Text Dark */
 }
 
 [data-theme="dark"] .subtask-item:hover {
-  background: #333333;
+  background: #334155; /* Lighter Surface/Border */
+}
+
+[data-theme="dark"] .subtask-item span.completed {
+  color: #94A3B8; /* Secondary Text Dark */
 }
 
 /* Dark mode for pending checkbox */
 [data-theme="dark"] .pending-checkbox {
-  color: #aaa;
+  color: #94A3B8; /* Secondary Text Dark */
 }
