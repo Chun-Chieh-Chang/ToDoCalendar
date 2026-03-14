@@ -104,13 +104,13 @@ export const storageService = {
   },
 
   // Import Data
-  importData(jsonString: string): boolean {
+  importData(jsonString: string): any {
     try {
       const data = JSON.parse(jsonString);
 
       // Basic validation
       if (!data || typeof data !== 'object') {
-        throw new Error('Invalid data format');
+        throw new Error('無效的資料格式');
       }
 
       // Validate tasks structure
@@ -119,7 +119,7 @@ export const storageService = {
           task && typeof task === 'object' && task.id && task.title
         );
         if (validTasks.length !== data.tasks.length) {
-          console.warn('Some tasks were invalid and skipped during import');
+          console.warn('部分任務格式不符，已跳過部分匯入');
         }
         this.saveTasks(validTasks);
       }
@@ -128,10 +128,10 @@ export const storageService = {
       if (data.selectedDate) this.saveSelectedDate(data.selectedDate);
       if (data.filter) this.saveFilter(data.filter);
 
-      return true;
+      return data;
     } catch (error) {
-      console.error('Failed to import data:', error);
-      return false;
+      console.error('匯入資料時發生錯誤:', error);
+      return null;
     }
   },
 

@@ -54,12 +54,21 @@ const App = () => {
               const reader = new FileReader();
               reader.onload = (event) => {
                 if (event.target?.result) {
-                  const success = storageService.importData(event.target.result as string);
-                  if (success) {
-                    alert('匯入成功！頁面將重新載入。');
-                    window.location.reload();
+                  const importedData = storageService.importData(event.target.result as string);
+                  if (importedData) {
+                    // 同步更新本地狀態，確保自動存檔邏輯不會用舊資料覆寫 localStorage
+                    if (importedData.tasks) dispatch({ type: 'SET_TASKS', payload: importedData.tasks });
+                    if (importedData.settings) dispatch({ type: 'SET_SETTINGS', payload: importedData.settings });
+                    if (importedData.filter) dispatch({ type: 'SET_FILTER', payload: importedData.filter });
+                    if (importedData.selectedDate) dispatch({ type: 'SET_SELECTED_DATE', payload: importedData.selectedDate });
+
+                    alert('匯入成功！系統將即時套用您的資料。');
+                    // 稍微延遲後重載以確保狀態已變動且穩定
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 500);
                   } else {
-                    alert('匯入失敗，請檢查檔案格式。');
+                    alert('匯入失敗，請檢查檔案格式是否正確。');
                   }
                 }
               };
