@@ -8,7 +8,9 @@
   - **Result**: Added a dedicated "數據管理" entry in the left sidebar for easier access to backup, restore, and storage path settings.
 - **Export Path Selection**:
   - **Result**: Confirmed that the export utility already triggers a system file dialog for path selection.
-
+- **Import Race Condition Fix**:
+  - **Action**: Modified `App.tsx` and `storage.ts` to synchronize state immediately upon import via `dispatch`.
+  - **Result**: Prevented the auto-save mechanism from overwriting imported data with stale state, ensuring reliable first-time data migration.
 ### ⚠️ 錯誤分析與預防措施 (Incident Report: Time Format Inconsistency)
 
 **1. 問題描述 (Issue)**:
