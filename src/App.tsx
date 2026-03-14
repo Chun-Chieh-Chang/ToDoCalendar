@@ -16,6 +16,7 @@ import KanbanBoard from './components/KanbanBoard/KanbanBoard';
 import TaskListView from './components/TaskListView/TaskListView';
 import AppGuide from './components/AppGuide/AppGuide';
 import Dashboard from './components/Dashboard/Dashboard';
+import DataManagementView from './components/DataManagement/DataManagementView';
 import { exportDataWithDialog } from './utils/exportUtils';
 import './App.css';
 
@@ -23,7 +24,7 @@ const App = () => {
   const { state, dispatch, isLoaded } = useAppContext();
   const translate = useTranslation(state.settings.language);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [activeView, setActiveView] = useState<'calendar' | 'kanban' | 'tasks' | 'pending' | 'guide' | 'dashboard' | 'all_tasks'>('calendar');
+  const [activeView, setActiveView] = useState<'calendar' | 'kanban' | 'tasks' | 'pending' | 'guide' | 'dashboard' | 'all_tasks' | 'data'>('calendar');
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showTaskList, setShowTaskList] = useState(false);
@@ -555,7 +556,20 @@ const App = () => {
                 </div>
               </div>
 
-              {/* 7. 系統設定 */}
+              {/* 8. 數據管理 */}
+              <div
+                className={`nav-item ${activeView === 'data' ? 'active' : ''}`}
+                onClick={() => setActiveView('data')}
+                title="數據管理與備份"
+              >
+                <div className="tooltip">
+                  <i className="ri-database-2-line"></i>
+                  <span>數據管理</span>
+                  <span className="tooltip-text">備份、還原及管理您的任務數據與儲存空間</span>
+                </div>
+              </div>
+
+              {/* 9. 系統設定 */}
               <div className="nav-item">
                 <div className="tooltip" onClick={handleOpenSettings} title="應用程式設定">
                   <i className="ri-settings-4-line"></i>
@@ -616,6 +630,9 @@ const App = () => {
           </div>
           <div className={`mobile-nav-item ${activeView === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveView('dashboard')}>
             <i className="ri-bar-chart-fill"></i>
+          </div>
+          <div className={`mobile-nav-item ${activeView === 'data' ? 'active' : ''}`} onClick={() => setActiveView('data')}>
+            <i className="ri-database-2-line"></i>
           </div>
           <div className="mobile-nav-item" onClick={handleOpenSettings}>
             <i className="ri-settings-4-line"></i>
@@ -750,6 +767,7 @@ const App = () => {
           )}
           {activeView === 'guide' && <AppGuide />}
           {activeView === 'dashboard' && <Dashboard />}
+          {activeView === 'data' && <DataManagementView />}
         </div>
 
         {/* 底部提示 */}
