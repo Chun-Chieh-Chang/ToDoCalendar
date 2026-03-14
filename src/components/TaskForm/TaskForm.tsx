@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../Modal/Modal';
-import { Task, Subtask, RecurrenceType } from '../../types';
+import { Task, Subtask } from '../../types';
 import { useAppContext } from '../../store/AppContext';
 import { parseTaskTitle } from '../../utils/nlpUtils';
 import './TaskForm.css';
@@ -163,12 +163,7 @@ const TaskForm = ({
     { value: 'low', label: '低', color: '#27ae60' }
   ];
 
-  const categoryOptions = [
-    { value: 'work', label: '工作' },
-    { value: 'study', label: '學習' },
-    { value: 'life', label: '生活' },
-    { value: 'other', label: '其他' }
-  ];
+
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={initialTask ? '編輯任務' : '新增任務'}>
@@ -245,15 +240,42 @@ const TaskForm = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="time">時間</label>
-            <input
-              type="time"
-              id="time"
-              name="time"
-              value={formData.time}
-              onChange={handleInputChange}
-              disabled={!formData.date}
-            />
+            <label htmlFor="time">時間 (24H)</label>
+            <div className="time-select-group">
+              <select
+                name="hour"
+                value={formData.time?.split(':')[0] || '00'}
+                onChange={(e) => {
+                  const hour = e.target.value;
+                  const minute = formData.time?.split(':')[1] || '00';
+                  setFormData(prev => ({ ...prev, time: `${hour}:${minute}` }));
+                }}
+                disabled={!formData.date}
+              >
+                {Array.from({ length: 24 }, (_, i) => (
+                  <option key={i} value={i.toString().padStart(2, '0')}>
+                    {i.toString().padStart(2, '0')}
+                  </option>
+                ))}
+              </select>
+              <span className="time-separator">:</span>
+              <select
+                name="minute"
+                value={formData.time?.split(':')[1] || '00'}
+                onChange={(e) => {
+                  const minute = e.target.value;
+                  const hour = formData.time?.split(':')[0] || '00';
+                  setFormData(prev => ({ ...prev, time: `${hour}:${minute}` }));
+                }}
+                disabled={!formData.date}
+              >
+                {Array.from({ length: 60 }, (_, i) => (
+                  <option key={i} value={i.toString().padStart(2, '0')}>
+                    {i.toString().padStart(2, '0')}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="form-group">

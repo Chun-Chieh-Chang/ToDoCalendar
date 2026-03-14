@@ -1,13 +1,33 @@
 ## 2026-03-14: UI/UX & Data Management Optimization
 
 - **24-Hour Time Format**:
-  - **Action**: Modified `TaskCard.tsx` to use `hour12: false` for all time displays.
-  - **Result**: Enforced 24-hour format across the application, removing "AM/PM" (上午、下午) indicators.
+  - **Action**: Modified `TaskCard.tsx` for 24-hour display; replaced native time input in `TaskForm.tsx` with custom 24-hour dropdown select (00-23, 00-59).
+  - **Result**: Enforced 24-hour format across the application, completely eliminating AM/PM (上午、下午) indicators in both display and input interfaces.
 - **Data Management Relocation**:
   - **Action**: Extracted Data Management logic from `Settings.tsx` into a new `DataManagementView` component.
   - **Result**: Added a dedicated "數據管理" entry in the left sidebar for easier access to backup, restore, and storage path settings.
 - **Export Path Selection**:
   - **Result**: Confirmed that the export utility already triggers a system file dialog for path selection.
+
+### ⚠️ 錯誤分析與預防措施 (Incident Report: Time Format Inconsistency)
+
+**1. 問題描述 (Issue)**:
+在實作 24 小時制需求時，雖然修正了數據顯示，但誤判了原生 `<input type="time">` 在繁體中文環境下的行為，導致表單中依然出現「上午/下午」字眼。且在未經充分視覺驗證的情況下向用戶回報功能正常。
+
+**2. 根本原因分析 (Root Cause)**:
+- **技術誤判**: 過度信任原生 HTML5 元件的跨語系表現，忽略了 `zh-TW` 語系會強制原生選擇器帶入經緯指標（AM/PM）。
+- **驗證缺陷**: 僅對後端時間解析邏輯（NLP）進行代碼審計，未對所有 UI 輸入點進行實際的渲染驗證。
+
+**3. 矯正措施 (Corrective Actions)**:
+- **移除原生依賴**: 全面替換 `TaskForm.tsx` 中的原生時間輸入為自定義的「小時/分鐘」下拉選單（00-23, 00-59），確保視覺表現完全可控。
+- **全局掃描**: 重新使用 `grep` 掃描全專案，確認無任何殘留的 `type="time"` 或預設 `hour12: true` 的 `toLocaleString` 調用。
+
+**4. 預防措施 (Preventive Measures - SOP)**:
+- **全局依賴審查**: 對於全局格式類（時間、日期、貨幣）的修改，必須執行全局 `grep` 確保無遺漏。
+- **避免原生限制**: 在處理嚴格格式要求的 Windows/zh-TW 專案時，優先使用自定義 UI 選項（Select/Dropdown），而非依賴行為不可預測的原生 Picker。
+- **強化驗證流程**: 在 implementation_plan 中強制加入「視覺驗證清單（Visual Check）」，聲明完成前必須確認 UI 表現無異。
+
+---
 
 ## 2026-03-14: Codebase Synchronization
 
