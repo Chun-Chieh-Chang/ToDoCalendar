@@ -1,16 +1,13 @@
-import { useState, useEffect } from 'react';
 import Modal from '../Modal/Modal';
-import { storageService } from '../../services/storage';
 import { useAppContext } from '../../store/AppContext';
 import { SettingsState } from '../../types';
-import { exportDataWithDialog } from '../../utils/exportUtils';
 import './Settings.css';
 
 interface SettingsProps {
   isOpen: boolean;
   onClose: () => void;
   settings: SettingsState;
-  onSettingsChange: (settings: Partial<SettingsState>) => void;
+  onSettingsChange: (settings: SettingsState) => void;
 }
 
 const Settings = ({
@@ -20,363 +17,69 @@ const Settings = ({
   onSettingsChange
 }: SettingsProps) => {
   const { t } = useAppContext();
-  const [dataPath, setDataPath] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof (window as any).electronAPI !== 'undefined') {
-      (window as any).electronAPI.getDataPath().then((path: string) => {
-        setDataPath(path);
-      });
-    }
-  }, []);
 
   const handleSettingChange = (key: string, value: any) => {
     let newSettings = { ...settings, [key]: value };
-    
-    // 主題切換時自動調整分類顏色
-    if (key === 'theme') {
-      const newCategories = settings.categories.map((category: any) => {
-        if (category.id === 'work') {
-          // 深色主題使用淡黃色，淺色主題使用藍色
-          const newColor = value === 'dark' ? '#FEF3C7' : '#3B82F6';
-          return { ...category, color: newColor };
-        }
-        return category;
-      });
-      newSettings = { ...newSettings, categories: newCategories };
-    }
-    
     onSettingsChange(newSettings);
   };
 
-  const themeOptions = [
-    { value: 'light', label: t('lightTheme') },
-    { value: 'dark', label: t('darkTheme') }
-  ];
-
-  const languageOptions = [
-    { value: 'zh-TW', label: t('traditionalChinese') },
-    { value: 'en', label: t('english') }
-  ];
-
-  const dateOptions = [
-    { value: 'yyyy-MM-dd', label: '2024-01-01' },
-    { value: 'dd/MM/yyyy', label: '01/01/2024' },
-    { value: 'MM/dd/yyyy', label: '01/01/2024' }
-  ];
-
-  const priorityOptions = [
-    { value: 'high', label: t('high') },
-    { value: 'medium', label: t('medium') },
-    { value: 'low', label: t('low') }
-  ];
+  if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={t('settingsTitle')}>
-      <div className="settings-content">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('settings')}>
+      <div className="settings-container">
+        {/* 常規設定 */}
         <div className="setting-group">
-          <h3>{t('interfaceSettings')}</h3>
-
-          <div className="setting-item">
-            <label>{t('theme')}</label>
-            <select
-              value={settings.theme}
-              onChange={(e) => handleSettingChange('theme', e.target.value)}
-            >
-              {themeOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
+          <h3>{t('generalSettings')}</h3>
           <div className="setting-item">
             <label>{t('language')}</label>
             <select
               value={settings.language}
               onChange={(e) => handleSettingChange('language', e.target.value)}
             >
-              {languageOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
+              <option value="zh-TW">繁體中文</option>
+              <option value="en-US">English</option>
             </select>
           </div>
-
           <div className="setting-item">
-            <label>{t('dateFormat')}</label>
+            <label>{t('theme')}</label>
             <select
-              value={settings.dateFormat}
-              onChange={(e) => handleSettingChange('dateFormat', e.target.value)}
+              value={settings.theme}
+              onChange={(e) => handleSettingChange('theme', e.target.value)}
             >
-              {dateOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
+              <option value="light">明亮模式</option>
+              <option value="dark">深色模式</option>
             </select>
-          </div>
-        </div>
-
-        <div className="setting-group">
-          <h3>{t('taskSettings')}</h3>
-
-          <div className="setting-item">
-            <label>{t('defaultPriority')}</label>
-            <select
-              value={settings.defaultPriority}
-              onChange={(e) => handleSettingChange('defaultPriority', e.target.value)}
-            >
-              {priorityOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="setting-item">
-            <label>{t('itemsPerPage')}</label>
-            <select
-              value={settings.itemsPerPage}
-              onChange={(e) => handleSettingChange('itemsPerPage', parseInt(e.target.value))}
-            >
-              {[5, 10, 15, 20, 25, 50].map(num => (
-                <option key={num} value={num}>
-                  {num} {t('items')}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="setting-group">
-          <h3>{t('dataManagement')}</h3>
-
-          {/* Show Data Path management ONLY if in Electron */}
-          {typeof (window as any).electronAPI !== 'undefined' ? (
-            <div className="setting-item data-path-item">
-              <label>資料儲存路徑</label>
-              <div className="data-path-control">
-                <div className="path-display" title={dataPath || '正在讀取...'}>
-                  {dataPath || '載入中...'}
-                </div>
-                <button
-                  className="btn-secondary btn-small"
-                  disabled={!dataPath}
-                  onClick={async () => {
-                    const dir = await (window as any).electronAPI.selectDirectory();
-                    if (dir) {
-                      const res = await (window as any).electronAPI.setCustomDataPath(dir);
-                      if (res.success) {
-                        setDataPath(res.path);
-                        alert('儲存路徑已更新！新路徑將於下次存檔時生效。');
-                      } else {
-                        alert(`更換失敗: ${res.error}`);
-                      }
-                    }
-                  }}
-                >
-                  更換路徑
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="setting-item web-storage-hint">
-              <i className="ri-information-line"></i>
-              <span>目前使用「網頁模式」，資料儲存於瀏覽器 LocalStorage。自定義存放路徑功能僅限於「桌面安裝版」。</span>
-            </div>
-          )}
-
-          <div className="setting-item">
-            <button className="btn-secondary" onClick={async () => {
-              try {
-                const result = await exportDataWithDialog();
-                if (result.success) {
-                  if (result.filePath) {
-                    alert(`數據已成功匯出至: ${result.filePath}`);
-                  } else if (result.method !== 'download') {
-                    alert('數據匯出成功！');
-                  }
-                }
-              } catch (err: any) {
-                alert(`匯出失敗: ${err.message}`);
-              }
-            }}>
-              {t('exportData')}
-            </button>
-          </div>
-
-          <div className="setting-item">
-            <button className="btn-secondary" onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'application/json';
-              input.onchange = (e: any) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  if (event.target?.result) {
-                    const success = storageService.importData(event.target.result as string);
-                    if (success) {
-                      alert('匯入成功！頁面將重新載入以應用變更。');
-                      window.location.reload();
-                    } else {
-                      alert('匯入失敗，請檢查檔案格式。');
-                    }
-                  }
-                };
-                reader.readAsText(file);
-              };
-              input.click();
-            }}>
-              {t('importData')}
-            </button>
           </div>
         </div>
 
         <div className="setting-group">
           <h3>User Profile</h3>
-
-          <div className="setting-item">
-            <label>User Name</label>
-            <input
-              type="text"
-              value={settings.userName || ''}
+          <div className="setting-item profile-info">
+            <div className="profile-label">
+              <label>使用者名稱</label>
+              <span className="profile-role">系統管理員</span>
+            </div>
+            <input 
+              type="text" 
+              value={settings.userName || 'Admin'} 
               onChange={(e) => handleSettingChange('userName', e.target.value)}
-              placeholder="Enter your name"
-              className="settings-input"
+              placeholder="輸入顯示名稱"
             />
           </div>
-
-          <div className="setting-item profile-avatar-section">
-            <label>使用者頭像</label>
-            <div className="avatar-preview-container">
-              <div className="avatar-preview-wrapper">
-                <div className="avatar-preview">
-                  {settings.userAvatar ? (
-                    <img src={settings.userAvatar} alt="Avatar Preview" className="avatar-image" />
-                  ) : (
-                    <div className="avatar-placeholder">
-                      {settings.userName ? settings.userName.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                  )}
-                </div>
-                <div className="avatar-tooltip">
-                  建議使用 1:1 比例的正方形圖片以獲得最佳顯示效果
-                </div>
-              </div>
-              <div className="avatar-controls">
-                <input
-                  type="text"
-                  value={settings.userAvatar || ''}
-                  onChange={(e) => handleSettingChange('userAvatar', e.target.value)}
-                  placeholder="輸入圖片網址"
-                  className="settings-input avatar-url-input"
-                />
-                <div className="avatar-upload-wrapper">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          if (event.target?.result) {
-                            handleSettingChange('userAvatar', event.target.result as string);
-                          }
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="avatar-file-input"
-                    id="avatar-upload"
-                  />
-                  <label htmlFor="avatar-upload" className="btn-secondary avatar-upload-btn">
-                    選擇圖片
-                  </label>
-                </div>
-              </div>
+          <div className="setting-item profile-id">
+            <label>裝置 ID</label>
+            <div className="id-container">
+              <code>{settings.deviceId || 'DEV-3KIDS-2026'}</code>
             </div>
-            <div className="setting-item-note">上傳圖片檔案或輸入圖片網址</div>
-          </div>
-        </div>
-        <div className="setting-group">
-          <h3>分類與標籤設定</h3>
-          <div className="category-manager">
-            {settings.categories.map((cat, index) => (
-              <div key={cat.id} className="category-config-item">
-                <input
-                  type="color"
-                  value={cat.color}
-                  onChange={(e) => {
-                    const newCats = [...settings.categories];
-                    newCats[index] = { ...cat, color: e.target.value };
-                    handleSettingChange('categories', newCats);
-                  }}
-                  className="cat-color-picker"
-                />
-                <input
-                  type="text"
-                  value={cat.name}
-                  onChange={(e) => {
-                    const newCats = [...settings.categories];
-                    newCats[index] = { ...cat, name: e.target.value };
-                    handleSettingChange('categories', newCats);
-                  }}
-                  className="cat-name-input"
-                />
-                <button
-                  className="btn-icon-delete"
-                  onClick={() => {
-                    const newCats = settings.categories.filter(c => c.id !== cat.id);
-                    handleSettingChange('categories', newCats);
-                  }}
-                  title="刪除分類"
-                >
-                  <i className="ri-delete-bin-line"></i>
-                </button>
-              </div>
-            ))}
-            <button
-              className="btn-secondary btn-add-cat"
-              onClick={() => {
-                const newCat = {
-                  id: `cat_${Date.now()}`,
-                  name: '新分類',
-                  color: '#94A3B8'
-                };
-                handleSettingChange('categories', [...settings.categories, newCat]);
-              }}
-            >
-              <i className="ri-add-line"></i> 新增分類
-            </button>
           </div>
         </div>
 
-        <div className="setting-actions">
-          <button onClick={onClose} className="btn-cancel">
-            {t('close')}
+        <div className="settings-footer">
+          <p className="version-info">版本: 1.2.0 | ToDoCalendar Desktop</p>
+          <button className="btn-primary" onClick={onClose}>
+            {t('saveAndClose') || '關閉'}
           </button>
-        </div>
-
-        <div className="setting-group privacy-shield">
-          <div className="privacy-shield-header">
-            <i className="ri-shield-check-line"></i>
-            <h3>隱私與安全防護</h3>
-          </div>
-          <p className="privacy-note">
-            此應用程式採用 <strong>「本地優先 (Local-First)」</strong> 架構：
-          </p>
-          <ul className="privacy-features">
-            <li><i className="ri-checkbox-circle-line"></i> 數據僅儲存於您的目前設備，不傳送至雲端。</li>
-            <li><i className="ri-checkbox-circle-line"></i> 不同使用者即使開啟相同網址，也無法存取彼此的紀錄。</li>
-            <li><i className="ri-checkbox-circle-line"></i> 您的隱私受瀏覽器沙盒技術嚴格隔離。</li>
-          </ul>
         </div>
       </div>
     </Modal>

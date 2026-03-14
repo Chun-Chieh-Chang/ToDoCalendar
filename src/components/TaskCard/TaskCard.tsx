@@ -121,7 +121,7 @@ const TaskCard = ({ task, onToggleComplete, onEdit, onDelete, onSchedule }: Task
       <div className="task-footer">
         <span className="task-date">📅 {task.date ? formatDate(task.date) : '無日期'}</span>
         <span className="task-time">
-          建立時間：{new Date(task.createdAt).toLocaleString('zh-TW')}
+          建立時間：{new Date(task.createdAt).toLocaleString('zh-TW', { hour12: false })}
         </span>
       </div>
     </div>

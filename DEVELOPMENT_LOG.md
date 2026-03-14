@@ -1,3 +1,21 @@
+## 2026-03-14: UI/UX & Data Management Optimization
+
+- **24-Hour Time Format**:
+  - **Action**: Modified `TaskCard.tsx` to use `hour12: false` for all time displays.
+  - **Result**: Enforced 24-hour format across the application, removing "AM/PM" (上午、下午) indicators.
+- **Data Management Relocation**:
+  - **Action**: Extracted Data Management logic from `Settings.tsx` into a new `DataManagementView` component.
+  - **Result**: Added a dedicated "數據管理" entry in the left sidebar for easier access to backup, restore, and storage path settings.
+- **Export Path Selection**:
+  - **Result**: Confirmed that the export utility already triggers a system file dialog for path selection.
+
+## 2026-03-14: Codebase Synchronization
+
+- **Git Synchronization**:
+  - **Action**: Performed `git pull`.
+  - **Result**: "Already up to date." Current codebase is confirmed to be in sync with the remote repository.
+  - **Status**: Working tree clean.
+
 ## 2026-03-01: UI/UX 對比度優化與關聯邏輯強化 (Current)
 
 - **目標**: 解決「使用指南」與「任務清單」在深色模式下的對比度問題，強化頁面關聯邏輯的視覺導引。
