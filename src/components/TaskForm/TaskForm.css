@@ -341,3 +341,24 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 [data-theme="dark"] .pending-checkbox {
   color: #94A3B8; /* Secondary Text Dark */
 }
+/* 24-Hour Time Select Styles */
+.time-select-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.time-select-group select {
+    flex: 1;
+    min-width: 70px;
+    text-align: center;
+}
+
+.time-separator {
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .time-separator {
+    color: #f1f5f9;
+}
