@@ -591,7 +591,7 @@ export function calculateContrastWithOpacity(
 ): number {
   // Calculate effective colors with opacity
   const effectiveForeground = calculateEffectiveColor(foreground, background);
-  const effectiveBackground = calculateEffectiveColor(background, config.background ? parseHexColor(config.background)?.rgb ?? { r: 255, g: 255, b: 255 } : { r: 255, g: 255, b: 255 });
+  const effectiveBackground = calculateEffectiveColor(background, config.background ? parseHexColor(config.background) ?? { r: 255, g: 255, b: 255 } : { r: 255, g: 255, b: 255 });
   
   return calculateContrastRatio(effectiveForeground, effectiveBackground);
 }
@@ -656,13 +656,112 @@ export function rgbToHsl(color: RGBColor): HSLColor {
 }
 
 /**
- * Format a color as a CSS string
- * @param color - RGB color
- * @returns CSS color string
+ * Select the best contrast color (dark or light) for a given background
+ * @param bgColor - Background color string (any format)
+ * @param darkColor - Color to use for dark text (default: Gray 900 #111827)
+ * @param lightColor - Color to use for light text (default: Slate 100 #F1F5F9)
+ * @returns The better contrasting color string
  */
-export function formatColorForCss(color: RGBColor): string {
-  if (color.alpha !== undefined && color.alpha < 1) {
-    return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.alpha})`;
+export function getBestContrastColor(
+  bgColor: string,
+  darkColor: string = '#111827',
+  lightColor: string = '#F1F5F9'
+): string {
+  const parsedBg = parseColor(bgColor);
+  if (!parsedBg) return darkColor;
+
+  // Calculate luminance of background
+  // If bgColor has alpha, we should blend it with a presumed white background for calculation
+  const effectiveBg = calculateEffectiveColor(parsedBg.rgb);
+  const bgLuminance = calculateLuminance(effectiveBg);
+
+  const parsedDark = parseColor(darkColor);
+  const parsedLight = parseColor(lightColor);
+
+  if (!parsedDark || !parsedLight) return bgLuminance > 0.5 ? '#000000' : '#FFFFFF';
+
+  const contrastWithDark = calculateContrastRatio(effectiveBg, parsedDark.rgb);
+  const contrastWithLight = calculateContrastRatio(effectiveBg, parsedLight.rgb);
+
+  return contrastWithDark >= contrastWithLight ? darkColor : lightColor;
+}
+
+/**
+ * Select the best contrast color (dark or light) for a foreground color blended over a background
+ * Useful for transparent overlays (e.g., 20% opacity pills)
+ * @param fgColor - Foreground color string (the semi-transparent one)
+ * @param bgColor - Background color string (the solid base)
+ * @param alpha - Alpha value of the foreground (0-1, default: 0.2)
+ * @param darkColor - Color to use for dark text
+ * @param lightColor - Color to use for light text
+ * @returns The better contrasting color string for the blended result
+ */
+export function getBestContrastForOverlay(
+  fgColor: string,
+  bgColor: string,
+  alpha: number = 0.2,
+  darkColor: string = '#111827',
+  lightColor: string = '#F1F5F9'
+): string {
+  const parsedFg = parseColor(fgColor);
+  const parsedBg = parseColor(bgColor);
+  
+  if (!parsedFg || !parsedBg) return darkColor;
+
+  // Calculate the effective blended color
+  // effective = fg * alpha + bg * (1 - alpha)
+  const blendedColor = calculateEffectiveColor({ ...parsedFg.rgb, alpha }, parsedBg.rgb);
+  const blendedHex = rgbToHex(blendedColor);
+
+  // Now use the existing best contrast logic on the blended color
+  return getBestContrastColor(blendedHex, darkColor, lightColor);
+}
+
+/**
+ * Ensures a color has a minimum contrast ratio against a background by adjusting its lightness
+ * @param colorStr - Color to adjust
+ * @param bgStr - Background color
+ * @param minRatio - Minimum contrast ratio (default: 4.5 for WCAG AA)
+ * @returns Adjusted hex color string
+ */
+export function ensureMinimumContrast(
+  colorStr: string,
+  bgStr: string,
+  minRatio: number = 4.5
+): string {
+  const color = parseColor(colorStr);
+  const bg = parseColor(bgStr);
+  
+  if (!color || !bg) return colorStr;
+  
+  const effectiveBg = calculateEffectiveColor(bg.rgb);
+  let ratio = calculateContrastRatio(color.rgb, effectiveBg);
+  
+  if (ratio >= minRatio) return colorStr;
+  
+  // If contrast is insufficient, adjust lightness
+  const hsl = rgbToHsl(color.rgb);
+  const bgLuminance = calculateLuminance(effectiveBg);
+  
+  // If background is light, darken the color; if dark, lighten the color
+  
+  if (bgLuminance > 0.5) {
+    // Darken until ratio is met
+    for (let l = hsl.l; l > 0; l -= 2) {
+      const rgb = hslToRgb(hsl.h / 360, hsl.s / 100, l / 100);
+      if (calculateContrastRatio(rgb, effectiveBg) >= minRatio) {
+        return rgbToHex(rgb);
+      }
+    }
+  } else {
+    // Lighten until ratio is met
+    for (let l = hsl.l; l < 100; l += 2) {
+      const rgb = hslToRgb(hsl.h / 360, hsl.s / 100, l / 100);
+      if (calculateContrastRatio(rgb, effectiveBg) >= minRatio) {
+        return rgbToHex(rgb);
+      }
+    }
   }
-  return `rgb(${color.r}, ${color.g}, ${color.b})`;
+  
+  return colorStr;
 }

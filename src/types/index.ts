@@ -35,13 +35,14 @@ export interface CategoryConfig {
 }
 
 export interface SettingsState {
-    theme: 'light' | 'dark';
+    theme: 'light' | 'dark' | 'system';
     language: 'zh-TW' | 'en';
     dateFormat: 'yyyy-MM-dd' | 'dd/MM/yyyy' | 'MM/dd/yyyy' | 'YYYY-MM-DD' | 'DD/MM/YYYY' | 'MM/DD/YYYY';
     defaultPriority: Priority;
     itemsPerPage: number;
     userName?: string;
     userAvatar?: string;
+    deviceId?: string;
     categories: CategoryConfig[];
 }
 

@@ -22,7 +22,7 @@ import './App.css';
 
 const App = () => {
   const { state, dispatch, isLoaded } = useAppContext();
-  const translate = useTranslation(state.settings.language);
+  const t = useTranslation(state.settings.language);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [activeView, setActiveView] = useState<'calendar' | 'kanban' | 'tasks' | 'pending' | 'guide' | 'dashboard' | 'all_tasks' | 'data'>('calendar');
   const [showTaskForm, setShowTaskForm] = useState(false);
@@ -252,7 +252,7 @@ const App = () => {
     const completedTasks = targetTasks.filter(t => t.completed);
     if (completedTasks.length === 0) return;
 
-    if (confirm(`確定要清除這 ${completedTasks.length} 項已完成的任務嗎？`)) {
+    if (confirm(t('confirmClearCompleted').replace('{count}', completedTasks.length.toString()))) {
       completedTasks.forEach(task => {
         dispatch({ type: 'DELETE_TASK', payload: task.id });
       });
@@ -462,8 +462,24 @@ const App = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+
+  // Handle system theme changes
+  const [systemTheme, setSystemTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSystemTheme(e.matches ? 'dark' : 'light');
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  const activeTheme = state.settings.theme === 'system' ? systemTheme : state.settings.theme;
+
   return (
-    <div className="app" data-theme={state.settings.theme}>
+    <div className="app" data-theme={activeTheme}>
       {/* 左側導航欄 - 僅在非手機版顯示 */}
       {!isMobile && (
         <aside className="sidebar">
@@ -475,15 +491,14 @@ const App = () => {
 
             <nav className="nav-menu">
               {/* 1. 使用說明 */}
-              <div
-                className={`nav-item ${activeView === 'guide' ? 'active' : ''}`}
+                <div className={`nav-item ${activeView === 'guide' ? 'active' : ''}`}
                 onClick={() => setActiveView('guide')}
-                title="使用說明"
+                title={t('guide')}
               >
                 <div className="tooltip">
                   <i className="ri-book-open-line"></i>
-                  <span>使用說明</span>
-                  <span className="tooltip-text">了解工具的核心功能與頁面關聯</span>
+                  <span>{t('guide')}</span>
+                  <span className="tooltip-text">{t('guideTooltip')}</span>
                 </div>
               </div>
 
@@ -491,12 +506,12 @@ const App = () => {
               <div
                 className={`nav-item ${activeView === 'all_tasks' ? 'active' : ''}`}
                 onClick={() => setActiveView('all_tasks')}
-                title="查看所有任務"
+                title={t('myTasks')}
               >
                 <div className="tooltip">
                   <i className="ri-task-line"></i>
-                  <span>我的任務</span>
-                  <span className="tooltip-text">查看系統中的所有任務 (包含待辦與已排程)</span>
+                  <span>{t('myTasks')}</span>
+                  <span className="tooltip-text">{t('myTasksTooltip')}</span>
                 </div>
               </div>
 
@@ -504,12 +519,12 @@ const App = () => {
               <div
                 className={`nav-item ${activeView === 'calendar' ? 'active' : ''}`}
                 onClick={() => setActiveView('calendar')}
-                title="顯示月曆視圖"
+                title={t('calendarView')}
               >
                 <div className="tooltip">
                   <i className="ri-calendar-2-line"></i>
-                  <span>月曆視圖</span>
-                  <span className="tooltip-text">顯示月曆主視圖，查看整體排程與每日任務分布</span>
+                  <span>{t('calendarView')}</span>
+                  <span className="tooltip-text">{t('calendarViewTooltip')}</span>
                 </div>
               </div>
 
@@ -517,12 +532,12 @@ const App = () => {
               <div
                 className={`nav-item ${activeView === 'pending' ? 'active' : ''}`}
                 onClick={() => setActiveView('pending')}
-                title="查看待辦事項"
+                title={t('pendingList')}
               >
                 <div className="tooltip">
                   <i className="ri-inbox-line"></i>
-                  <span>待辦清單</span>
-                  <span className="tooltip-text">查看尚未排入日程的待辦事項，可隨時安排執行時間</span>
+                  <span>{t('pendingList')}</span>
+                  <span className="tooltip-text">{t('pendingListTooltip')}</span>
                 </div>
               </div>
 
@@ -530,12 +545,12 @@ const App = () => {
               <div
                 className={`nav-item ${activeView === 'tasks' ? 'active' : ''}`}
                 onClick={() => setActiveView('tasks')}
-                title="查看已排程清單"
+                title={t('scheduledList')}
               >
                 <div className="tooltip">
                   <i className="ri-list-check"></i>
-                  <span>已排程清單</span>
-                  <span className="tooltip-text">查看所有已規劃的任務日程表</span>
+                  <span>{t('scheduledList')}</span>
+                  <span className="tooltip-text">{t('scheduledListTooltip')}</span>
                 </div>
               </div>
 
@@ -543,12 +558,12 @@ const App = () => {
               <div
                 className={`nav-item ${activeView === 'kanban' ? 'active' : ''}`}
                 onClick={() => setActiveView('kanban')}
-                title="顯示看板視圖"
+                title={t('kanbanBoard')}
               >
                 <div className="tooltip">
                   <i className="ri-layout-column-line"></i>
-                  <span>看板管理</span>
-                  <span className="tooltip-text">透過看板管理任務進度，支援拖拉更換狀態</span>
+                  <span>{t('kanbanBoard')}</span>
+                  <span className="tooltip-text">{t('kanbanBoardTooltip')}</span>
                 </div>
               </div>
 
@@ -556,34 +571,34 @@ const App = () => {
               <div
                 className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
                 onClick={() => setActiveView('dashboard')}
-                title="查看數據統計"
+                title={t('insights')}
               >
                 <div className="tooltip">
                   <i className="ri-bar-chart-fill"></i>
-                  <span>數據洞察</span>
-                  <span className="tooltip-text">了解任務完成趨勢與分配情況</span>
+                  <span>{t('insights')}</span>
+                  <span className="tooltip-text">{t('insightsTooltip')}</span>
                 </div>
               </div>
 
-              {/* 8. 數據管理 */}
+               {/* 8. 數據管理 */}
               <div
                 className={`nav-item ${activeView === 'data' ? 'active' : ''}`}
                 onClick={() => setActiveView('data')}
-                title="數據管理與備份"
+                title={t('dataManagement')}
               >
                 <div className="tooltip">
                   <i className="ri-database-2-line"></i>
-                  <span>數據管理</span>
-                  <span className="tooltip-text">備份、還原及管理您的任務數據與儲存空間</span>
+                  <span>{t('dataManagement')}</span>
+                  <span className="tooltip-text">{t('dataManagementDesc')}</span>
                 </div>
               </div>
 
               {/* 9. 系統設定 */}
               <div className="nav-item">
-                <div className="tooltip" onClick={handleOpenSettings} title="應用程式設定">
+                <div className="tooltip" onClick={handleOpenSettings} title={t('settingsTitle')}>
                   <i className="ri-settings-4-line"></i>
-                  <span>系統設定</span>
-                  <span className="tooltip-text">調整應用程式外觀、語言及其他個人偏好設定</span>
+                  <span>{t('settingsTitle')}</span>
+                  <span className="tooltip-text">{t('settingsDesc')}</span>
                 </div>
               </div>
 
@@ -591,10 +606,10 @@ const App = () => {
 
               {/* 8. 安全退出 */}
               <div className="nav-item exit-item" onClick={handleExit}>
-                <div className="tooltip" title="安全退出系統">
+                <div className="tooltip" title={t('exitSystem')}>
                   <i className="ri-logout-box-r-line"></i>
-                  <span>退出系統</span>
-                  <span className="tooltip-text">安全離開系統並提醒備份數據</span>
+                  <span>{t('exitSystem')}</span>
+                  <span className="tooltip-text">{t('exitSystemDesc')}</span>
                 </div>
               </div>
             </nav>
@@ -640,10 +655,10 @@ const App = () => {
           <div className={`mobile-nav-item ${activeView === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveView('dashboard')}>
             <i className="ri-bar-chart-fill"></i>
           </div>
-          <div className={`mobile-nav-item ${activeView === 'data' ? 'active' : ''}`} onClick={() => setActiveView('data')}>
+          <div className={`mobile-nav-item ${activeView === 'data' ? 'active' : ''}`} onClick={() => setActiveView('data')} title={t('dataManagement')}>
             <i className="ri-database-2-line"></i>
           </div>
-          <div className="mobile-nav-item" onClick={handleOpenSettings}>
+          <div className="mobile-nav-item" onClick={handleOpenSettings} title={t('settingsTitle')}>
             <i className="ri-settings-4-line"></i>
           </div>
         </nav>
@@ -673,7 +688,7 @@ const App = () => {
                   value={currentMonth.getMonth()}
                   onChange={handleMonthSelectChange}
                 >
-                  {translations[state.settings.language].months.map((month: string, index: number) => (
+                  {(translations[(state?.settings?.language || 'zh-TW') as keyof typeof translations]?.months || translations['zh-TW']?.months || []).map((month: string, index: number) => (
                     <option key={index} value={index}>{month}</option>
                   ))}
                 </select>
@@ -682,14 +697,14 @@ const App = () => {
                 <button
                   className="nav-btn"
                   onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                  title="上個月"
+                  title={t('lastMonth') || '上個月'}
                 >
                   <i className="ri-arrow-left-s-line"></i>
                 </button>
                 <button
                   className="nav-btn"
                   onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                  title="下個月"
+                  title={t('nextMonth') || '下個月'}
                 >
                   <i className="ri-arrow-right-s-line"></i>
                 </button>
@@ -698,7 +713,7 @@ const App = () => {
 
             <div className="header-actions">
               <button className="action-btn btn-today" onClick={handleTodayClick}>
-                <i className="ri-focus-3-line"></i> {translate('today')}
+                <i className="ri-focus-3-line"></i> {t('today')}
               </button>
             </div>
           </header>
@@ -712,9 +727,10 @@ const App = () => {
               selectedDate={state.selectedDate}
               onDateSelect={handleDateSelect}
               onDateDoubleClick={handleDateDoubleClick}
-              onMonthChange={handleMonthChange}
               tasks={state.tasks}
               categories={state.settings.categories}
+              theme={activeTheme as 'light' | 'dark'}
+              t={t}
             />
           )}
           {activeView === 'kanban' && (
@@ -725,12 +741,12 @@ const App = () => {
               onDelete={handleDeleteTask}
               onStatusChange={handleStatusChange}
               onReorder={handleReorderTasks}
-              t={translate}
+              t={t}
             />
           )}
           {activeView === 'tasks' && (
             <TaskListView
-              title="📅 已排程清單"
+              title={t('scheduledListTitle')}
               tasks={filteredAllPlannedTasks}
               filter={state.filter}
               onFilterChange={handleFilterChange}
@@ -745,7 +761,7 @@ const App = () => {
           )}
           {activeView === 'pending' && (
             <TaskListView
-              title="📝 靈感待辦牆"
+              title={t('pendingWallTitle')}
               tasks={filteredPendingTasks}
               filter={state.filter}
               onFilterChange={handleFilterChange}
@@ -761,7 +777,7 @@ const App = () => {
           )}
           {activeView === 'all_tasks' && (
             <TaskListView
-              title="📋 我的任務 (總覽)"
+              title={t('myTasksTitle')}
               tasks={filteredAllTasks}
               filter={state.filter}
               onFilterChange={handleFilterChange}
@@ -783,7 +799,7 @@ const App = () => {
         {activeView === 'calendar' && (
           <div className="bottom-hint">
             <span className="hint-dot"></span>
-            <span>{translate('hint')}</span>
+            <span>{t('hint')}</span>
           </div>
         )}
 
@@ -791,20 +807,20 @@ const App = () => {
         <footer className="status-bar">
           <div className="status-item">
             <span className="status-dot dot-blue"></span>
-            進行中任務 ({state.tasks.filter(t => !t.completed && t.date).length})
+            {t('inProgress')} ({state.tasks.filter(t => !t.completed && t.date).length})
           </div>
           <div className="status-item">
             <span className="status-dot dot-green"></span>
-            已完成 ({state.tasks.filter(t => t.completed).length})
+            {t('done')} ({state.tasks.filter(t => t.completed).length})
           </div>
           <div className="status-item">
             <span className="status-dot dot-yellow"></span>
-            待處理 ({state.tasks.filter(t => !t.date).length})
+            {t('pending')} ({state.tasks.filter(t => !t.date).length})
           </div>
 
           <div className="progress-wrapper">
             <span className="progress-label">
-              本月完成率 {state.tasks.length > 0 ? Math.round((state.tasks.filter(t => t.completed).length / state.tasks.length) * 100) : 0}%
+              {t('completionRate')} {state.tasks.length > 0 ? Math.round((state.tasks.filter(t => t.completed).length / state.tasks.length) * 100) : 0}%
             </span>
             <div className="progress-bar">
               <div
@@ -853,18 +869,18 @@ const App = () => {
       <Modal
         isOpen={showExitModal}
         onClose={() => setShowExitModal(false)}
-        title="退出系統"
+        title={t('exitSystem')}
         className="exit-modal"
       >
         <div className="exit-modal-content">
           <div className="exit-icon">🚪</div>
-          <p>您即將退出系統。為了資料安全，建議您在離開前匯出最新的備份檔案存檔。</p>
+          <p>{t('exitModalDesc')}</p>
           <div className="exit-actions">
             <button className="btn btn-danger" onClick={confirmExitWithBackup}>
-              <i className="ri-download-2-line"></i> 匯出數據並退出
+              <i className="ri-download-2-line"></i> {t('backupNow')}
             </button>
             <button className="btn btn-secondary" onClick={() => setShowExitModal(false)}>
-              取消
+              {t('cancel')}
             </button>
           </div>
         </div>
@@ -872,10 +888,10 @@ const App = () => {
 
       {/* 加載狀態 */}
       {isLoading && (
-        <div className="loading-overlay" role="status" aria-label="正在保存任務">
+        <div className="loading-overlay" role="status" aria-label={t('savingTask') || '正在保存任務'}>
           <div className="loading-spinner">
             <div className="spinner"></div>
-            <div className="text">正在保存任務...</div>
+            <div className="text">{t('savingTask') || '正在保存任務...'}</div>
           </div>
         </div>
       )}

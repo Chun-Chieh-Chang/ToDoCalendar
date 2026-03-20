@@ -3,7 +3,7 @@ import { AppState, Task } from '../types';
 import { storageService } from '../services/storage';
 import { defaultSettings, defaultFilter } from '../constants/defaults';
 import { dateUtils } from '../utils/dateUtils';
-import { useTranslation } from '../utils/i18n';
+import { useTranslation, translations, getTranslation } from '../utils/i18n';
 
 // Helpers for broken types in environment
 type Dispatch<A> = (value: A) => void;
@@ -139,7 +139,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 interface AppContextType {
   state: AppState;
   dispatch: Dispatch<AppAction>;
-  t: (key: string) => string;
+  t: (key: string) => any;
   isLoaded: boolean;
 }
 
@@ -181,18 +181,19 @@ export function AppProvider({ children }: AppProviderProps) {
         dispatch({ type: 'SET_TASKS', payload: savedTasks });
       } else if (isActuallyNewStart) {
         // 只有在全新啟動時才注入歡迎範例
+        const lang = savedSettings.language || 'zh-TW';
         const sampleTasks = [
           {
             id: '1',
-            title: '✨ 歡迎使用 ToDoCalendar',
-            description: '您的所有紀錄都會自動儲存在本地電腦中。您可以點擊左側導覽列開始規劃任務。',
+            title: getTranslation(lang, 'welcomeTaskTitle'),
+            description: getTranslation(lang, 'welcomeTaskDesc'),
             date: dateUtils.dateToString(new Date()),
             priority: 'high' as const,
             category: 'work' as const,
             completed: false,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            notes: '您可以點擊右側的鉛筆圖示編輯此地標。'
+            notes: getTranslation(lang, 'welcomeTaskNotes')
           }
         ];
         dispatch({ type: 'SET_TASKS', payload: sampleTasks });
@@ -201,14 +202,23 @@ export function AppProvider({ children }: AppProviderProps) {
       if (Object.keys(savedSettings).length > 0) {
         // 只在深色主題時遷移分類顏色：將藍色工作分類更新為淡黃色
         const migratedSettings = { ...savedSettings };
+        // 1. 遷移分類顏色：將藍色工作分類更新為淡黃色 (僅在深色主題)
         if (migratedSettings.categories && Array.isArray(migratedSettings.categories) && migratedSettings.theme === 'dark') {
           migratedSettings.categories = migratedSettings.categories.map((category: any) => {
-            if (category.id === 'work' && category.color === '#3B82F6') {
-              return { ...category, color: '#FEF3C7' };
+            if (category.id === 'work' && (category.color === '#3B82F6' || category.color === '#FEF3C7')) {
+              return { ...category, color: '#60A5FA' };
             }
             return category;
           });
         }
+
+        // 2. 驗證語言設定是否合法，避免因不支援的語言造成 UI 崩潰 (TypeError: months of undefined)
+        const supportedLanguages = Object.keys(translations);
+        if (migratedSettings.language && !supportedLanguages.includes(migratedSettings.language)) {
+          console.warn(`Unsupported language detected: ${migratedSettings.language}. Falling back to default.`);
+          delete migratedSettings.language;
+        }
+
         dispatch({ type: 'SET_SETTINGS', payload: { ...defaultSettings, ...migratedSettings } });
       } else {
         dispatch({ type: 'SET_SETTINGS', payload: defaultSettings });
