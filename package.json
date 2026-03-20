@@ -13,7 +13,9 @@
     "pack": "vite build && electron-builder --win portable"
   },
   "dependencies": {
+    "css-tree": "^3.2.1",
     "date-fns": "^2.30.0",
+    "postcss": "^8.5.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remixicon": "^4.9.1"

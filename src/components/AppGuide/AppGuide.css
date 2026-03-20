@@ -89,7 +89,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  background: #f1f5f9; /* Slate 100 */
+  background: var(--bg-color); /* Updated for consistency */
   padding: var(--space-xl);
   border-radius: 24px;
   gap: var(--space-md);
@@ -147,7 +147,7 @@
 }
 
 [data-theme="dark"] .guide-card h3 {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .guide-card p {
@@ -174,7 +174,7 @@
 }
 
 [data-theme="dark"] .guide-header h1 {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .guide-header p {

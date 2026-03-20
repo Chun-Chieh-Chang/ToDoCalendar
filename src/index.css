@@ -20,14 +20,14 @@
   --font-xxl: 68px;
 
   /* Artist's Palette (Ethereal Light) - Enhanced Contrast */
-  --bg-color: #F8FAFC;
+  --bg-color: #F9FAFB;
   --surface-color: #FFFFFF;
   --primary-color: #6D28D9;
   --primary-gradient: linear-gradient(135deg, #6D28D9 0%, #DB2777 100%);
 
   --sidebar-bg: rgba(255, 255, 255, 0.85);
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
   --border-color: #E2E8F0;
   --border-glass: rgba(0, 0, 0, 0.08);
   --accent-glow: rgba(124, 58, 237, 0.15);
@@ -51,13 +51,13 @@
 
 /* Dark Theme Variables */
 [data-theme="dark"] {
-  --bg-color: #020617;
-  --surface-color: #0F172A;
+  --bg-color: #0F172A;
+  --surface-color: #1E293B;
   --sidebar-bg: rgba(2, 6, 23, 0.85);
 
-  --text-primary: #E2E8F0;
-  --text-secondary: #A8B2C3;
-  --border-color: #1E293B;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --border-color: #334155;
   --border-glass: rgba(255, 255, 255, 0.04);
 
   --primary-color: #C084FC;
@@ -327,14 +327,14 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 }
 
 [data-theme="dark"] .btn-secondary {
-  background: #1e293b;
-  color: #f1f5f9;
+  background: #1E293B;
+  color: #F1F5F9;
   border-color: #334155;
 }
 
 [data-theme="dark"] .btn-secondary:hover {
   background: #334155;
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
 /* 響應式設計 */

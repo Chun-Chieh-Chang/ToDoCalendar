@@ -1,3 +1,22 @@
+## 2026-03-20: 全域對比度優化與 CSS 掃描器增強 (Current)
+
+- **目標**: 根據「色彩大師規範」更新全域變數，並增強對比度掃描系統以支援 CSS 變數解析。
+- **優化範圍**:
+  - **色彩體系 (index.css)**:
+    - 根據規範調整 `Light Mode` 與 `Dark Mode` 的背景、表面與文字顏色。
+    - 確保 `text-primary` 與 `text-secondary` 符合 WCAG 2.1 AA 4.5:1 的對比度要求。
+  - **CSS 掃描器 (src/utils/cssScanner.ts)**:
+    - 實作「雙層掃描」機制：第一層蒐集所有 CSS 變數，第二層解析規則並替換 `var()`。
+    - 支援遞迴解析變數，確保深度定義的顏色也能被正確計算。
+  - **組件級深層優化**:
+    - 針對 `AppGuide.css`, `TaskListView.css`, `TaskForm.css` 與 `Calendar.css` 進行精準替換，移除硬編碼色值。
+    - 解決「便利貼牆」在深色模式下的邊框與背景對比度微調。
+- **邏輯檢核**:
+  - 驗證 `index.css` 內的變數已成功替換並應用於全域樣式。
+  - 手動檢查 `btn-secondary` 在深色模式下的配色一致性。
+
+---
+
 ## 2026-03-14: UI/UX & Data Management Optimization
 
 - **24-Hour Time Format**:
@@ -11,6 +30,7 @@
 - **Import Race Condition Fix**:
   - **Action**: Modified `App.tsx` and `storage.ts` to synchronize state immediately upon import via `dispatch`.
   - **Result**: Prevented the auto-save mechanism from overwriting imported data with stale state, ensuring reliable first-time data migration.
+
 ### ⚠️ 錯誤分析與預防措施 (Incident Report: Time Format Inconsistency)
 
 **1. 問題描述 (Issue)**:
@@ -31,14 +51,7 @@
 
 ---
 
-## 2026-03-14: Codebase Synchronization
-
-- **Git Synchronization**:
-  - **Action**: Performed `git pull`.
-  - **Result**: "Already up to date." Current codebase is confirmed to be in sync with the remote repository.
-  - **Status**: Working tree clean.
-
-## 2026-03-01: UI/UX 對比度優化與關聯邏輯強化 (Current)
+## 2026-03-01: UI/UX 對比度優化與關聯邏輯強化
 
 - **目標**: 解決「使用指南」與「任務清單」在深色模式下的對比度問題，強化頁面關聯邏輯的視覺導引。
 - **優化範圍**:

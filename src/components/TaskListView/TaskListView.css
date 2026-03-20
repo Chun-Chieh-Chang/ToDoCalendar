@@ -36,12 +36,12 @@
 
 .stat-pill {
     padding: 4px 12px;
-    background: #f1f5f9; /* Soft Slate */
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
     border-radius: 99px;
     font-size: 13px;
     font-weight: 600;
-    color: #475569; /* Slate 600 */
+    color: var(--text-secondary);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
 }
 
@@ -247,9 +247,9 @@
 }
 
 [data-theme="dark"] .sticky-wall .task-card {
-    background: #1e293b; /* Slate 800 */
-    color: #f1f5f9; /* Slate 100 */
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color) !important;
 }
 
 [data-theme="dark"] .stat-pill {
