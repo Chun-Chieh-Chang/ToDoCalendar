@@ -42,6 +42,17 @@
   --task-purple-bg: #FAF5FF;
   --task-purple-text: #6B21A8;
 
+  /* Priority Colors - Light */
+  --priority-high-bg: #fee2e2;
+  --priority-high-text: #dc2626;
+  --priority-high-border: #fecaca;
+  --priority-medium-bg: #fef3c7;
+  --priority-medium-text: #d97706;
+  --priority-medium-border: #fde68a;
+  --priority-low-bg: #dcfce7;
+  --priority-low-text: #16a34a;
+  --priority-low-border: #bbf7d0;
+
   --shadow-premium:
     0 10px 30px -5px rgba(0, 0, 0, 0.05),
     0 5px 15px -5px rgba(0, 0, 0, 0.02);
@@ -56,7 +67,7 @@
   --sidebar-bg: rgba(2, 6, 23, 0.85);
 
   --text-primary: #F1F5F9;
-  --text-secondary: #94A3B8;
+  --text-secondary: #B0B9C8;
   --border-color: #334155;
   --border-glass: rgba(255, 255, 255, 0.04);
 
@@ -72,6 +83,17 @@
   --task-yellow-text: #FDE68A;
   --task-purple-bg: rgba(88, 28, 135, 0.4);
   --task-purple-text: #D8B4FE;
+
+  /* Priority Colors - Dark */
+  --priority-high-bg: rgba(220, 38, 38, 0.2);
+  --priority-high-text: #fca5a5;
+  --priority-high-border: rgba(220, 38, 38, 0.4);
+  --priority-medium-bg: rgba(217, 119, 6, 0.2);
+  --priority-medium-text: #fcd34d;
+  --priority-medium-border: rgba(217, 119, 6, 0.4);
+  --priority-low-bg: rgba(22, 163, 74, 0.2);
+  --priority-low-text: #86efac;
+  --priority-low-border: rgba(22, 163, 74, 0.4);
 
   --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
 }

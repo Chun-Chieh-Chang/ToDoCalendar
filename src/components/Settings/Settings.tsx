@@ -20,65 +20,69 @@ const Settings = ({
 
   const handleSettingChange = (key: string, value: any) => {
     let newSettings = { ...settings, [key]: value };
+    // 如果是語言變更，立即套用以刷新介面
     onSettingsChange(newSettings);
   };
 
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={t('settings')}>
+    <Modal isOpen={isOpen} onClose={onClose} title={t('settingsTitle')}>
       <div className="settings-container">
         {/* 常規設定 */}
         <div className="setting-group">
-          <h3>{t('generalSettings')}</h3>
+          <h3>{t('interfaceSettings')}</h3>
           <div className="setting-item">
-            <label>{t('language')}</label>
+            <label>{t('languageLabel')}</label>
             <select
               value={settings.language}
               onChange={(e) => handleSettingChange('language', e.target.value)}
             >
-              <option value="zh-TW">繁體中文</option>
-              <option value="en-US">English</option>
+              <option value="zh-TW">{t('traditionalChinese')}</option>
+              <option value="en">{t('english')}</option>
             </select>
           </div>
           <div className="setting-item">
-            <label>{t('theme')}</label>
+            <label>{t('themeLabel')}</label>
             <select
               value={settings.theme}
               onChange={(e) => handleSettingChange('theme', e.target.value)}
             >
-              <option value="light">明亮模式</option>
-              <option value="dark">深色模式</option>
+              <option value="light">{t('lightTheme')}</option>
+              <option value="dark">{t('darkTheme')}</option>
+              <option value="system">{t('systemTheme')}</option>
             </select>
           </div>
         </div>
 
         <div className="setting-group">
-          <h3>User Profile</h3>
+          <h3>{t('userProfile')}</h3>
           <div className="setting-item profile-info">
             <div className="profile-label">
-              <label>使用者名稱</label>
-              <span className="profile-role">系統管理員</span>
+              <label>{t('userNameLabel')}</label>
+              <span className="profile-role">{t('systemAdmin')}</span>
             </div>
             <input 
               type="text" 
               value={settings.userName || 'Admin'} 
               onChange={(e) => handleSettingChange('userName', e.target.value)}
-              placeholder="輸入顯示名稱"
+              placeholder={t('enterDisplayName')}
             />
           </div>
           <div className="setting-item profile-id">
-            <label>裝置 ID</label>
+            <label>{t('deviceIdLabel') || '裝置 ID'}</label>
             <div className="id-container">
               <code>{settings.deviceId || 'DEV-3KIDS-2026'}</code>
             </div>
           </div>
         </div>
 
-        <div className="settings-footer">
-          <p className="version-info">版本: 1.2.0 | ToDoCalendar Desktop</p>
-          <button className="btn-primary" onClick={onClose}>
-            {t('saveAndClose') || '關閉'}
+        <div className="setting-actions">
+          <p className="version-info">
+            {t('versionInfo').replace('{version}', '1.3.0')}
+          </p>
+          <button className="btn btn-primary" onClick={onClose}>
+            {t('saveAndClose')}
           </button>
         </div>
       </div>

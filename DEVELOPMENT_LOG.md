@@ -1,6 +1,152 @@
-## 2026-03-20: 全域對比度優化與 CSS 掃描器增強 (Current)
+## 2026-03-20 | 設定按鈕修復與全系統國際化 (i18n) 徹底優化
 
-- **目標**: 根據「色彩大師規範」更新全域變數，並增強對比度掃描系統以支援 CSS 變數解析。
+**1. 目標**: 修復設定面板「儲存並關閉」按鈕失效問題，並實現 100% 的語系切換支援（包含導覽、工具提示、初始任務及彈窗標籤）。
+
+**2. 核心修正**:
+- **按鈕功能與佈局 (Settings.tsx & Settings.css)**:
+    - 修正 `settings-footer` 誤植為 `setting-actions` 的 CSS 類名衝突。
+    - 修正 `btn-primary` 欠缺基類 `btn` 導致的樣式失效。
+    - 確保「儲存並關閉」按鈕能正確觸發狀態儲存與視窗關閉邏輯。
+- **全語意化 i18n 遷移 (i18n.ts & App.tsx/Calendar.tsx/etc.)**:
+    - **Key 補原**: 新建超過 30 組缺失翻譯金鑰，涵蓋側邊欄導覽、所有視圖標題（如「靈感待辦牆」）、圖表進度條及退出提示。
+    - **深層組件解耦**: 
+        - `Calendar.tsx`: 移除硬編碼的「週一、週二」及懸停提示字串，改為動態注入。
+        - `Modal.tsx`: 導入 `useAppContext` 以實現關閉按鈕 (`aria-label`) 的即時語系變換。
+        - `AppContext.tsx`: 確保「歡迎任務」在系統初次啟動時，能根據使用者環境語言自動生成正確的翻譯內容。
+- **i18n 基礎設施強化**:
+    - 修改 `getTranslation` 以支援回傳數組 (Array)，解決週日期標籤的渲染需求。
+    - 統一 AppContext 的 `t` 函數型別為 `any`，增強對多元翻譯結構的容錯能力。
+
+**3. 成果**:
+- 實現了「無死角」的國際化體驗，切換至 English 後，所有導覽與互動提示均無殘留中文。
+- 修復了設定面板的嚴重交互 Bug，確保設定流程順暢無阻。
+- 通過 Browser Subagent 驗證，確認 UI 佈局在語系切換後依然保持對齊與國際水準的 premium 感。
+
+---
+
+## 2026-03-20 | UI/UX 深度優化與伺服器連線修復
+
+**1. 目標**: 解決使用者提出的 UI 對比度問題，並修復 `ERR_CONNECTION_REFUSED` 連線異常。
+
+**2. 核心修正**:
+- **連線修復**: 發現 Vite 開發伺服器未啟動，透過 `cmd /c "npm run dev"` 在背景啟動伺服器，恢復 `http://localhost:5173/ToDoCalendar/` 的連線。
+- **UI 驗證**: 使用 Browser Subagent 進行全自動視覺化驗證，確認深淺主題切換正常，無 Console 報錯。
+- **數據管理與設定優化**: 實施 CSS 變量化重構，優化徽章 (Badge) 與卡片 (Card) 的視覺層次感。
+
+
+**2. 核心修正**:
+- **數據管理頁面 (DataManagementView.css)**:
+    - 優化 `page-header` 描述文字，使用 `var(--text-secondary)` 並調整字重與行高。
+    - 重塑 `info-card` 樣式，提升背景透明度並明確規範深色模式下的標籤與內文顏色。
+- **設定頁面 (Settings.css)**:
+    - **全面變量化**: 移除超過 15 處硬編碼 Hex 色值，改為引用全域設計 Token。
+    - **組件級精修**: 
+        - 為「系統管理員」角色標籤設計專屬徽章樣式 (Badge)。
+        - 為「裝置 ID」打造專屬技術感徽章 (JetBrains Mono + Inset Shadow)。
+    - **表單優化**: 統一 Select 與 Input 的 Focus 狀態，整合至 `var(--accent-glow)`。
+
+**3. 成果**:
+- 實現了 100% 的設計系統變量覆蓋，徹底解決深色模式下的「黑底深字」對比度 Regression 噴發點。
+- UI 整體質感大幅提升，符合「國際一級水準」的 premium 視覺目標。
+
+---
+
+## 2026-03-20 | Phase 3: 語意化 i18n 遷移與深色模式對比度深檢 (Deep Clean)
+
+
+**1. 目標**: 全面移除硬編碼字串，修復語言切換失效問題，並提升深色模式輔助文字對比度。
+
+**2. 核心修正**:
+- **i18n 系統重寫 (src/utils/i18n.ts)**:
+    - 執行原子級重寫，新增 `lastMonth`, `nextMonth`, `savingTask` 等缺失 Key。
+    - 確保 `en` 與 `zh-TW` 鍵值對完全同步。
+- **深色模式對比優化 (src/index.css)**:
+    - 提升 `--text-secondary` 亮度（從 `#94A3B8` 至 `#B0B9C8`）。
+    - 移除 `TaskCard.css` 與 `Settings.css` 中的 hardcoded 灰色與過低不透明度。
+- **元件語意化重構**:
+    - `App.tsx`: 將導覽列、 Exit Modal 全面改為 `t()` 函數調用。
+    - `Settings.tsx`: 修正 `saveAndClose` 翻譯與版本號顯示 (v1.3.0)。
+    - `DataManagementView.tsx`: 實現全語意化支援。
+
+**3. 技術障礙解決 (Vite Dev Server Cache)**:
+- **現象**: 修改 `i18n.ts` 後，Vite 瀏覽器遮罩依然報錯 line 254 語法錯誤（實體檔案已無此行）。
+- **驗證**: 執行 `npx vite build` 成功，且 `tsc --noEmit` 無報錯，確認實體檔案正確性。
+- **結論**: Dev Server 發生 esbuild 緩存鎖死，建議手動重啟。
+
+---
+
+## 2026-03-20: 全域對比度優化 (水平展開) 與 語系切換穩定性增強
+
+- **目標**: 執行「水平展開深度全檢」，解決任務在不同分類顏色下的對比度問題，並修復切換主題/語系時的崩潰 Bug。
+- **修復與優化範圍**:
+  - **對比度工具 (src/utils/contrastUtils.ts)**:
+    - 實作 `getBestContrastColor`：根據背景亮度動態選擇深色 (#111827) 或淺色 (#F1F5F9) 文字，符合 WCAG 對比度規範。
+  - **分類色彩調整 (src/store/AppContext.tsx)**:
+    - 將「工作」分類顏色在深色模式下調整為 **Sky Blue (#60A5FA)**，提升視覺層次與識別度。
+  - **日曆組件 (src/components/Calendar/Calendar.tsx)**:
+    - 整合 `getBestContrastColor`，確保日曆格子內的任務預覽文字在任何背景下皆清晰可見。
+  - **穩定性增強 (src/App.tsx & Settings.tsx)**:
+    - **App.tsx**: 加入極致防禦性程式碼（Optional Chaining + 多重 Fallback），確保 `months` 屬性存取在任何狀態變動瞬間皆不會崩潰。
+    - **Settings.tsx**: 修正語系金鑰不一致錯誤 (`en-US` -> `en`)，並修正 `deviceId` 型別缺失問題。
+- **水平展開檢查清單**:
+  - [x] Calendar: 已修正動態對比度。
+  - [x] Kanban: 使用 `TaskCard` 且配色安全。
+  - [x] TaskListView: 標題與分類標籤對比度正常。
+  - [x] Dashboard: 圖表標籤與分類色塊對比度正常。
+- **驗證結果**:
+  - 通過瀏覽器自動化測試，模擬快速切換主題與語系，系統運行穩定，未再出現 `TypeError`。
+
+---
+
+## 2026-03-20: 語言切換異常修復與 UI 魯棒性增強 (Incident Fix)
+
+- **目標**: 修復 `TypeError: Cannot read properties of undefined (reading 'months')` 並強化語系切換的容錯機制。
+- **修復範圍**:
+  - **i18n 工具 (src/utils/i18n.ts)**:
+    - 優化 `getTranslation`：加入語言金鑰檢查，若傳入不支援的語系則強制回退至 `zh-TW`。
+    - 強化深層 Key 尋找邏輯，確保在回退機制下也能正確取得對應的字元。
+  - **狀態管理 (src/store/AppContext.tsx)**:
+    - 在 `loadData` 時加入語系驗證邏輯，防止 `localStorage` 或外部匯入的損毀/過舊設定導致應用程式崩潰。
+  - **主介面 (src/App.tsx)**:
+    - 針對「月份選擇器」加入防禦性渲染邏輯，確保即使語系物件暫時失效，也能顯示預設語系的月份名稱。
+- **驗證結果**:
+  - 模擬非法語系輸入（如手動修改 `localStorage`），應用程式能正確執行回退並正常啟動，console 無報錯。
+
+### ⚠️ 錯誤分析與預防措施 (Incident Report: Months Property TypeError)
+
+**1. 問題描述 (Issue)**:
+在 v1.3.0 版本中，當應用程式載入時或切換語系時，偶發性出現 `TypeError: Cannot read properties of undefined (reading 'months')` 導致白屏或局部 UI 崩潰。
+
+**2. 根本原因分析 (Root Cause)**:
+- **未授權的語系值**: `localStorage` 中可能存有過舊或未定義的語系代碼，導致 `translations[language]` 回傳 `undefined`。
+- **直接屬性存取**: 在 `App.tsx` 中直接對語系物件進行 `.months` 存取，缺乏 Optional Chaining 或 Null Check，造成渲染時的崩潰。
+
+**3. 矯正措施 (Corrective Actions)**:
+- **全域回退機制**: 在 `i18n` 底層實作強制回退，確保 API `t()` 始終回傳有效字串。
+- **狀態層攔截**: 在 `AppContext` 的生命週期起點（資料加載）即進行語系檢查與修正。
+- **防禦性 UI**: 對於關鍵的數組映射（`.map`）操作，使用 `?.` 或 `||` 提供安全預設值。
+
+**4. 預防措施 (Preventive Measures - SOP)**:
+- **禁止直接存取翻譯物件**: 應優先使用 `t()` 函數，若需直接存取 `translations` 物件進行循環，則必須包含 Fallback 邏輯。
+- **嚴格 Schema 驗證**: 對於從外部（Storage/File）載入的 Settings，必須與 `defaultSettings` 進行 Key/Value 匹配與合法性檢查。
+
+---
+
+## 2026-03-20 | 綜合優化：對比度強化與系統主題支持 (Phase 2)
+
+**1. 問題背景 (Background)**:
+- 雖然 Phase 1 解決了基礎對比度與崩潰問題，但 **20% 透明度背景** 的任務 Pill 在深色模式下與深色格子混合後，若僅依據原始分類色計算對比度，會導致「深色文字/深色背景」的 Regression。
+- `system` 主題設定缺乏 JS 層級的解析，導致對比度計算邏輯與實際呈現的主題不對齊。
+
+**2. 核心技術修補 (Core Fixes)**:
+- **Alpha-Blending 模擬**：在 `contrastUtils.ts` 實作 `getBestContrastForOverlay`，模擬 foreground 與 background 混合後的正確亮度。
+- **主題解析流**：在 `App.tsx` 加入 `activeTheme` 偵測邏輯，將 `system` 偏好轉譯為明確的 `light` 或 `dark` 並傳遞給組件。
+- **語義化色彩代幣**：標準化 `priority-high-bg` 等 CSS 變數，移除 `TaskCard.tsx` 中的硬編碼顏色。
+
+**3. 驗證結果**:
+- 測項：工作 (Sky Blue) 分類在深色模式下。
+- 結果：文字由深藍色成功轉化為 **純白 (#F1F5F9)**，對比度完美。
+- 測試環境：Windows / Vite Dev Server / Chromium。
 - **優化範圍**:
   - **色彩體系 (index.css)**:
     - 根據規範調整 `Light Mode` 與 `Dark Mode` 的背景、表面與文字顏色。

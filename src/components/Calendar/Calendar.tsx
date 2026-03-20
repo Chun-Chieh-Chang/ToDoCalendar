@@ -3,15 +3,17 @@ import { format } from 'date-fns';
 import * as React from 'react';
 import './Calendar.css';
 import { Task, CategoryConfig } from '../../types';
+import { getBestContrastForOverlay } from '../../utils/contrastUtils';
 
 interface CalendarProps {
   currentMonth: Date;
   selectedDate: string;
   onDateSelect: (date: Date) => void;
   onDateDoubleClick: (date: Date) => void;
-  onMonthChange: (date: Date) => void;
   tasks: Task[];
   categories: CategoryConfig[];
+  theme?: 'light' | 'dark';
+  t: (key: string) => any;
 }
 
 const Calendar = ({
@@ -19,23 +21,25 @@ const Calendar = ({
   selectedDate,
   onDateSelect,
   onDateDoubleClick,
-  onMonthChange,
   tasks,
-  categories
+  categories,
+  theme = 'light',
+  t
 }: CalendarProps) => {
   // 使用 useMemo 優化性能
   const days = (React as any).useMemo(() => {
     const getMonthDays = (date: Date) => {
       const days = [];
-      const start = new Date(date.getFullYear(), date.getMonth(), 1);
+      const safeDate = isNaN(date.getTime()) ? new Date() : date;
+      const start = new Date(safeDate.getFullYear(), safeDate.getMonth(), 1);
       const startDate = new Date(start);
       startDate.setDate(startDate.getDate() - startDate.getDay());
 
       // 計算需要的行數 (5行或6行)
-      const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+      const daysInMonth = new Date(safeDate.getFullYear(), safeDate.getMonth() + 1, 0).getDate();
       // 簡單判斷：如果第一天+當月天數補齊第一週空缺後小於等於35，則只要35格
       const firstDayIndex = start.getDay();
-      const daysNeeded = firstDayIndex + daysInMonth;
+      const daysNeeded = (isNaN(firstDayIndex) ? 0 : firstDayIndex) + (isNaN(daysInMonth) ? 30 : daysInMonth);
       const renderDays = daysNeeded <= 35 ? 35 : 42;
 
       for (let i = 0; i < renderDays; i++) {
@@ -70,7 +74,7 @@ const Calendar = ({
   return (
     <div className="calendar">
       <div className="calendar-weekdays">
-        {['週日', '週一', '週二', '週三', '週四', '週五', '週六'].map(day => (
+        {t('weekdays').map(day => (
           <div key={day} className="weekday">{day}</div>
         ))}
       </div>
@@ -94,10 +98,15 @@ const Calendar = ({
           const getTaskStyle = (task: any) => {
             const category = categories.find(c => c.id === task.category);
             if (category) {
+              // Calculate text color based on the category color blended over the cell background.
+              // We use 0.2 alpha (20%) which matches the backgroundColor opacity.
+              const baseBg = theme === 'dark' ? '#1E293B' : '#FFFFFF';
+              const textColor = getBestContrastForOverlay(category.color, baseBg, 0.2, '#111827', '#F1F5F9');
+              
               return {
                 borderLeftColor: category.color,
                 backgroundColor: `${category.color}20`, // 20% opacity
-                color: category.color
+                color: textColor
               };
             }
 
@@ -116,8 +125,10 @@ const Calendar = ({
                 } ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`}
               onClick={() => onDateSelect(day)}
               onDoubleClick={() => isCurrentMonth && onDateDoubleClick(day)}
-              disabled={!isCurrentMonth}
-              title={tasksForDay.length > 0 ? `此日有 ${tasksForDay.length} 個任務\n${taskListTooltip}\n\n雙擊查看詳情` : '雙擊查看任務列表'}
+              title={tasksForDay.length > 0 
+                ? `${t('tasksOnThisDay').replace('{count}', tasksForDay.length.toString())}\n${taskListTooltip}\n\n${t('doubleClickToView')}` 
+                : t('doubleClickToTaskList')
+              }
             >
               <div className="day-number">{day.getDate()}</div>
 
@@ -129,7 +140,6 @@ const Calendar = ({
                       key={idx}
                       className="task-preview-item"
                       style={getTaskStyle(task)}
-                      title={task.title}
                     >
                       {task.time && <span className="task-time">{task.time}</span>}
                       {task.title}

@@ -166,24 +166,17 @@
   justify-content: center;
   transition: all 0.2s ease;
   font-size: 16px;
+  color: var(--text-primary);
 }
 
 .action-btn:hover {
-  background: #f0f3f7;
+  background: var(--bg-color);
   transform: scale(1.1);
 }
 
 .action-btn:active {
   transform: scale(0.9);
-  background: rgba(99, 102, 241, 0.15);
-}
-
-.edit-btn:hover {
-  background: #e3f2fd;
-}
-
-.delete-btn:hover {
-  background: #ffebee;
+  background: var(--accent-glow);
 }
 
 .task-quick-schedule {
@@ -195,7 +188,7 @@
 .task-quick-schedule button {
   padding: 6px 12px;
   background: var(--surface-color);
-  border: 1px solid var(--border-glass);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
@@ -248,7 +241,7 @@
 
 .task-card.completed .task-title {
   text-decoration: line-through;
-  color: #7f8c8d;
+  color: var(--text-secondary);
 }
 
 .task-description {
@@ -260,8 +253,8 @@
 }
 
 .task-notes {
-  background: #f8fafd;
-  border: 1px solid #eef2f7;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 12px;
   margin-top: 12px;
@@ -270,16 +263,15 @@
 .task-notes h4 {
   margin: 0 0 8px 0;
   font-size: 13px;
-  color: #7f8c8d;
-  font-weight: 600;
+  color: var(--text-secondary);
+  font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .task-notes p {
   margin: 0;
   font-size: 14px;
-  /* 從 13px 增加到 14px */
-  color: #555;
+  color: var(--text-primary);
   line-height: 1.5;
   font-weight: 500;
 }
@@ -291,7 +283,6 @@
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid var(--border-color);
-  opacity: 0.8;
   font-size: 13px;
   color: var(--text-secondary);
   flex-wrap: wrap;
@@ -299,20 +290,55 @@
   font-weight: 500;
 }
 
-/* The consolidated Dark Theme is handled via CSS variables in App.css */
+/* Dark Mode Overrides for TaskCard */
+[data-theme="dark"] .task-card {
+  background: rgba(30, 41, 59, 0.4);
+  border-color: var(--border-color);
+}
 
-/* 响应式设计 */
+[data-theme="dark"] .task-card:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .task-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .task-description {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .task-notes {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .task-category {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .task-quick-schedule button {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .checkbox-label {
+  background: transparent;
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .subtask-badge {
+  background: rgba(3, 105, 161, 0.2);
+  color: #7dd3fc;
+}
+
 @media (max-width: 768px) {
   .task-card {
     padding: 14px;
-  }
-
-  .task-actions {
-    margin-left: auto;
-  }
-
-  .task-content {
-    margin-left: 0;
   }
 
   .task-footer {
@@ -320,58 +346,4 @@
     align-items: flex-start;
     gap: 6px;
   }
-}
-
-/* Dark Mode Overrides for TaskCard */
-[data-theme="dark"] .task-card {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .task-card:hover {
-  background: rgba(15, 23, 42, 0.8);
-  border-color: var(--primary-color);
-}
-
-[data-theme="dark"] .task-title {
-  color: #FFFFFF;
-}
-
-[data-theme="dark"] .task-description {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-[data-theme="dark"] .task-notes {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .task-notes h4 {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-[data-theme="dark"] .task-notes p {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-[data-theme="dark"] .task-category {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: rgba(255, 255, 255, 0.7) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-[data-theme="dark"] .task-quick-schedule button {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.8);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .checkbox-label {
-  background: transparent;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="dark"] .subtask-badge {
-  background: rgba(3, 105, 161, 0.2);
-  color: #7dd3fc;
 }

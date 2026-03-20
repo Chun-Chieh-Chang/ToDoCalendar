@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useAppContext } from '../../store/AppContext';
 import './Modal.css';
 
 interface ModalProps {
@@ -11,6 +12,7 @@ interface ModalProps {
 }
 
 const Modal = ({ isOpen, onClose, title, children, className = '', headerActions }: ModalProps) => {
+    const { t } = useAppContext();
     if (!isOpen) return null;
 
     const handleBackdropClick = (e: any) => {
@@ -42,7 +44,7 @@ const Modal = ({ isOpen, onClose, title, children, className = '', headerActions
                         <button
                             className="modal-close"
                             onClick={onClose}
-                            aria-label="關閉"
+                            aria-label={t('closeLabel') || 'Close'}
                         >
                             ✕
                         </button>

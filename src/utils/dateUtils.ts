@@ -81,6 +81,8 @@ export const dateUtils = {
   },
 
   stringToDate(dateStr: string): Date {
-    return new Date(dateStr);
+    if (!dateStr) return new Date();
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? new Date() : date;
   }
 };

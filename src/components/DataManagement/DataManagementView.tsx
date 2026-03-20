@@ -21,7 +21,7 @@ const DataManagementView = () => {
             <header className="page-header">
                 <div className="header-info">
                     <h1><i className="ri-database-2-line"></i> {t('dataManagement')}</h1>
-                    <p>管理您的任務數據、備份與儲存路徑</p>
+                    <p>{t('dataManagementDesc')}</p>
                 </div>
             </header>
 
@@ -30,11 +30,11 @@ const DataManagementView = () => {
                     {/* 儲存路徑管理 - 僅限 Electron */}
                     {typeof (window as any).electronAPI !== 'undefined' ? (
                         <section className="data-section">
-                            <h3><i className="ri-folder-settings-line"></i> 儲存路徑管理</h3>
-                            <p className="section-desc">自定義您的數據檔案儲存位置，方便雲端同步或手動備份。</p>
+                            <h3><i className="ri-folder-settings-line"></i> {t('dataPathManagement')}</h3>
+                            <p className="section-desc">{t('dataPathDesc')}</p>
                             <div className="data-path-control">
-                                <div className="path-display" title={dataPath || '正在讀取...'}>
-                                    {dataPath || '載入中...'}
+                                <div className="path-display" title={dataPath || t('pathLoading')}>
+                                    {dataPath || t('pathLoading')}
                                 </div>
                                 <button
                                     className="btn-primary"
@@ -45,21 +45,21 @@ const DataManagementView = () => {
                                             const res = await (window as any).electronAPI.setCustomDataPath(dir);
                                             if (res.success) {
                                                 setDataPath(res.path);
-                                                alert('儲存路徑已更新！新路徑將於下次存檔時生效。');
+                                                alert(t('dataPathUpdated'));
                                             } else {
-                                                alert(`更換失敗: ${res.error}`);
+                                                alert(`${t('dataPathUpdateFailed')}: ${res.error}`);
                                             }
                                         }
                                     }}
                                 >
-                                    更換存儲目錄
+                                    {t('changePath')}
                                 </button>
                             </div>
                         </section>
                     ) : (
                         <section className="data-section info-card">
-                            <h3><i className="ri-information-line"></i> 網頁版儲存說明</h3>
-                            <p>您目前使用的是網頁版，資料安全地儲存在瀏覽器的 LocalStorage 中。若需跨設備同步，建議定期執行「匯出數據」。</p>
+                            <h3><i className="ri-information-line"></i> {t('webStorageHintTitle')}</h3>
+                            <p>{t('webStorageHintDesc')}</p>
                         </section>
                     )}
 
@@ -69,22 +69,22 @@ const DataManagementView = () => {
                                 <i className="ri-download-cloud-2-line"></i>
                             </div>
                             <h3>{t('exportData')}</h3>
-                            <p>將所有任務與設定匯出為 JSON 檔案，用於備份或遷移至其他裝置。</p>
+                            <p>{t('dataManagementDesc')}</p>
                             <button className="btn-secondary full-width" onClick={async () => {
                                 try {
                                     const result = await exportDataWithDialog();
                                     if (result.success) {
                                         if (result.filePath) {
-                                            alert(`數據已成功匯出至: ${result.filePath}`);
+                                            alert(`${t('exportSuccess')}: ${result.filePath}`);
                                         } else if (result.method !== 'download') {
-                                            alert('數據匯出成功！');
+                                            alert(t('exportData'));
                                         }
                                     }
                                 } catch (err: any) {
-                                    alert(`匯出失敗: ${err.message}`);
+                                    alert(`${t('exportData')} ${t('importFailed')}: ${err.message}`);
                                 }
                             }}>
-                                立即備份數據
+                                {t('backupNow')}
                             </button>
                         </section>
 
@@ -93,9 +93,9 @@ const DataManagementView = () => {
                                 <i className="ri-upload-cloud-2-line"></i>
                             </div>
                             <h3>{t('importData')}</h3>
-                            <p>從先前備份的 JSON 檔案中還原您的任務與設定。注意：這將覆蓋現有數據。</p>
+                            <p>{t('importConfirm').replace('?', '')}</p>
                             <button className="btn-secondary full-width" onClick={() => {
-                                if (!confirm('匯入數據將會覆蓋目前的任務與設定，確定要繼續嗎？')) return;
+                                if (!confirm(t('importConfirm'))) return;
                                 
                                 const input = document.createElement('input');
                                 input.type = 'file';
@@ -108,10 +108,10 @@ const DataManagementView = () => {
                                         if (event.target?.result) {
                                             const success = storageService.importData(event.target.result as string);
                                             if (success) {
-                                                alert('匯入成功！頁面將重新載入以應用變更。');
+                                                alert(t('importSuccess'));
                                                 window.location.reload();
                                             } else {
-                                                alert('匯入失敗，請檢查檔案格式。');
+                                                alert(t('importFailed'));
                                             }
                                         }
                                     };
@@ -119,7 +119,7 @@ const DataManagementView = () => {
                                 };
                                 input.click();
                             }}>
-                                還原備份檔案
+                                {t('restoreNow')}
                             </button>
                         </section>
                     </div>
