@@ -1,0 +1,24 @@
+{
+  "minimumRatios": {
+    "normalText": 4.5,
+    "largeText": 3
+  },
+  "exclusions": {
+    "selectors": [],
+    "files": []
+  },
+  "fixBehavior": "review-only",
+  "themes": {
+    "light": {
+      "normalTextRatio": 4.5,
+      "largeTextRatio": 3,
+      "backgroundColors": ["#ffffff"]
+    },
+    "dark": {
+      "normalTextRatio": 4.5,
+      "largeTextRatio": 3,
+      "backgroundColors": ["#1a1a1a", "#2d2d2d"]
+    }
+  },
+  "backgroundColors": ["#ffffff"]
+}

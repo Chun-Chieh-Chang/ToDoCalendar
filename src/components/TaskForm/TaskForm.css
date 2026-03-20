@@ -19,7 +19,7 @@
 .form-group label {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   letter-spacing: 0.5px;
 }
 
@@ -27,11 +27,11 @@
 .form-group select,
 .form-group textarea {
   padding: 12px 14px;
-  border: 1px solid #e5e7eb; /* Border/Divider Light */
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   font-size: 14px;
-  background: #ffffff; /* Surface Light */
-  color: #111827; /* Primary Text Light */
+  background: var(--surface-color);
+  color: var(--text-primary);
   transition: all 0.2s ease;
   font-family: inherit;
 }
@@ -136,9 +136,9 @@
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
 [data-theme="dark"] .form-group textarea {
-  background: #1e293b; /* Surface Dark */
-  color: #f1f5f9; /* Primary Text Dark */
-  border-color: #334155; /* Border/Divider Dark */
+  background: var(--surface-color);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
 /* Fix Date & Time Icon Contrast */
