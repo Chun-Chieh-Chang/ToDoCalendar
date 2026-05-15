@@ -36,7 +36,7 @@
 .logo i {
   font-size: 2rem;
   color: var(--primary-neon);
-  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
 }
 
 .logo span {
@@ -76,7 +76,7 @@
 }
 
 .nav-item:hover {
-  background: rgba(139, 92, 246, 0.08);
+  background: rgba(59, 130, 246, 0.08);
   color: var(--primary-neon);
   transform: translateX(4px);
 }
@@ -84,7 +84,7 @@
 .nav-item.active {
   background: var(--gradient-neon);
   color: white;
-  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
 }
 
 .nav-item.active span {
@@ -147,7 +147,7 @@
   flex-direction: column;
   padding: 32px;
   gap: 24px;
-  background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.05), transparent);
+  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent);
 }
 
 .calendar-header {
