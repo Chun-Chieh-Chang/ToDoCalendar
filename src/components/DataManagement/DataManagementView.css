@@ -144,8 +144,9 @@
 }
 
 .action-card .btn {
-    width: 100%;
-    justify-content: center;
+    margin-top: auto; /* Push buttons to bottom */
+    padding: 14px 28px !important;
+    min-height: 50px;
 }
 
 @keyframes slideUp {
