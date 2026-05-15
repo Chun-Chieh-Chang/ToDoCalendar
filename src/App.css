@@ -7,7 +7,7 @@
   display: flex;
   height: 100vh;
   width: 100vw;
-  background: var(--bg-main);
+  background: transparent; /* Allow body-level blobs to show through */
   color: var(--text-pure);
   overflow: hidden;
   font-family: 'Inter', sans-serif;
@@ -147,7 +147,16 @@
   flex-direction: column;
   padding: 32px;
   gap: 24px;
-  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent);
+  background: transparent; /* Allow body blobs to show through */
+}
+
+.view-panel {
+  flex: 1;
+  background: transparent;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .calendar-header {
