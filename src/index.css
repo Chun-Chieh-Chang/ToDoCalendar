@@ -1,35 +1,49 @@
 /* 
- * ToDoCalendar x SkillsBuilder Flagship Design Tokens
+ * ToDoCalendar x SkillsBuilder Official Color Master Palette
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
 
 :root {
-  --primary-neon: #8b5cf6;
-  --secondary-neon: #ec4899;
-  --gradient-neon: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-  --accent-neon: #3b82f6;
+  /* SkillsBuilder Brand Tokens */
+  --primary-neon: #3B82F6; /* Royal Blue */
+  --secondary-neon: #60A5FA; /* Sky Blue */
+  --gradient-neon: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  --accent-glow: rgba(59, 130, 246, 0.15);
   
-  /* Light Mode (Premium Day) */
-  --bg-main: #fcfdff;
-  --surface-main: #ffffff;
-  --surface-glass: rgba(255, 255, 255, 0.7);
-  --text-pure: #0f172a;
-  --text-dim: #475569;
-  --text-muted: #94a3b8;
-  --border-soft: rgba(0, 0, 0, 0.06);
-  --shadow-premium: 0 10px 40px rgba(0, 0, 0, 0.04);
+  /* SkillsBuilder Light Mode (Day) */
+  --bg-main: #F9FAFB;
+  --surface-main: #FFFFFF;
+  --surface-glass: rgba(255, 255, 255, 0.8);
+  --text-pure: #111827;
+  --text-dim: #4B5563; /* Darker Slate 600 */
+  --text-muted: #6B7280; /* Gray 500 - Passes 4.5:1 on white */
+  --border-soft: #D1D5DB; /* Gray 300 - More visible border */
+  --shadow-premium: 0 10px 40px rgba(0, 0, 0, 0.03);
+  
+  /* Functional Colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
 }
 
 [data-theme="dark"] {
-  --bg-main: #020617; /* Slate 950 */
-  --surface-main: #0f172a;
-  --surface-glass: rgba(15, 23, 42, 0.8);
-  --text-pure: #f8fafc;
-  --text-dim: #cbd5e1;
-  --text-muted: #64748b;
-  --border-soft: rgba(255, 255, 255, 0.08);
-  --shadow-premium: 0 20px 60px rgba(0, 0, 0, 0.5);
+  /* SkillsBuilder Dark Mode (Night) */
+  --bg-main: #0F172A; /* Slate 900 */
+  --surface-main: #1E293B; /* Slate 800 */
+  --surface-glass: rgba(30, 41, 59, 0.8);
+  --text-pure: #F1F5F9; /* Slate 100 */
+  --text-dim: #94A3B8; /* Slate 400 */
+  --text-muted: #64748B;
+  --border-soft: #334155; /* Slate 700 */
+  --shadow-premium: 0 20px 60px rgba(0, 0, 0, 0.4);
+  
+  --primary-neon: #60A5FA; /* Sky Blue */
+  --gradient-neon: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+  --accent-glow: rgba(96, 165, 250, 0.15);
+  
+  --success: #34D399;
+  --error: #F87171;
 }
 
 * {
@@ -43,13 +57,11 @@ body {
   background-color: var(--bg-main);
   color: var(--text-pure);
   -webkit-font-smoothing: antialiased;
-  /* Dynamic Background Glow */
-  background-image: 
-    radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.03) 0%, transparent 50%);
   background-attachment: fixed;
+  transition: background-color 0.3s ease;
 }
 
+/* Global Button Styles to match Blue Palette */
 .btn {
   padding: 10px 20px;
   border-radius: 12px;
@@ -65,12 +77,12 @@ body {
 .btn-primary {
   background: var(--gradient-neon);
   color: white;
-  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.4);
 }
 
 .btn-secondary {
@@ -80,6 +92,6 @@ body {
 }
 
 .btn-secondary:hover {
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--bg-main);
   border-color: var(--primary-neon);
 }
