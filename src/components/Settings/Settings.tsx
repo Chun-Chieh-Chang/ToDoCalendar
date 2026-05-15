@@ -56,7 +56,6 @@ const Settings = ({
         </div>
 
         <div className="setting-group">
-        <div className="setting-group">
           <h3>雲端同步 (Cloud Sync)</h3>
           <div className="setting-item cloud-sync-item">
             <div className="cloud-info">
