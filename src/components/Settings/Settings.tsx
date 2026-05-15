@@ -56,6 +56,37 @@ const Settings = ({
         </div>
 
         <div className="setting-group">
+        <div className="setting-group">
+          <h3>雲端同步 (Cloud Sync)</h3>
+          <div className="setting-item cloud-sync-item">
+            <div className="cloud-info">
+              <label>雲端備份與同步</label>
+              <p className="setting-description">登入後即可在手機與電腦間同步數據</p>
+            </div>
+            <div className="cloud-actions">
+              <button 
+                className="btn-cloud" 
+                onClick={async () => {
+                  const { supabase } = await import('../../services/supabase');
+                  const { data: { session } } = await supabase.auth.getSession();
+                  if (session) {
+                    await supabase.auth.signOut();
+                    window.location.reload();
+                  } else {
+                    await supabase.auth.signInWithOAuth({ 
+                      provider: 'google',
+                      options: { redirectTo: window.location.origin + '/ToDoCalendar/' }
+                    });
+                  }
+                }}
+              >
+                <i className="ri-google-fill"></i> 使用 Google 登入
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="setting-group">
           <h3>{t('userProfile')}</h3>
           <div className="setting-item profile-info">
             <div className="profile-label">
@@ -77,13 +108,8 @@ const Settings = ({
           </div>
         </div>
 
-        <div className="setting-actions">
-          <p className="version-info">
-            {t('versionInfo').replace('{version}', '1.3.0')}
-          </p>
-          <button className="btn btn-primary" onClick={onClose}>
-            {t('saveAndClose')}
-          </button>
+        <div className="settings-version">
+          <p>版本: 1.3.0 | ToDoCalendar Professional</p>
         </div>
       </div>
     </Modal>

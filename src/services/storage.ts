@@ -1,4 +1,5 @@
 import { AppState, Task } from '../types';
+import { supabase } from './supabase';
 
 const STORAGE_KEYS = {
   TASKS: 'todo_tasks',
@@ -90,107 +91,139 @@ export const storageService = {
     }
   },
 
-  // Export Data
+  // Export/Import (Keep for manual backup)
   exportData(): string {
     const data = {
       tasks: this.getTasks(),
       settings: this.getSettings(),
       selectedDate: this.getSelectedDate(),
       filter: this.getFilter(),
-      version: '1.1.0',
+      version: '1.3.0',
       exportDate: new Date().toISOString()
     };
     return JSON.stringify(data, null, 2);
   },
 
-  // Import Data
   importData(jsonString: string): any {
     try {
       const data = JSON.parse(jsonString);
-
-      // Basic validation
-      if (!data || typeof data !== 'object') {
-        throw new Error('無效的資料格式');
-      }
-
-      // Validate tasks structure
-      if (data.tasks && Array.isArray(data.tasks)) {
-        const validTasks = data.tasks.filter((task: any) =>
-          task && typeof task === 'object' && task.id && task.title
-        );
-        if (validTasks.length !== data.tasks.length) {
-          console.warn('部分任務格式不符，已跳過部分匯入');
-        }
-        this.saveTasks(validTasks);
-      }
-
+      if (!data || typeof data !== 'object') throw new Error('Invalid format');
+      
+      if (data.tasks) this.saveTasks(data.tasks);
       if (data.settings) this.saveSettings(data.settings);
       if (data.selectedDate) this.saveSelectedDate(data.selectedDate);
       if (data.filter) this.saveFilter(data.filter);
 
       return data;
     } catch (error) {
-      console.error('匯入資料時發生錯誤:', error);
+      console.error('Import failed:', error);
       return null;
     }
   },
 
-  // Async Persistence for Electron
+  // --- Cloud Sync Logic (Supabase) ---
+
   async loadAllData(): Promise<any> {
-    const isElectron = typeof (window as any).electronAPI !== 'undefined';
-
-    if (isElectron) {
-      try {
-        const result = await (window as any).electronAPI.loadData();
-        if (result.success && result.data) {
-          console.log('Loaded data from file system');
-          // Sync to localStorage
-          if (result.data.tasks) this.saveTasks(result.data.tasks);
-          if (result.data.settings) this.saveSettings(result.data.settings);
-          if (result.data.filter) this.saveFilter(result.data.filter);
-          if (result.data.selectedDate) this.saveSelectedDate(result.data.selectedDate);
-
-          return result.data;
-        }
-      } catch (error) {
-        console.error('Error loading from file system:', error);
-      }
-    }
-
-    // Fallback to localStorage
-    return {
+    const localData = {
       tasks: this.getTasks(),
       settings: this.getSettings(),
       filter: this.getFilter(),
       selectedDate: this.getSelectedDate()
     };
+
+    // Check if user is logged in AND is the authorized admin
+    const { data: { session } } = await supabase.auth.getSession();
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+    
+    if (session?.user && session.user.email === adminEmail) {
+      try {
+        console.log('Admin detected. Syncing with Cloud...');
+        
+        // Parallel fetch from Cloud
+        const [cloudTasks, cloudSettings] = await Promise.all([
+          supabase.from('tasks').select('*').eq('user_id', session.user.id),
+          supabase.from('user_settings').select('*').eq('user_id', session.user.id).single()
+        ]);
+
+        // Merge Logic: Cloud wins if newer, or if local is empty
+        let finalTasks = localData.tasks;
+        if (cloudTasks.data && cloudTasks.data.length > 0) {
+          const cloudMap = new Map(cloudTasks.data.map(t => [t.id, t]));
+          const localMap = new Map(localData.tasks.map(t => [t.id, t]));
+          
+          cloudMap.forEach((task, id) => localMap.set(id, task));
+          finalTasks = Array.from(localMap.values());
+          this.saveTasks(finalTasks);
+        }
+
+        let finalSettings = localData.settings;
+        if (cloudSettings.data) {
+          finalSettings = { ...localData.settings, ...cloudSettings.data };
+          this.saveSettings(finalSettings as any);
+        }
+
+        return { ...localData, tasks: finalTasks, settings: finalSettings };
+      } catch (error) {
+        console.error('Cloud sync failed, using local:', error);
+      }
+    } else if (session?.user) {
+      console.warn('Authorized Admin only. Cloud sync disabled for this account.');
+    }
+
+    // Fallback for Electron
+    const isElectron = typeof (window as any).electronAPI !== 'undefined';
+    if (isElectron) {
+      const result = await (window as any).electronAPI.loadData();
+      if (result.success && result.data) return result.data;
+    }
+
+    return localData;
   },
 
   async saveAllData(data: { tasks?: Task[], settings?: any, filter?: any, selectedDate?: string }): Promise<void> {
-    // 1. Save to localStorage (Sync) - Always do this first as a reliable backup
+    // 1. Always save to localStorage immediately
     if (data.tasks !== undefined) this.saveTasks(data.tasks);
     if (data.settings !== undefined) this.saveSettings(data.settings);
     if (data.filter !== undefined) this.saveFilter(data.filter);
     if (data.selectedDate !== undefined) this.saveSelectedDate(data.selectedDate);
 
-    // 2. Save to File System (Async, Electron only)
-    const isElectron = typeof (window as any).electronAPI !== 'undefined';
-    if (isElectron) {
+    // 2. Async Sync to Cloud (ADMIN ONLY)
+    const { data: { session } } = await supabase.auth.getSession();
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+
+    if (session?.user && session.user.email === adminEmail) {
+      const userId = session.user.id;
+      
       try {
-        // Use provided data or fall back to what's currently in localStorage to ensure all data is persisted
-        const fullData = {
-          tasks: data.tasks !== undefined ? data.tasks : this.getTasks(),
-          settings: data.settings !== undefined ? data.settings : this.getSettings(),
-          filter: data.filter !== undefined ? data.filter : this.getFilter(),
-          selectedDate: data.selectedDate !== undefined ? data.selectedDate : this.getSelectedDate()
-        };
-        const result = await (window as any).electronAPI.saveData(fullData);
-        if (!result.success) {
-          console.error('Electron save failed:', result.error);
+        if (data.tasks) {
+          const tasksToUpsert = data.tasks.map(t => ({ ...t, user_id: userId }));
+          await supabase.from('tasks').upsert(tasksToUpsert);
+        }
+
+        if (data.settings) {
+          await supabase.from('user_settings').upsert({
+            user_id: userId,
+            theme: data.settings.theme,
+            language: data.settings.language,
+            user_name: data.settings.userName,
+            categories: data.settings.categories
+          });
         }
       } catch (error) {
-        console.error('Error saving to file system:', error);
+        console.error('Cloud push failed:', error);
       }
     }
+
+    // 3. Sync to File System (Electron only)
+    const isElectron = typeof (window as any).electronAPI !== 'undefined';
+    if (isElectron) {
+      const fullData = {
+        tasks: data.tasks || this.getTasks(),
+        settings: data.settings || this.getSettings(),
+        filter: data.filter || this.getFilter(),
+        selectedDate: data.selectedDate || this.getSelectedDate()
+      };
+      await (window as any).electronAPI.saveData(fullData);
+    }
   }
-};
+};

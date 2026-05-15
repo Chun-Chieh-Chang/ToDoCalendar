@@ -1,8 +1,10 @@
+import { format } from 'date-fns';
 import { storageService } from '../services/storage';
 
 export const exportDataWithDialog = async () => {
     const jsonStr = storageService.exportData();
-    const defaultFilename = `todo_calendar_backup.json`;
+    const dateStr = format(new Date(), 'yyyyMMdd');
+    const defaultFilename = `todo_calendar_backup_${dateStr}.json`;
 
     // 1. Electron 桌面版優先處理
     if (typeof (window as any).electronAPI !== 'undefined') {

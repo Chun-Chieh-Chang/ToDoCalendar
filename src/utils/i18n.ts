@@ -381,6 +381,11 @@ export const getTranslation = (language: 'zh-TW' | 'en' | string, key: string): 
     }
   }
 
+  // 魯棒性檢查：確保 weekdays 和 months 始終回傳陣列
+  if ((key === 'weekdays' || key === 'months') && !Array.isArray(value)) {
+    return key === 'weekdays' ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : [];
+  }
+
   return (typeof value === 'string' || Array.isArray(value)) ? value : key;
 };
 
