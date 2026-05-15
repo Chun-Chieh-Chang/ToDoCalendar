@@ -1,5 +1,6 @@
 import Modal from '../Modal/Modal';
 import { useAppContext } from '../../store/AppContext';
+import { authService } from '../../services/authService';
 import { SettingsState } from '../../types';
 import './Settings.css';
 
@@ -66,20 +67,17 @@ const Settings = ({
               <button 
                 className="btn-cloud" 
                 onClick={async () => {
-                  const { supabase } = await import('../../services/supabase');
-                  if (!supabase) {
-                    alert('雲端服務未配置。請在 .env 檔案中填寫 Supabase API 金鑰。');
-                    return;
-                  }
-                  const { data: { session } } = await supabase.auth.getSession();
-                  if (session) {
-                    await supabase.auth.signOut();
-                    window.location.reload();
-                  } else {
-                    await supabase.auth.signInWithOAuth({ 
-                      provider: 'google',
-                      options: { redirectTo: window.location.origin + '/ToDoCalendar/' }
-                    });
+                  try {
+                    const session = await authService.getCurrentUser();
+                    if (session) {
+                      await authService.signOut();
+                      window.location.reload();
+                    } else {
+                      const { error } = await authService.signInWithGoogle();
+                      if (error) alert(`登入失敗: ${error.message}`);
+                    }
+                  } catch (err: any) {
+                    alert('雲端服務未配置或發生錯誤。請檢查 .env 設定。');
                   }
                 }}
               >
