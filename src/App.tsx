@@ -448,352 +448,176 @@ const App = () => {
   };
 
   const filteredDateTasks = taskUtils.filterTasks(state.tasks.filter(t => t.date === state.selectedDate), state.filter);
-  const filteredAllPlannedTasks = taskUtils.filterTasks(state.tasks.filter(t => t.date), state.filter);
-  const filteredPendingTasks = taskUtils.filterTasks(state.tasks.filter(t => !t.date), state.filter);
-  const filteredAllTasks = taskUtils.filterTasks(state.tasks, state.filter);
+  const filteredAllPlanned      {/* 左側導航欄 (SkillsBuilder Floating Style) */}
+      <aside className="sidebar">
+        <div className="sidebar-top">
+          <div className="logo">
+            <i className="ri-calendar-todo-fill"></i>
+            <span>ToDoCalendar</span>
+          </div>
 
-
-
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-
-  // Handle system theme changes
-  const [systemTheme, setSystemTheme] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? 'dark' : 'light');
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  const activeTheme = state.settings.theme === 'system' ? systemTheme : state.settings.theme;
-
-  return (
-    <div className="app" data-theme={activeTheme}>
-      {/* 左側導航欄 - 僅在非手機版顯示 */}
-      {!isMobile && (
-        <aside className="sidebar">
-          <div className="sidebar-top">
-            <div className="logo">
-              <i className="ri-calendar-todo-fill"></i>
-              <span>ToDoCalendar</span>
+          <nav className="nav-menu">
+            <div className={`nav-item ${activeView === 'calendar' ? 'active' : ''}`} onClick={() => setActiveView('calendar')}>
+              <i className="ri-dashboard-3-line"></i>
+              <span>{t('calendarView')}</span>
+            </div>
+            
+            <div className={`nav-item ${activeView === 'all_tasks' ? 'active' : ''}`} onClick={() => setActiveView('all_tasks')}>
+              <i className="ri-task-line"></i>
+              <span>{t('myTasks')}</span>
             </div>
 
-            <nav className="nav-menu">
-              {/* 1. 使用說明 */}
-                <div className={`nav-item ${activeView === 'guide' ? 'active' : ''}`}
-                onClick={() => setActiveView('guide')}
-                title={t('guide')}
-              >
-                <div className="tooltip">
-                  <i className="ri-book-open-line"></i>
-                  <span>{t('guide')}</span>
-                  <span className="tooltip-text">{t('guideTooltip')}</span>
-                </div>
-              </div>
+            <div className={`nav-item ${activeView === 'pending' ? 'active' : ''}`} onClick={() => setActiveView('pending')}>
+              <i className="ri-inbox-line"></i>
+              <span>{t('pendingList')}</span>
+            </div>
 
-              {/* 2. 我的任務 (所有任務) */}
-              <div
-                className={`nav-item ${activeView === 'all_tasks' ? 'active' : ''}`}
-                onClick={() => setActiveView('all_tasks')}
-                title={t('myTasks')}
-              >
-                <div className="tooltip">
-                  <i className="ri-task-line"></i>
-                  <span>{t('myTasks')}</span>
-                  <span className="tooltip-text">{t('myTasksTooltip')}</span>
-                </div>
-              </div>
+            <div className={`nav-item ${activeView === 'kanban' ? 'active' : ''}`} onClick={() => setActiveView('kanban')}>
+              <i className="ri-layout-masonry-line"></i>
+              <span>{t('kanbanBoard')}</span>
+            </div>
 
-              {/* 3. 月曆視圖 */}
-              <div
-                className={`nav-item ${activeView === 'calendar' ? 'active' : ''}`}
-                onClick={() => setActiveView('calendar')}
-                title={t('calendarView')}
-              >
-                <div className="tooltip">
-                  <i className="ri-calendar-2-line"></i>
-                  <span>{t('calendarView')}</span>
-                  <span className="tooltip-text">{t('calendarViewTooltip')}</span>
-                </div>
-              </div>
+            <div className="nav-divider"></div>
 
-              {/* 4. 待辦清單 (Pending) */}
-              <div
-                className={`nav-item ${activeView === 'pending' ? 'active' : ''}`}
-                onClick={() => setActiveView('pending')}
-                title={t('pendingList')}
-              >
-                <div className="tooltip">
-                  <i className="ri-inbox-line"></i>
-                  <span>{t('pendingList')}</span>
-                  <span className="tooltip-text">{t('pendingListTooltip')}</span>
-                </div>
-              </div>
+            <div className={`nav-item ${activeView === 'data' ? 'active' : ''}`} onClick={() => setActiveView('data')}>
+              <i className="ri-database-2-line"></i>
+              <span>{t('dataManagement')}</span>
+            </div>
 
-              {/* 5. 已排程清單 (Scheduled Tasks) */}
-              <div
-                className={`nav-item ${activeView === 'tasks' ? 'active' : ''}`}
-                onClick={() => setActiveView('tasks')}
-                title={t('scheduledList')}
-              >
-                <div className="tooltip">
-                  <i className="ri-list-check"></i>
-                  <span>{t('scheduledList')}</span>
-                  <span className="tooltip-text">{t('scheduledListTooltip')}</span>
-                </div>
-              </div>
+            <div className="nav-item" onClick={handleOpenSettings}>
+              <i className="ri-settings-4-line"></i>
+              <span>{t('settingsTitle')}</span>
+            </div>
 
-              {/* 6. 看板管理 */}
-              <div
-                className={`nav-item ${activeView === 'kanban' ? 'active' : ''}`}
-                onClick={() => setActiveView('kanban')}
-                title={t('kanbanBoard')}
-              >
-                <div className="tooltip">
-                  <i className="ri-layout-column-line"></i>
-                  <span>{t('kanbanBoard')}</span>
-                  <span className="tooltip-text">{t('kanbanBoardTooltip')}</span>
-                </div>
-              </div>
+            <div className="nav-item exit-item" onClick={handleExit}>
+              <i className="ri-logout-circle-r-line"></i>
+              <span>{t('exitSystem')}</span>
+            </div>
+          </nav>
+        </div>
 
-              {/* 7. 數據洞察 */}
-              <div
-                className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
-                onClick={() => setActiveView('dashboard')}
-                title={t('insights')}
-              >
-                <div className="tooltip">
-                  <i className="ri-bar-chart-fill"></i>
-                  <span>{t('insights')}</span>
-                  <span className="tooltip-text">{t('insightsTooltip')}</span>
-                </div>
-              </div>
-
-               {/* 8. 數據管理 */}
-              <div
-                className={`nav-item ${activeView === 'data' ? 'active' : ''}`}
-                onClick={() => setActiveView('data')}
-                title={t('dataManagement')}
-              >
-                <div className="tooltip">
-                  <i className="ri-database-2-line"></i>
-                  <span>{t('dataManagement')}</span>
-                  <span className="tooltip-text">{t('dataManagementDesc')}</span>
-                </div>
-              </div>
-
-              {/* 9. 系統設定 */}
-              <div className="nav-item">
-                <div className="tooltip" onClick={handleOpenSettings} title={t('settingsTitle')}>
-                  <i className="ri-settings-4-line"></i>
-                  <span>{t('settingsTitle')}</span>
-                  <span className="tooltip-text">{t('settingsDesc')}</span>
-                </div>
-              </div>
-
-              <div className="nav-divider"></div>
-
-              {/* 8. 安全退出 */}
-              <div className="nav-item exit-item" onClick={handleExit}>
-                <div className="tooltip" title={t('exitSystem')}>
-                  <i className="ri-logout-box-r-line"></i>
-                  <span>{t('exitSystem')}</span>
-                  <span className="tooltip-text">{t('exitSystemDesc')}</span>
-                </div>
-              </div>
-            </nav>
-          </div>
-
-          <div className="sidebar-footer">
-            <div className="user-profile" onClick={() => setShowSettings(true)}>
-              {state.settings.userAvatar ? (
-                <img src={state.settings.userAvatar} alt="User Avatar" className="avatar" />
-              ) : (
-                <div className="avatar">{state.settings.userName ? state.settings.userName.charAt(0).toUpperCase() : 'U'}</div>
-              )}
-              <div className="user-info">
-                <h4>{state.settings.userName || 'User Name'}</h4>
-                <p>v1.3.0 Professional</p>
-              </div>
+        <div className="sidebar-footer">
+          <div className="user-profile" onClick={() => setShowSettings(true)}>
+            <div className="avatar">W</div>
+            <div className="user-info">
+              <h4>Wesley Chang</h4>
+              <p>v1.3.0 Flagship</p>
             </div>
           </div>
-        </aside>
-      )}
+        </div>
+      </aside>
 
-      {/* 手機版底部導航欄 */}
-      {isMobile && (
-        <nav className="mobile-nav">
-          <div className={`mobile-nav-item ${activeView === 'guide' ? 'active' : ''}`} onClick={() => setActiveView('guide')}>
-            <i className="ri-book-open-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'all_tasks' ? 'active' : ''}`} onClick={() => setActiveView('all_tasks')}>
-            <i className="ri-task-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'calendar' ? 'active' : ''}`} onClick={() => setActiveView('calendar')}>
-            <i className="ri-calendar-2-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'pending' ? 'active' : ''}`} onClick={() => setActiveView('pending')}>
-            <i className="ri-inbox-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'tasks' ? 'active' : ''}`} onClick={() => setActiveView('tasks')}>
-            <i className="ri-list-check"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'kanban' ? 'active' : ''}`} onClick={() => setActiveView('kanban')}>
-            <i className="ri-layout-column-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveView('dashboard')}>
-            <i className="ri-bar-chart-fill"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'data' ? 'active' : ''}`} onClick={() => setActiveView('data')} title={t('dataManagement')}>
-            <i className="ri-database-2-line"></i>
-          </div>
-          <div className="mobile-nav-item" onClick={handleOpenSettings} title={t('settingsTitle')}>
-            <i className="ri-settings-4-line"></i>
-          </div>
-        </nav>
-      )}
-
-      {/* 主內容區域 */}
+      {/* 主內容區域 (Horizontal Flow) */}
       <main className="main-content">
-        {/* 月曆標題列 - 僅在月曆/看板視圖顯示 */}
-        {(activeView === 'calendar' || activeView === 'kanban') && (
-          <header className="calendar-header">
-            <div className="month-selector">
-              <div className="date-dropdowns">
-                {/* 年份下拉選單 */}
-                <select
-                  className="year-select"
-                  value={currentMonth.getFullYear()}
-                  onChange={handleYearChange}
-                >
-                  {generateYearOptions().map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-
-                {/* 月份下拉選單 */}
-                <select
-                  className="month-select"
-                  value={currentMonth.getMonth()}
-                  onChange={handleMonthSelectChange}
-                >
-                  {(translations[(state?.settings?.language || 'zh-TW') as keyof typeof translations]?.months || translations['zh-TW']?.months || []).map((month: string, index: number) => (
-                    <option key={index} value={index}>{month}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="nav-arrows">
-                <button
-                  className="nav-btn"
-                  onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                  title={t('lastMonth') || '上個月'}
-                >
-                  <i className="ri-arrow-left-s-line"></i>
-                </button>
-                <button
-                  className="nav-btn"
-                  onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                  title={t('nextMonth') || '下個月'}
-                >
-                  <i className="ri-arrow-right-s-line"></i>
-                </button>
-              </div>
+        {/* Dashboard Header */}
+        <header className="calendar-header">
+          <div className="month-selector">
+            <div className="date-dropdowns">
+              <select className="year-select" value={currentMonth.getFullYear()} onChange={handleYearChange}>
+                {generateYearOptions().map(year => <option key={year} value={year}>{year}</option>)}
+              </select>
+              <select className="month-select" value={currentMonth.getMonth()} onChange={handleMonthSelectChange}>
+                {(translations[(state?.settings?.language || 'zh-TW') as keyof typeof translations]?.months || []).map((month: string, index: number) => (
+                  <option key={index} value={index}>{month}</option>
+                ))}
+              </select>
             </div>
-
-            <div className="header-actions">
-              <button className="action-btn btn-today" onClick={handleTodayClick}>
-                <i className="ri-focus-3-line"></i> {t('today')}
+            <div className="nav-arrows">
+              <button className="nav-btn" onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}>
+                <i className="ri-arrow-left-s-line"></i>
+              </button>
+              <button className="nav-btn" onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}>
+                <i className="ri-arrow-right-s-line"></i>
               </button>
             </div>
-          </header>
-        )}
+          </div>
 
-        {/* 主內容區域容器 */}
+          <div className="header-actions">
+            <button className="btn btn-secondary" onClick={handleTodayClick}>
+              <i className="ri-focus-3-line"></i> {t('today')}
+            </button>
+            <button className="btn btn-primary" onClick={() => handleAddTask()}>
+              <i className="ri-add-line"></i> {t('addTask')}
+            </button>
+          </div>
+        </header>
+
+        {/* Horizontal Expanded Viewport */}
         <div className="calendar-wrapper">
-          {activeView === 'calendar' && (
-            <Calendar
-              currentMonth={currentMonth}
-              selectedDate={state.selectedDate}
-              onDateSelect={handleDateSelect}
-              onDateDoubleClick={handleDateDoubleClick}
-              tasks={state.tasks}
-              categories={state.settings.categories}
-              theme={activeTheme as 'light' | 'dark'}
-              t={t}
-            />
-          )}
-          {activeView === 'kanban' && (
-            <KanbanBoard
-              tasks={state.tasks}
-              onToggleComplete={handleToggleComplete}
-              onEdit={handleEditTask}
-              onDelete={handleDeleteTask}
-              onStatusChange={handleStatusChange}
-              onReorder={handleReorderTasks}
-              t={t}
-            />
-          )}
-          {activeView === 'tasks' && (
-            <TaskListView
-              title={t('scheduledListTitle')}
-              tasks={filteredAllPlannedTasks}
-              filter={state.filter}
-              onFilterChange={handleFilterChange}
-              onClearFilter={handleClearFilter}
-              onToggleComplete={handleToggleComplete}
-              onEdit={handleEditTask}
-              onDelete={handleDeleteTask}
-              onAddTask={handleAddTask}
-              onClearCompleted={() => handleClearCompleted(filteredAllPlannedTasks)}
-              onSchedule={handleScheduleTask}
-            />
-          )}
-          {activeView === 'pending' && (
-            <TaskListView
-              title={t('pendingWallTitle')}
-              tasks={filteredPendingTasks}
-              filter={state.filter}
-              onFilterChange={handleFilterChange}
-              onClearFilter={handleClearFilter}
-              onToggleComplete={handleToggleComplete}
-              onEdit={handleEditTask}
-              onDelete={handleDeleteTask}
-              onAddTask={handleAddTask}
-              onClearCompleted={() => handleClearCompleted(filteredPendingTasks)}
-              onSchedule={handleScheduleTask}
-              viewMode="sticky"
-            />
-          )}
-          {activeView === 'all_tasks' && (
-            <TaskListView
-              title={t('myTasksTitle')}
-              tasks={filteredAllTasks}
-              filter={state.filter}
-              onFilterChange={handleFilterChange}
-              onClearFilter={handleClearFilter}
-              onToggleComplete={handleToggleComplete}
-              onEdit={handleEditTask}
-              onDelete={handleDeleteTask}
-              onAddTask={handleAddTask}
-              onClearCompleted={() => handleClearCompleted(filteredAllTasks)}
-              onSchedule={handleScheduleTask}
-            />
-          )}
-          {activeView === 'guide' && <AppGuide />}
-          {activeView === 'dashboard' && <Dashboard />}
-          {activeView === 'data' && <DataManagementView />}
+          <div className="view-panel">
+            {activeView === 'calendar' && (
+              <Calendar
+                currentMonth={currentMonth}
+                selectedDate={state.selectedDate}
+                onDateSelect={handleDateSelect}
+                onDateDoubleClick={handleDateDoubleClick}
+                tasks={state.tasks}
+                categories={state.settings.categories}
+                theme={activeTheme as 'light' | 'dark'}
+                t={t}
+              />
+            )}
+            {activeView === 'kanban' && (
+              <KanbanBoard
+                tasks={state.tasks}
+                onToggleComplete={handleToggleComplete}
+                onEdit={handleEditTask}
+                onDelete={handleDeleteTask}
+                onStatusChange={handleStatusChange}
+                onReorder={handleReorderTasks}
+                t={t}
+              />
+            )}
+            {activeView === 'tasks' && (
+              <TaskListView
+                title={t('scheduledListTitle')}
+                tasks={filteredAllPlannedTasks}
+                filter={state.filter}
+                onFilterChange={handleFilterChange}
+                onClearFilter={handleClearFilter}
+                onToggleComplete={handleToggleComplete}
+                onEdit={handleEditTask}
+                onDelete={handleDeleteTask}
+                onAddTask={handleAddTask}
+                onClearCompleted={() => handleClearCompleted(filteredAllPlannedTasks)}
+                onSchedule={handleScheduleTask}
+              />
+            )}
+            {activeView === 'pending' && (
+              <TaskListView
+                title={t('pendingWallTitle')}
+                tasks={filteredPendingTasks}
+                filter={state.filter}
+                onFilterChange={handleFilterChange}
+                onClearFilter={handleClearFilter}
+                onToggleComplete={handleToggleComplete}
+                onEdit={handleEditTask}
+                onDelete={handleDeleteTask}
+                onAddTask={handleAddTask}
+                onClearCompleted={() => handleClearCompleted(filteredPendingTasks)}
+                onSchedule={handleScheduleTask}
+                viewMode="sticky"
+              />
+            )}
+            {activeView === 'all_tasks' && (
+              <TaskListView
+                title={t('myTasksTitle')}
+                tasks={filteredAllTasks}
+                filter={state.filter}
+                onFilterChange={handleFilterChange}
+                onClearFilter={handleClearFilter}
+                onToggleComplete={handleToggleComplete}
+                onEdit={handleEditTask}
+                onDelete={handleDeleteTask}
+                onAddTask={handleAddTask}
+                onClearCompleted={() => handleClearCompleted(filteredAllTasks)}
+                onSchedule={handleScheduleTask}
+              />
+            )}
+            {activeView === 'data' && <DataManagementView />}
+          </div>
         </div>
+      </main>
 
         {/* 底部提示 */}
         {activeView === 'calendar' && (
