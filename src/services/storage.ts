@@ -132,6 +132,8 @@ export const storageService = {
     };
 
     // Check if user is logged in AND is the authorized admin
+    if (!supabase) return localData;
+
     const { data: { session } } = await supabase.auth.getSession();
     const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
     
@@ -188,6 +190,8 @@ export const storageService = {
     if (data.selectedDate !== undefined) this.saveSelectedDate(data.selectedDate);
 
     // 2. Async Sync to Cloud (ADMIN ONLY)
+    if (!supabase) return;
+
     const { data: { session } } = await supabase.auth.getSession();
     const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
 

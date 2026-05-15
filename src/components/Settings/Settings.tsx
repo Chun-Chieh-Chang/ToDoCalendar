@@ -67,6 +67,10 @@ const Settings = ({
                 className="btn-cloud" 
                 onClick={async () => {
                   const { supabase } = await import('../../services/supabase');
+                  if (!supabase) {
+                    alert('雲端服務未配置。請在 .env 檔案中填寫 Supabase API 金鑰。');
+                    return;
+                  }
                   const { data: { session } } = await supabase.auth.getSession();
                   if (session) {
                     await supabase.auth.signOut();
