@@ -37,7 +37,7 @@ const DataManagementView = () => {
                                     {dataPath || t('pathLoading')}
                                 </div>
                                 <button
-                                    className="btn-primary"
+                                    className="btn btn-primary"
                                     disabled={!dataPath}
                                     onClick={async () => {
                                         const dir = await (window as any).electronAPI.selectDirectory();
@@ -70,7 +70,7 @@ const DataManagementView = () => {
                             </div>
                             <h3>{t('exportData')}</h3>
                             <p>{t('dataManagementDesc')}</p>
-                            <button className="btn-secondary full-width" onClick={async () => {
+                            <button className="btn btn-secondary full-width" onClick={async () => {
                                 try {
                                     const result = await exportDataWithDialog();
                                     if (result.success) {
@@ -94,7 +94,7 @@ const DataManagementView = () => {
                             </div>
                             <h3>{t('importData')}</h3>
                             <p>{t('importConfirm').replace('?', '')}</p>
-                            <button className="btn-secondary full-width" onClick={() => {
+                            <button className="btn btn-secondary full-width" onClick={() => {
                                 if (!confirm(t('importConfirm'))) return;
                                 
                                 const input = document.createElement('input');
