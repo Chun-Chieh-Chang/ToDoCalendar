@@ -37,13 +37,16 @@
     font-weight: 500;
 }
 
-/* Data Sections - Same as Settings Group */
+/* Data Sections - Enhanced for Main Flow visibility */
 .data-section {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-glass); /* Solid glass 0.8 opacity */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     padding: 32px;
     border-radius: 28px;
     border: 1px solid var(--border-soft);
-    transition: all 0.4s ease;
+    box-shadow: var(--shadow-premium);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="dark"] .data-section {
@@ -94,14 +97,17 @@
 
 .action-card {
     background: var(--surface-glass);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     padding: 40px;
-    border-radius: 24px;
+    border-radius: 28px;
     border: 1px solid var(--border-soft);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: var(--shadow-premium);
 }
 
 .action-card:hover {
