@@ -1,31 +1,36 @@
-
 import { format } from 'date-fns';
 import * as React from 'react';
 import './Calendar.css';
 import { Task, CategoryConfig } from '../../../../types';
+import { useAppStore } from '../../../../store/useAppStore';
 import { getBestContrastForOverlay } from '../../../../shared/utils/contrastUtils';
 
 interface CalendarProps {
+  t: (key: string) => string;
   currentMonth: Date;
   selectedDate: string;
-  onDateSelect: (date: Date) => void;
-  onDateDoubleClick: (date: Date) => void;
   tasks: Task[];
-  categories: CategoryConfig[];
-  theme?: 'light' | 'dark';
-  t: (key: string) => any;
+  onDateSelect: (date: string) => void;
+  onDateDoubleClick: (date: string) => void;
+  onMonthChange: (date: Date) => void;
+  categories: any[];
+  theme?: string;
 }
 
 const Calendar = ({
+  t,
   currentMonth,
   selectedDate,
+  tasks,
   onDateSelect,
   onDateDoubleClick,
-  tasks,
+  onMonthChange,
   categories,
-  theme = 'light',
-  t
+  theme: propTheme
 }: CalendarProps) => {
+  const storeTheme = useAppStore(state => state.settings.theme);
+  const theme = propTheme || storeTheme || 'light';
+  
   // 使用 useMemo 優化性能
   const days = (React as any).useMemo(() => {
     const getMonthDays = (date: Date) => {
