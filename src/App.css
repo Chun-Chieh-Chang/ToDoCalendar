@@ -845,7 +845,15 @@ body {
 
 .mobile-nav-item.active {
   color: var(--primary-color);
-  background: rgba(99, 102, 241, 0.08); /* Soft primary tint */
+}
+
+.mobile-nav-item span {
+  transition: color 0.3s ease;
+}
+
+.mobile-nav-item.active span {
+  color: var(--primary-color);
+  font-weight: 700;
 }
 
 .mobile-nav-item i {

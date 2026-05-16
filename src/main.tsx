@@ -9,9 +9,13 @@ const StrictMode = (React as any).StrictMode;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AppProvider>
-      {console.log('ToDoCalendar Loaded: v1.3.0 ' + new Date().toISOString())}
+    {console.log('ToDoCalendar Loaded: v1.3.0 ' + new Date().toISOString())}
       <App />
-    </AppProvider>
   </StrictMode>,
 )
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}service-worker.js`).catch(err => console.log('SW fail', err));
+  });
+}

@@ -1,5 +1,6 @@
 import { AppState, Task } from '../types';
 import { supabase } from './supabase';
+import { db } from './db';
 
 const STORAGE_KEYS = {
   TASKS: 'todo_tasks',
@@ -9,110 +10,87 @@ const STORAGE_KEYS = {
 };
 
 export const storageService = {
-  // Tasks
-  getTasks(): Task[] {
+  // --- Migration Logic ---
+  async migrateFromLocalStorage(): Promise<void> {
     try {
-      const tasks = localStorage.getItem(STORAGE_KEYS.TASKS);
-      return tasks ? JSON.parse(tasks) : [];
-    } catch (error) {
-      console.error('Failed to load tasks:', error);
-      return [];
-    }
-  },
+      const tasksCount = await db.tasks.count();
+      if (tasksCount > 0) return; // Already migrated or has data
 
-  saveTasks(tasks: Task[]): void {
-    try {
-      localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
-    } catch (error) {
-      console.error('Failed to save tasks:', error);
-    }
-  },
+      console.log('Migrating data from LocalStorage to IndexedDB (Dexie)...');
+      const lsTasks = localStorage.getItem(STORAGE_KEYS.TASKS);
+      if (lsTasks) {
+        const parsed = JSON.parse(lsTasks);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          await db.tasks.bulkPut(parsed);
+        }
+      }
 
-  // Settings
-  getSettings(): Partial<AppState['settings']> {
-    try {
-      const settings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      return settings ? JSON.parse(settings) : {};
-    } catch (error) {
-      console.error('Failed to load settings:', error);
-      return {};
-    }
-  },
+      const lsSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+      if (lsSettings) await db.appData.put({ id: 'settings', data: JSON.parse(lsSettings) });
 
-  saveSettings(settings: AppState['settings']): void {
-    try {
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-    }
-  },
+      const lsDate = localStorage.getItem(STORAGE_KEYS.SELECTED_DATE);
+      if (lsDate) await db.appData.put({ id: 'selectedDate', data: lsDate });
 
-  // Selected Date
-  getSelectedDate(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.SELECTED_DATE);
-  },
+      const lsFilter = localStorage.getItem(STORAGE_KEYS.FILTER);
+      if (lsFilter) await db.appData.put({ id: 'filter', data: JSON.parse(lsFilter) });
 
-  saveSelectedDate(date: string): void {
-    try {
-      localStorage.setItem(STORAGE_KEYS.SELECTED_DATE, date);
-    } catch (error) {
-      console.error('Failed to save selected date:', error);
-    }
-  },
-
-  // Filter
-  getFilter(): Partial<AppState['filter']> {
-    try {
-      const filter = localStorage.getItem(STORAGE_KEYS.FILTER);
-      return filter ? JSON.parse(filter) : {};
-    } catch (error) {
-      console.error('Failed to load filter:', error);
-      return {};
-    }
-  },
-
-  saveFilter(filter: AppState['filter']): void {
-    try {
-      localStorage.setItem(STORAGE_KEYS.FILTER, JSON.stringify(filter));
-    } catch (error) {
-      console.error('Failed to save filter:', error);
-    }
-  },
-
-  // Clear all data
-  clearAll(): void {
-    try {
+      // Clean up localStorage after successful migration
       localStorage.removeItem(STORAGE_KEYS.TASKS);
       localStorage.removeItem(STORAGE_KEYS.SETTINGS);
       localStorage.removeItem(STORAGE_KEYS.SELECTED_DATE);
       localStorage.removeItem(STORAGE_KEYS.FILTER);
+    } catch (e) {
+      console.error('Migration from LocalStorage failed:', e);
+    }
+  },
+
+  // --- IndexedDB Sync Logic ---
+  async getLocalData() {
+    const tasks = await db.tasks.toArray();
+    const settingsObj = await db.appData.get('settings');
+    const filterObj = await db.appData.get('filter');
+    const dateObj = await db.appData.get('selectedDate');
+
+    return {
+      tasks: tasks || [],
+      settings: settingsObj ? settingsObj.data : {},
+      filter: filterObj ? filterObj.data : {},
+      selectedDate: dateObj ? dateObj.data : null
+    };
+  },
+
+  // Clear all data
+  async clearAll(): Promise<void> {
+    try {
+      await db.tasks.clear();
+      await db.appData.clear();
     } catch (error) {
       console.error('Failed to clear data:', error);
     }
   },
 
-  // Export/Import (Keep for manual backup)
-  exportData(): string {
-    const data = {
-      tasks: this.getTasks(),
-      settings: this.getSettings(),
-      selectedDate: this.getSelectedDate(),
-      filter: this.getFilter(),
+  // Export/Import
+  async exportData(): Promise<string> {
+    const data = await this.getLocalData();
+    const exportData = {
+      ...data,
       version: '1.3.0',
       exportDate: new Date().toISOString()
     };
-    return JSON.stringify(data, null, 2);
+    return JSON.stringify(exportData, null, 2);
   },
 
-  importData(jsonString: string): any {
+  async importData(jsonString: string): Promise<any> {
     try {
       const data = JSON.parse(jsonString);
       if (!data || typeof data !== 'object') throw new Error('Invalid format');
       
-      if (data.tasks) this.saveTasks(data.tasks);
-      if (data.settings) this.saveSettings(data.settings);
-      if (data.selectedDate) this.saveSelectedDate(data.selectedDate);
-      if (data.filter) this.saveFilter(data.filter);
+      await this.saveAllData({
+        tasks: data.tasks,
+        settings: data.settings,
+        filter: data.filter,
+        selectedDate: data.selectedDate
+      });
 
       return data;
     } catch (error) {
@@ -121,15 +99,11 @@ export const storageService = {
     }
   },
 
-  // --- Cloud Sync Logic (Supabase) ---
+  // --- Main Sync Logic ---
 
   async loadAllData(): Promise<any> {
-    const localData = {
-      tasks: this.getTasks(),
-      settings: this.getSettings(),
-      filter: this.getFilter(),
-      selectedDate: this.getSelectedDate()
-    };
+    await this.migrateFromLocalStorage();
+    const localData = await this.getLocalData();
 
     // Check if user is logged in AND is the authorized admin
     if (!supabase) return localData;
@@ -155,21 +129,19 @@ export const storageService = {
           
           cloudMap.forEach((task, id) => localMap.set(id, task));
           finalTasks = Array.from(localMap.values());
-          this.saveTasks(finalTasks);
+          await db.tasks.bulkPut(finalTasks);
         }
 
         let finalSettings = localData.settings;
         if (cloudSettings.data) {
           finalSettings = { ...localData.settings, ...cloudSettings.data };
-          this.saveSettings(finalSettings as any);
+          await db.appData.put({ id: 'settings', data: finalSettings });
         }
 
         return { ...localData, tasks: finalTasks, settings: finalSettings };
       } catch (error) {
         console.error('Cloud sync failed, using local:', error);
       }
-    } else if (session?.user) {
-      console.warn('Authorized Admin only. Cloud sync disabled for this account.');
     }
 
     // Fallback for Electron
@@ -183,11 +155,22 @@ export const storageService = {
   },
 
   async saveAllData(data: { tasks?: Task[], settings?: any, filter?: any, selectedDate?: string }): Promise<void> {
-    // 1. Always save to localStorage immediately
-    if (data.tasks !== undefined) this.saveTasks(data.tasks);
-    if (data.settings !== undefined) this.saveSettings(data.settings);
-    if (data.filter !== undefined) this.saveFilter(data.filter);
-    if (data.selectedDate !== undefined) this.saveSelectedDate(data.selectedDate);
+    // 1. Always save to Dexie immediately
+    try {
+      if (data.tasks !== undefined) {
+        // Replace all tasks for full sync or use bulkPut for merge
+        // Since `data.tasks` represents the full state from Zustand, we overwrite
+        await db.transaction('rw', db.tasks, async () => {
+          await db.tasks.clear();
+          await db.tasks.bulkAdd(data.tasks!);
+        });
+      }
+      if (data.settings !== undefined) await db.appData.put({ id: 'settings', data: data.settings });
+      if (data.filter !== undefined) await db.appData.put({ id: 'filter', data: data.filter });
+      if (data.selectedDate !== undefined) await db.appData.put({ id: 'selectedDate', data: data.selectedDate });
+    } catch (err) {
+      console.error('Failed to save to IndexedDB', err);
+    }
 
     // 2. Async Sync to Cloud (ADMIN ONLY)
     if (!supabase) return;
@@ -221,13 +204,14 @@ export const storageService = {
     // 3. Sync to File System (Electron only)
     const isElectron = typeof (window as any).electronAPI !== 'undefined';
     if (isElectron) {
+      const localData = await this.getLocalData();
       const fullData = {
-        tasks: data.tasks || this.getTasks(),
-        settings: data.settings || this.getSettings(),
-        filter: data.filter || this.getFilter(),
-        selectedDate: data.selectedDate || this.getSelectedDate()
+        tasks: data.tasks || localData.tasks,
+        settings: data.settings || localData.settings,
+        filter: data.filter || localData.filter,
+        selectedDate: data.selectedDate || localData.selectedDate
       };
       await (window as any).electronAPI.saveData(fullData);
     }
   }
-};
+};
