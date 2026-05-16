@@ -13,6 +13,7 @@
     "pack": "vite build && electron-builder --win portable"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
     "css-tree": "^3.2.1",
     "date-fns": "^2.30.0",
     "postcss": "^8.5.8",
