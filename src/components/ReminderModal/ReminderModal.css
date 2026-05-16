@@ -64,8 +64,9 @@
 }
 
 .btn-secondary {
-    background: #f0f3f7;
-    color: #7f8c8d;
+    background: var(--glass-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-glass);
 }
 
 .btn-secondary:hover {
@@ -130,9 +131,9 @@
 
 /* Dark mode button styles */
 [data-theme="dark"] .btn-secondary {
-    background: #333333;
-    color: #ffffff;
-    border: 1px solid #555555;
+    background: var(--glass-bg-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--border-glass);
 }
 
 [data-theme="dark"] .btn-secondary:hover {

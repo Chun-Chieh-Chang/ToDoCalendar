@@ -102,9 +102,9 @@
 }
 
 .btn-cancel {
-  background: #f3f4f6;
-  color: #374151;
-  border: 2px solid #e5e7eb;
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-glass);
 }
 
 .btn-cancel:hover {
@@ -181,9 +181,9 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 }
 
 [data-theme="dark"] .btn-cancel {
-  background: #333333;
-  color: #ffffff;
-  border-color: #444444;
+  background: var(--glass-bg-dark);
+  color: var(--text-primary);
+  border-color: var(--border-glass);
 }
 
 [data-theme="dark"] .btn-cancel:hover {

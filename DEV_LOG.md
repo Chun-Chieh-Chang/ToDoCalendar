@@ -9,6 +9,12 @@
 - **Failure F - 文檔冗餘 (Documentation Redundancy)**:
     - **現象**: 同時存在 `DEV_LOG.md` 與 `DEVELOPMENT_LOG.md`。
     - **成因**: 模型未能貫徹執行 MECE 掃描，導致單一真理來源 (SSOT) 破碎。
+- **Failure G - 視覺變數屏蔽 (False Opaque Regression)**:
+    - **現象**: 透明度調整失效，調整至極限依然不透明。
+    - **成因**: 
+        1. **標度衝突**: 在 JS 層對已經標準化 (0-1) 的數值執行了二次標準化 (/100)，導致數值縮小 100 倍。
+        2. **層疊覆蓋**: 忽略了 `@media` 與組件層級的硬編碼背景色。
+    - **CAPA**: 實裝「標度源審計」與「全域焦土搜索」SOP。
 
 ### 2. 最終矯正措施 (Corrective Actions / CAPA)
 - **依賴修復**: 補齊 `supabase-js`，驗證全站編譯通過。

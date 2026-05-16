@@ -34,7 +34,7 @@
   --glass-opacity: 0.18;
   --border-opacity: 0.6;
   --glass-bg: rgba(var(--glass-rgb), var(--glass-opacity)); 
-  --glass-bg-dark: rgba(var(--glass-rgb), calc(var(--glass-opacity) * 0.4)); 
+  --glass-bg-dark: rgba(var(--glass-rgb), var(--glass-opacity)); 
   --glass-blur: 24px;
   --border-glass: rgba(var(--border-rgb), var(--border-opacity));
   --border-glass-strong: rgba(var(--border-rgb), calc(var(--border-opacity) + 0.2));
@@ -347,31 +347,23 @@ h6 {
   animation: shine 1s ease-in-out;
 }
 
-/* 深色主題 */
+/* 深色主題媒體查詢同步 */
 @media (prefers-color-scheme: dark) {
-
   .input,
   .select,
   .textarea {
-    background: #000000;
-    border-color: #333333;
-    color: #e5e7eb;
-  }
-
-  .input:focus,
-  .select:focus,
-  .textarea:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    background: var(--glass-bg-dark);
+    border-color: var(--border-glass);
+    color: var(--text-primary);
   }
 
   .card {
-    background: #000000;
-    border-color: #333333;
+    background: var(--glass-bg-dark);
+    border-color: var(--border-glass);
   }
 
   .card:hover {
-    border-color: #444444;
+    border-color: var(--border-glass-strong);
   }
 }
 

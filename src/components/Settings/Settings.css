@@ -81,10 +81,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bg-color);
+  background: var(--glass-bg);
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-glass);
   gap: 16px;
 }
 
@@ -300,9 +300,9 @@
 }
 
 [data-theme="dark"] .path-display {
-  background: #1a1a1a;
-  color: #9ca3af;
-  border-color: #374151;
+  background: var(--glass-bg-dark);
+  color: var(--text-secondary);
+  border-color: var(--border-glass);
 }
 
 .btn-small {
@@ -390,9 +390,9 @@
 
 .btn-cancel {
   padding: 12px 20px;
-  background: #f0f3f7;
-  color: #7f8c8d;
-  border: 2px solid #eef2f7;
+  background: var(--glass-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-glass);
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -449,9 +449,9 @@
 }
 
 [data-theme="dark"] .avatar-upload-btn {
-  background: #333333;
-  color: #ffffff;
-  border: 1px solid #555555;
+  background: var(--glass-bg-dark);
+  color: var(--text-primary);
+  border: 1px solid var(--border-glass);
   border-radius: 12px;
 }
 
