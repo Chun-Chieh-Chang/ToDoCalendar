@@ -105,19 +105,22 @@
 
 ---
 
-## [2026-05-16] UI/UX Optimization & Restoration
+## [2026-05-16] Contrast Rescue & MECE Cleanup
 
-- **目標**: 恢復透明玻璃美學，解決「邊界感缺失」問題。
-- **執行**:
-    - 強化 `--inner-glow` 與 `--border-glass`，使用光影而非不透明度定義邊界。
-    - 恢復 `TaskForm` 的橫向佈局邏輯。
-    - 解決 `vite.svg` 404 與硬編碼模糊度的回歸問題。
+### 1. 失敗記錄與分析 (Post-Mortem / RCA)
+- **Failure J - Contrast Logic Failure (Property Missing)**:
+    - **現象**: 深色模式下的月曆任務文字呈現深灰色，與深色背景幾乎重疊，完全無法閱讀。
+    - **成因**: `App.tsx` 在調用 `Calendar` 元件時遺漏了 `theme` prop。這導致 `Calendar` 元件內部預設為 `light` 模式，在計算對比度時錯誤地假設背景為白色，進而選擇了深色文字 (`#111827`)。
+    - **CAPA**: 
+        1. 修正 `App.tsx` 傳遞正確的 `theme` 狀態。
+        2. 優化 `Calendar.tsx` 的對比度演算法，加入 `textShadow` 以增強深色背景下的光感閱讀。
+        3. 移除 `task-time` 的不透明度限制，確保時間資訊絕對清晰。
 
----
+### 2. 最終矯正措施 (Corrective Actions / CAPA)
+- **視覺對比度二次加固**: 實裝全域 `theme` 感知，確保所有動態顏色計算皆基於當前主題背景。
+- **MECE 冗餘清理**: 識別並移除專案根目錄下過時的 `打包應用.bat` 與 `開發模式.bat`，統一使用 `package.json` 腳本進行開發與建置。
 
-## [2026-05-15] Global Unification & Color Master Palette Update
-
-- **全域去紫化**: 全面替換為皇家藍/天藍體系。
-- **對比度加固**: 執行 WCAG 2.1 AA 審計，優化可讀性。
-- **空間一統**: 重寫 `DataManagementView.css` 質感，同步設定面板風格。
-- **Supabase**: 完成雲端同步與 RLS 安全原則全線跑通。
+### 3. 目前狀態 (Check & Act)
+- [x] 月曆視圖任務文字對比度修復完畢，深色模式下自動切換為高亮度文字。
+- [x] 移除冗餘 `.bat` 檔案，保持專案架構純淨。
+- [x] `npm run build` 通過驗證。

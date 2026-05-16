@@ -104,14 +104,15 @@ const Calendar = ({
             const category = categories.find(c => c.id === task.category);
             if (category) {
               // Calculate text color based on the category color blended over the cell background.
-              // We use 0.2 alpha (20%) which matches the backgroundColor opacity.
+              // In dark mode, the effective background is a blend of surface-color over bg-color.
               const baseBg = theme === 'dark' ? '#1E293B' : '#FFFFFF';
               const textColor = getBestContrastForOverlay(category.color, baseBg, 0.2, '#111827', '#F1F5F9');
               
               return {
                 borderLeftColor: category.color,
                 backgroundColor: `${category.color}20`, // 20% opacity
-                color: textColor
+                color: textColor,
+                textShadow: theme === 'dark' && textColor === '#F1F5F9' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none'
               };
             }
 
