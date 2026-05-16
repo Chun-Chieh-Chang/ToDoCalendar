@@ -3,8 +3,8 @@ import { storageService } from '../services/storage';
 
 export const exportDataWithDialog = async () => {
     const jsonStr = storageService.exportData();
-    const dateStr = format(new Date(), 'yyyyMMdd');
-    const defaultFilename = `todo_calendar_backup_${dateStr}.json`;
+    const timestamp = format(new Date(), 'yyyyMMdd_HHmmss');
+    const defaultFilename = `ToDoCalendar_Backup_${timestamp}.json`;
 
     // 1. Electron 桌面版優先處理
     if (typeof (window as any).electronAPI !== 'undefined') {

@@ -34,6 +34,7 @@ export interface CategoryConfig {
     icon?: string;
 }
 
+
 export interface SettingsState {
     theme: 'light' | 'dark' | 'system';
     language: 'zh-TW' | 'en';
@@ -44,6 +45,9 @@ export interface SettingsState {
     userAvatar?: string;
     deviceId?: string;
     categories: CategoryConfig[];
+    glassOpacity: number;
+    glassBlur: number;
+    borderOpacity: number;
 }
 
 export type Status = 'all' | 'completed' | 'pending';

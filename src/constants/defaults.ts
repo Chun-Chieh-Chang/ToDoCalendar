@@ -13,7 +13,10 @@ export const defaultSettings: SettingsState = {
         { id: 'study', name: '學習', color: '#10B981' },
         { id: 'life', name: '生活', color: '#F59E0B' },
         { id: 'other', name: '其他', color: '#6D28D9' }
-    ]
+    ],
+    glassOpacity: 0.18,
+    glassBlur: 20,
+    borderOpacity: 0.6
 };
 
 export const defaultFilter: FilterState = {

@@ -1,12 +1,15 @@
 .task-card {
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.1);
+  border: 1px solid var(--border-glass);
   border-radius: 20px;
   padding: 20px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 
+    var(--shadow-sm),
+    var(--inner-glow);
   display: flex;
   flex-direction: column;
 }
@@ -14,7 +17,10 @@
 .task-card:hover {
   border-color: var(--primary-color);
   transform: translateY(-6px) scale(1.02);
-  box-shadow: var(--shadow-premium);
+  box-shadow: 
+    var(--shadow-premium),
+    var(--inner-glow);
+  background: var(--surface-color);
 }
 
 .task-card::after {
