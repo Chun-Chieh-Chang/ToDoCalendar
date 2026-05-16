@@ -88,8 +88,12 @@
 3. **PWA 落地**：成功將 Web 應用轉化為「可安裝、可離線」的 PWA，顯著提升了「原生感」。
 
 ### 挫折與修正 (Failures & CAPA)
-- **RCA (Root Cause Analysis)**: 在執行大範圍代碼替換時，工具對檔案標記點的識別發生偏差，導致 `App.tsx` 核心邏輯遺失。
-- **CAPA (Corrective Action)**: 立即撰寫 Node.js 修復腳本精準恢復缺失塊，並更新全域 Skill `skills-builder` 的「確效門檻」，強制要求在任務結束前執行生產環境編譯。
+- **RCA (Root Cause Analysis)**: 
+    1. 在執行 `restore_app_logic.cjs` 時，由於 Marker (`// 選擇日期`) 定位不精準且替換區塊過大，導致組件中段的 150+ 行 Handler 函式被遺漏。
+    2. 雖然執行了 `npm run build`，但編譯器並未捕捉到 JSX 中的 `onClick={handleOpenSettings}` 引用錯誤（因為是動態屬性且在混淆過程中未觸發 Fatal Error，直到運行時才崩潰）。
+- **CAPA (Corrective Action)**: 
+    1. 實施 `final_restore.cjs` 進行二次精準注入，恢復所有缺失功能。
+    2. **[SOP 升級]**: 未來在執行大規模代碼替換後，必須進行關鍵路徑 (Critical Path) 的 UI 點擊測試。
 
 ### 下一步建議 (Next Steps)
 - **多裝置同步**：研究基於 Supabase 或 WebRTC 的數據同步方案。
