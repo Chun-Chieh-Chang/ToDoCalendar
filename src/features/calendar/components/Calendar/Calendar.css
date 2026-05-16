@@ -303,9 +303,9 @@
 /* Task Time */
 .task-time {
   font-size: 10px;
-  opacity: 0.8;
   display: block;
   margin-bottom: 2px;
+  font-weight: 700;
 }
 
 /* Animations */

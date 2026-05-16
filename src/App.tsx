@@ -539,6 +539,7 @@ const App = () => {
               onMonthChange={handleMonthChange}
               tasks={state.tasks}
               categories={state.settings.categories}
+              theme={state.settings.theme}
             />
           )}
           {activeView === 'kanban' && (
