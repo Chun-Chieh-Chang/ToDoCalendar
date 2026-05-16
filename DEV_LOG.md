@@ -124,3 +124,18 @@
 - [x] 月曆視圖任務文字對比度修復完畢，深色模式下自動切換為高亮度文字。
 - [x] 移除冗餘 `.bat` 檔案，保持專案架構純淨。
 - [x] `npm run build` 通過驗證。
+
+## [2026-05-16] Contrast Rescue Phase II: SSOT & CSS Robustness
+
+### 1. 失敗記錄與分析 (Post-Mortem / RCA)
+- **Failure K - Theme State Desync**:
+    - **現象**: 儘管在 `App.tsx` 傳遞了 `theme` prop，但在某些情況下（如快取或非同步渲染），`Calendar` 元件內部的 `theme` 狀態仍可能與全域狀態脫節，導致計算邏輯失效。
+    - **成因**: 依賴 prop 傳遞主題狀態不夠健壯，且 CSS 中缺乏對任務項目的保底文字色彩設定。
+    - **CAPA**: 
+        1. **SSOT (單一真理來源)**：直接在 `Calendar.tsx` 內部使用 `useAppStore` 讀取主題，確保狀態絕對同步。
+        2. **CSS 保底機制**：在 `Calendar.css` 中顯式設定 `.task-preview-item` 的預設文字色彩為 `var(--text-primary)`，並強制 `text-align: left` 以修正異常居中問題。
+
+### 2. 目前狀態 (Check & Act)
+- [x] 月曆視圖文字色彩邏輯已改為從 Store 直接讀取，消除 prop 傳遞延遲。
+- [x] CSS 層級加入保底屬性，防止 JS 計算失效時發生視覺崩潰。
+- [x] 已清理快取並完成測試。

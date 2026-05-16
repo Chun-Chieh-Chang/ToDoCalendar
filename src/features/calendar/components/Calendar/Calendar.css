@@ -244,6 +244,9 @@
   border-left: 3px solid;
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease;
+  text-align: left;
+  color: var(--text-primary);
+  background-color: rgba(var(--glass-rgb), 0.1);
 }
 
 .task-preview-item:hover {
