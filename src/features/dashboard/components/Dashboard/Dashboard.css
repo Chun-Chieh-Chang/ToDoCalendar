@@ -117,6 +117,7 @@
     margin-bottom: 24px;
     font-size: 1.2rem;
     font-weight: 700;
+    color: var(--text-primary);
 }
 
 /* SVG Chart */
@@ -177,11 +178,13 @@
 .cat-name {
     flex: 1;
     font-weight: 600;
+    color: var(--text-primary);
 }
 
 .cat-count {
     font-weight: 700;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    opacity: 0.9;
 }
 
 .progress-bg {
@@ -236,11 +239,13 @@
 .priority-label {
     font-size: 0.75rem;
     font-weight: 800;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    opacity: 0.7;
 }
 
 .priority-value {
-    font-weight: 700;
+    font-weight: 800;
+    color: var(--text-primary);
 }
 
 /* Dark Mode Overrides */
@@ -250,6 +255,8 @@
 }
 
 [data-theme="dark"] .point-label { fill: #fff; }
+[data-theme="dark"] .axis-label { fill: rgba(255, 255, 255, 0.7); }
+[data-theme="dark"] .axis-line { stroke: rgba(255, 255, 255, 0.1); }
 
 @media (max-width: 1024px) {
     .stats-overview {
