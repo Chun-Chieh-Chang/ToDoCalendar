@@ -11,7 +11,8 @@
   background: transparent;
   border: none;
   border-radius: 12px 12px 0 0;
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  opacity: 0.6;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -338,7 +339,8 @@
 
 .setting-item-note {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  opacity: 0.5;
   margin-top: 4px;
   width: 100%;
   text-align: left;
@@ -390,8 +392,9 @@
 
 .btn-cancel {
   padding: 12px 20px;
-  background: var(--glass-bg);
-  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  opacity: 0.8;
   border: 1px solid var(--border-glass);
   border-radius: 12px;
   font-size: 14px;
@@ -605,13 +608,14 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 .version-info {
   font-size: 12px;
-  color: var(--text-secondary);
-  opacity: 0.9;
+  color: var(--text-primary);
+  opacity: 0.5;
   font-weight: 500;
 }
 
 [data-theme="dark"] .version-info {
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  opacity: 0.4;
 }
 
 .category-manager {

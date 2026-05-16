@@ -31,8 +31,9 @@
 }
 
 [data-theme="dark"] .weekday {
-  color: var(--text-secondary);
-  font-weight: 500;
+  color: var(--text-primary);
+  opacity: 0.7;
+  font-weight: 700;
 }
 
 /* Calendar Grid */
@@ -79,7 +80,7 @@
 /* Day Number */
 .day-number {
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 8px;
   width: 32px;
@@ -276,27 +277,27 @@
 
 /* Task Colors - Dark Theme */
 [data-theme="dark"] .task-preview-item.task-blue {
-  background-color: rgba(219, 39, 119, 0.2);
-  color: #F472B6;
-  border-left-color: #DB2777;
+  background-color: rgba(37, 99, 235, 0.2);
+  color: #93C5FD;
+  border-left-color: #3B82F6;
 }
 
 [data-theme="dark"] .task-preview-item.task-green {
-  background-color: #81C784;
-  color: #121212;
-  border-left-color: #388E3C;
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #6EE7B7;
+  border-left-color: #10B981;
 }
 
 [data-theme="dark"] .task-preview-item.task-yellow {
-  background-color: #FFD54F;
-  color: #121212;
-  border-left-color: #FBC02D;
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #FDE68A;
+  border-left-color: #F59E0B;
 }
 
 [data-theme="dark"] .task-preview-item.task-purple {
-  background-color: #CE93D8;
-  color: #121212;
-  border-left-color: #7B1FA2;
+  background-color: rgba(139, 92, 246, 0.2);
+  color: #DDD6FE;
+  border-left-color: #8B5CF6;
 }
 
 /* Task Time */

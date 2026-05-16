@@ -94,7 +94,10 @@
 - **CAPA (Corrective Action)**: 
     1. 實施 `final_restore.cjs` 進行二次精準注入，恢復所有缺失功能。
     2. **[SOP 升級]**: 未來在執行大規模代碼替換後，必須進行關鍵路徑 (Critical Path) 的 UI 點擊測試。
-    3. **[Contrast Rescue]**: 手動為 Dashboard 各組件指派 `--text-primary` 與高亮度 SVG 顏色，解決深色模式下的可讀性危機。
+    3. **[Contrast Rescue - 全域水平展開]**: 
+        - 識別出深色模式下 `Slate 400` 對比度不足的系統性問題。
+        - **水平展開**：同步修正 Calendar, TaskCard, TaskListView, Filter, Settings 等所有視圖，將文字亮度提升至 `text-primary` 或高亮度 `rgba`。
+        - 建立「高對比度規範」，避免未來開發再次發生視覺災難。
 
 ### 下一步建議 (Next Steps)
 - **多裝置同步**：研究基於 Supabase 或 WebRTC 的數據同步方案。
