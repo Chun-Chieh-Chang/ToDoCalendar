@@ -148,6 +148,157 @@ const App = () => {
     dispatch({ type: 'SET_SELECTED_DATE', payload: todayStr });
     setCurrentMonth(new Date());
   };
+  // 添加任務
+  const handleAddTask = (titleOrTask?: any) => {
+    if (typeof titleOrTask === 'string') {
+      const parsed = parseTaskTitle(titleOrTask);
+      const newTask = taskUtils.createDefaultTask({
+        ...parsed,
+        date: activeView === 'pending' ? '' : (parsed.date || state.selectedDate)
+      });
+      handleSaveTask(newTask);
+      return;
+    }
+    setEditingTask(titleOrTask);
+    setShowTaskForm(true);
+  };
+
+  // 編輯任務
+  const handleEditTask = (task: any) => {
+    setEditingTask(task);
+    setShowTaskForm(true);
+  };
+
+  // 刪除任務
+  const handleDeleteTask = (taskId: string) => {
+    dispatch({ type: 'DELETE_TASK', payload: taskId });
+  };
+
+  // 清除已完成任務
+  const handleClearCompleted = (targetTasks: Task[]) => {
+    const completedTasks = targetTasks.filter(t => t.completed);
+    if (completedTasks.length === 0) return;
+    if (confirm(`確定要清除這 ${completedTasks.length} 項已完成的任務嗎？`)) {
+      completedTasks.forEach(task => {
+        dispatch({ type: 'DELETE_TASK', payload: task.id });
+      });
+    }
+  };
+
+  // 快速安排日期
+  const handleScheduleTask = (taskId: string, date: string) => {
+    const task = state.tasks.find(t => t.id === taskId);
+    if (!task) return;
+    dispatch({
+      type: 'UPDATE_TASK',
+      payload: { ...task, date, updatedAt: new Date().toISOString() }
+    });
+  };
+
+  // 退出系統與備份
+  const handleExit = () => {
+    setShowExitModal(true);
+  };
+
+  const confirmExitWithBackup = async () => {
+    try {
+      const result = await exportDataWithDialog();
+      if (result.success) {
+        if (result.filePath) {
+          alert(`數據已成功匯出至: ${result.filePath}\n程式將自動關閉。`);
+        } else if (result.method !== 'download') {
+          alert('數據匯出完成！程式將自動關閉。');
+        }
+        setShowExitModal(false);
+        if (typeof (window as any).electronAPI !== 'undefined') {
+          (window as any).electronAPI.quitApp();
+        } else {
+          window.close();
+          if (!window.closed) alert('請手動關閉此分頁。');
+        }
+      }
+    } catch (err) {
+      alert(`匯出失敗: ${err.message}`);
+    }
+  };
+
+  // 更新過濾條件
+  const handleFilterChange = (newFilter: any) => {
+    dispatch({ type: 'SET_FILTER', payload: newFilter });
+  };
+
+  // 清除過濾條件
+  const handleClearFilter = () => {
+    dispatch({ type: 'SET_FILTER', payload: { priority: undefined, category: undefined, status: 'all', search: '' } });
+  };
+
+  // 打開設定
+  const handleOpenSettings = () => {
+    setShowSettings(true);
+  };
+
+  // 關閉設定
+  const handleCloseSettings = () => {
+    setShowSettings(false);
+  };
+
+  // 更新設定
+  const handleSettingsChange = (newSettings: any) => {
+    dispatch({ type: 'SET_SETTINGS', payload: newSettings });
+  };
+
+  // 保存任務
+  const handleSaveTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      if (!taskData.title?.trim()) throw new Error('任務標題不能為空');
+      if (editingTask && editingTask.id) {
+        dispatch({
+          type: 'UPDATE_TASK',
+          payload: { ...editingTask, ...taskData, updatedAt: new Date().toISOString() }
+        });
+      } else {
+        const newTask = {
+          ...taskData,
+          id: Date.now().toString(),
+          order: state.tasks.length,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          completed: false
+        };
+        dispatch({ type: 'ADD_TASK', payload: newTask });
+      }
+      setShowTaskForm(false);
+      setEditingTask(undefined);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '保存失敗');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 切換任務完成狀態
+  const handleToggleComplete = (taskId: string) => {
+    dispatch({ type: 'TOGGLE_TASK_COMPLETION', payload: taskId });
+  };
+
+  // 處理狀態變更 (看板拖拽)
+  const handleStatusChange = (taskId: string, newStatus: any) => {
+    const task = state.tasks.find(t => t.id === taskId);
+    if (!task) return;
+    const isDone = newStatus === 'done';
+    dispatch({
+      type: 'UPDATE_TASK',
+      payload: { ...task, status: newStatus, completed: isDone, updatedAt: new Date().toISOString() }
+    });
+  };
+
+  // 處理重新排序
+  const handleReorderTasks = (updatedTasks: Task[]) => {
+    dispatch({ type: 'REORDER_TASKS', payload: updatedTasks });
+  };
+
 
   // 處理年份變更
   const handleYearChange = (e: any) => {
