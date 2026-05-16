@@ -610,19 +610,10 @@ const App = () => {
       {/* 手機版底部導航欄 */}
       {isMobile && (
         <nav className="mobile-nav">
-          <div className={`mobile-nav-item ${activeView === 'guide' ? 'active' : ''}`} onClick={() => setActiveView('guide')}>
-            <i className="ri-book-open-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'all_tasks' ? 'active' : ''}`} onClick={() => setActiveView('all_tasks')}>
-            <i className="ri-task-line"></i>
-          </div>
           <div className={`mobile-nav-item ${activeView === 'calendar' ? 'active' : ''}`} onClick={() => setActiveView('calendar')}>
             <i className="ri-calendar-2-line"></i>
           </div>
-          <div className={`mobile-nav-item ${activeView === 'pending' ? 'active' : ''}`} onClick={() => setActiveView('pending')}>
-            <i className="ri-inbox-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'tasks' ? 'active' : ''}`} onClick={() => setActiveView('tasks')}>
+          <div className={`mobile-nav-item ${['tasks', 'all_tasks', 'pending'].includes(activeView) ? 'active' : ''}`} onClick={() => setActiveView('tasks')}>
             <i className="ri-list-check"></i>
           </div>
           <div className={`mobile-nav-item ${activeView === 'kanban' ? 'active' : ''}`} onClick={() => setActiveView('kanban')}>
@@ -630,9 +621,6 @@ const App = () => {
           </div>
           <div className={`mobile-nav-item ${activeView === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveView('dashboard')}>
             <i className="ri-bar-chart-fill"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'data' ? 'active' : ''}`} onClick={() => setActiveView('data')}>
-            <i className="ri-database-2-line"></i>
           </div>
           <div className="mobile-nav-item" onClick={handleOpenSettings}>
             <i className="ri-settings-4-line"></i>

@@ -116,7 +116,7 @@ const TaskListModal = ({
                     <i className="ri-flashlight-line"></i>
                     <input
                         type="text"
-                        placeholder="在此日期快速新增任務... (輸入後按 Enter)"
+                        placeholder="快速新增任務... (Enter)"
                         value={quickAddTitle}
                         onChange={(e) => setQuickAddTitle(e.target.value)}
                     />
