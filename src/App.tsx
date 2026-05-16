@@ -1,158 +1,57 @@
 import { useState, useEffect } from 'react';
-import { useAppContext } from './store/AppContext';
+import { useAppStore } from './store/useAppStore';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+
 import { storageService } from './services/storage';
 import { Task } from './types';
-import { dateUtils } from './utils/dateUtils';
-import { taskUtils } from './utils/taskUtils';
+import { dateUtils } from './shared/utils/dateUtils';
+import { taskUtils } from './features/tasks/utils/taskUtils';
 import { useTranslation, translations } from './utils/i18n';
 import { parseTaskTitle } from './utils/nlpUtils';
-import Calendar from './components/Calendar/Calendar';
-import TaskForm from './components/TaskForm/TaskForm';
-import Settings from './components/Settings/Settings';
-import Modal from './components/Modal/Modal';
-import TaskListModal from './components/TaskListModal/TaskListModal';
-import ReminderModal from './components/ReminderModal/ReminderModal';
-import KanbanBoard from './components/KanbanBoard/KanbanBoard';
-import TaskListView from './components/TaskListView/TaskListView';
-import AppGuide from './components/AppGuide/AppGuide';
-import Dashboard from './components/Dashboard/Dashboard';
-import { exportDataWithDialog } from './utils/exportUtils';
+import { notificationUtils } from './shared/utils/notificationUtils';
+import Calendar from './features/calendar/components/Calendar/Calendar';
+import TaskForm from './features/tasks/components/TaskForm/TaskForm';
+import Settings from './features/settings/components/Settings/Settings';
+import Modal from './shared/components/Modal/Modal';
+import TaskListModal from './features/tasks/components/TaskListModal/TaskListModal';
+import ReminderModal from './features/tasks/components/ReminderModal/ReminderModal';
+import KanbanBoard from './features/kanban/components/KanbanBoard/KanbanBoard';
+import TaskListView from './features/tasks/components/TaskListView/TaskListView';
+import AppGuide from './features/guide/components/AppGuide/AppGuide';
+import Dashboard from './features/dashboard/components/Dashboard/Dashboard';
+import { exportDataWithDialog } from './features/settings/utils/exportUtils';
 import './App.css';
 
 const App = () => {
-  const { state, dispatch, isLoaded } = useAppContext();
+  const state = useAppStore();
+  const isLoaded = state.isLoaded;
+  const dispatch = (action: any) => {
+    switch(action.type) {
+      case "SET_TASKS": state.setTasks(action.payload); break;
+      case "ADD_TASK": state.addTask(action.payload); break;
+      case "UPDATE_TASK": state.updateTask(action.payload); break;
+      case "DELETE_TASK": state.deleteTask(action.payload); break;
+      case "TOGGLE_TASK_COMPLETION": state.toggleTaskCompletion(action.payload); break;
+      case "SET_SELECTED_DATE": state.setSelectedDate(action.payload); break;
+      case "SET_FILTER": state.setFilter(action.payload); break;
+      case "SET_SETTINGS": state.setSettings(action.payload); break;
+      case "REORDER_TASKS": state.reorderTasks(action.payload); break;
+      case "RESET_STATE": state.resetState(); break;
+    }
+  };
   const translate = useTranslation(state.settings.language);
+  useEffect(() => {
+    state.loadData();
+  }, []);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [activeView, setActiveView] = useState<'calendar' | 'kanban' | 'tasks' | 'pending' | 'guide' | 'dashboard' | 'all_tasks'>('calendar');
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showTaskList, setShowTaskList] = useState(false);
-  const [showExitModal, setShowExitModal] = useState(false);
-
-  // 網頁版啟動時詢問匯入
-  useEffect(() => {
-    if (isLoaded) {
-      const isElectron = typeof (window as any).electronAPI !== 'undefined';
-      // 判斷是否為「全新狀態」（只有預設的歡迎任務）
-      const isActuallyEmpty = state.tasks.length === 1 && state.tasks[0].id === '1';
-
-      if (!isElectron && isActuallyEmpty && !sessionStorage.getItem('import_prompted')) {
-        sessionStorage.setItem('import_prompted', 'true');
-
-        // 延遲一下待畫面渲染完成再彈窗
-        setTimeout(() => {
-          const shouldImport = window.confirm('✨ 歡迎使用 ToDoCalendar 網頁版！\n\n偵測到您目前尚無個人資料，是否要從電腦匯入先前的備份檔案 (.json)？');
-
-          if (shouldImport) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-            input.onchange = (e: any) => {
-              const file = e.target.files[0];
-              if (!file) return;
-              const reader = new FileReader();
-              reader.onload = (event) => {
-                if (event.target?.result) {
-                  const importedData = storageService.importData(event.target.result as string);
-                  if (importedData) {
-                    // 同步更新本地狀態，確保自動存檔邏輯不會用舊資料覆寫 localStorage
-                    if (importedData.tasks) dispatch({ type: 'SET_TASKS', payload: importedData.tasks });
-                    if (importedData.settings) dispatch({ type: 'SET_SETTINGS', payload: importedData.settings });
-                    if (importedData.filter) dispatch({ type: 'SET_FILTER', payload: importedData.filter });
-                    if (importedData.selectedDate) dispatch({ type: 'SET_SELECTED_DATE', payload: importedData.selectedDate });
-
-                    alert('匯入成功！系統將即時套用您的資料。');
-                    // 稍微延遲後重載以確保狀態已變動且穩定
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 500);
-                  } else {
-                    alert('匯入失敗，請檢查檔案格式是否正確。');
-                  }
-                }
-              };
-              reader.readAsText(file);
-            };
-            input.click();
-          }
-        }, 800);
-      }
-    }
-  }, [isLoaded, state.tasks]);
-
-  // Sync transparency settings to CSS variables
-  useEffect(() => {
-    const root = document.documentElement;
-    if (state.settings.glassOpacity !== undefined) {
-      root.style.setProperty('--glass-opacity', state.settings.glassOpacity.toString());
-    }
-    if (state.settings.glassBlur !== undefined) {
-      root.style.setProperty('--glass-blur', `${state.settings.glassBlur}px`);
-    }
-    if (state.settings.borderOpacity !== undefined) {
-      root.style.setProperty('--border-opacity', state.settings.borderOpacity.toString());
-    }
-  }, [state.settings.glassOpacity, state.settings.glassBlur, state.settings.borderOpacity]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input or textarea
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
-        return;
-      }
-
-      if (e.key.toLowerCase() === 'n') {
-        setShowTaskForm(true);
-      } else if (e.key.toLowerCase() === 'c') {
-        setActiveView('calendar');
-      } else if (e.key.toLowerCase() === 'k') {
-        setActiveView('kanban');
-      } else if (e.key.toLowerCase() === 't') {
-        setActiveView('tasks');
-      } else if (e.key.toLowerCase() === 'p') {
-        setActiveView('pending');
-      } else if (e.key.toLowerCase() === 'd') {
-        setActiveView('dashboard');
-      } else if (e.key === '/') {
-        e.preventDefault();
-        // We'll need a search ref later, for now just a log
-        console.log('Search focused');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  useEffect(() => {
-    const handleViewChange = (e: any) => {
-      if (e.detail) setActiveView(e.detail);
-    };
-    window.addEventListener('changeView', handleViewChange);
-    return () => window.removeEventListener('changeView', handleViewChange);
-  }, []);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
   const [reminderQueue, setReminderQueue] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Use useState for stable mutable object Reference to avoid useRef import issues
   const [remindedKeys] = useState(() => new Set<string>());
 
-  // Request notification permission on app start
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'default') {
-        Notification.requestPermission();
-      }
-    }
-  }, []);
-
-  // 初始化時設置當前月份
-  useEffect(() => {
-    setCurrentMonth(dateUtils.stringToDate(state.selectedDate));
-  }, [state.selectedDate]);
-
-  // 檢查提醒 - 使用 useMemo 優化性能
+  // 檢查提醒
   useEffect(() => {
     const checkReminders = () => {
       const now = new Date();
@@ -162,37 +61,21 @@ const App = () => {
       state.tasks.forEach(task => {
         if (task.completed || !task.time) return;
 
-        // 檢查日期和時間是否在提醒範圍內（提前10分鐘到時間已過）
         if (task.date === currentDate) {
-          // 將時間轉換為可比較的格式
           const taskDateTime = new Date(`${task.date}T${task.time}`);
+          const reminderTime = new Date(taskDateTime.getTime() - 10 * 60 * 1000); 
 
-          // 計算提醒時間（提前10分鐘）
-          const reminderTime = new Date(taskDateTime.getTime() - 10 * 60 * 1000); // 提前10分鐘
-
-          // 檢查是否應該觸發提醒（在提醒時間點或之後，但在任務時間點之後不再提醒）
           if (now >= reminderTime && now < taskDateTime) {
             const key = `${task.id}-${task.time}`;
             if (!remindedKeys.has(key)) {
               newReminders.push(task);
               remindedKeys.add(key);
 
-              // 發送桌面通知
-              if (typeof (window as any).electronAPI !== 'undefined') {
-                (window as any).electronAPI.sendNotification({
-                  title: '任務提醒',
-                  body: `任務: ${task.title}${task.time ? `\n時間: ${task.time}` : ''}`
-                });
-
-                // Restore window when reminder is triggered
-                (window as any).electronAPI.restoreWindow();
-              }
-              // 網頁通知作為備用
-              else if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('任務提醒', {
-                  body: `任務: ${task.title}${task.time ? `\n時間: ${task.time}` : ''}`
-                });
-              }
+              // 發送系統通知
+              notificationUtils.send('任務提醒', {
+                body: `任務: ${task.title}${task.time ? `\n時間: ${task.time}` : ''}`,
+                tag: task.id
+              });
             }
           }
         }
@@ -203,211 +86,41 @@ const App = () => {
       }
     };
 
-    // 每2分鐘檢查一次
-    const intervalId = setInterval(checkReminders, 120000);
-
-    // 立即檢查一次
+    const intervalId = setInterval(checkReminders, 60000);
     checkReminders();
-
     return () => clearInterval(intervalId);
   }, [state.tasks, remindedKeys]);
 
-  // Update document title when there are reminders
-  useEffect(() => {
-    if (reminderQueue.length > 0) {
-      document.title = `(${reminderQueue.length}) ToDoCalendar`;
 
-      // Change favicon to indicate reminders
-      const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-      if (favicon) {
-        favicon.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❗</text></svg>';
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showTaskList, setShowTaskList] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
+  // 註冊全域快捷鍵
+  useKeyboardShortcuts({
+    onNewTask: () => setShowTaskForm(true),
+    onSwitchView: (view: any) => {
+      setActiveView(view);
+      if (view === 'tasks') {
+        setShowTaskList(false);
       }
-    } else {
-      document.title = 'ToDoCalendar';
-      // Reset favicon
-      const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-      if (favicon) {
-        favicon.href = 'favicon.ico';
-      }
-    }
-  }, [reminderQueue.length]);
-
-
-  // 添加任務
-  const handleAddTask = (titleOrTask?: any) => {
-    if (typeof titleOrTask === 'string') {
-      const parsed = parseTaskTitle(titleOrTask);
-      const newTask = taskUtils.createDefaultTask({
-        ...parsed,
-        date: activeView === 'pending' ? '' : (parsed.date || state.selectedDate)
-      });
-      handleSaveTask(newTask);
-      return;
-    }
-    setEditingTask(titleOrTask);
-    setShowTaskForm(true);
-  };
-
-  // 編輯任務
-  const handleEditTask = (task: any) => {
-    setEditingTask(task);
-    setShowTaskForm(true);
-  };
-
-  // 刪除任務
-  const handleDeleteTask = (taskId: string) => {
-    // 直接刪除任務（未來可以考慮加入自訂確認彈窗）
-    dispatch({ type: 'DELETE_TASK', payload: taskId });
-  };
-
-  // 清除已完成任務
-  const handleClearCompleted = (targetTasks: Task[]) => {
-    const completedTasks = targetTasks.filter(t => t.completed);
-    if (completedTasks.length === 0) return;
-
-    if (confirm(`確定要清除這 ${completedTasks.length} 項已完成的任務嗎？`)) {
-      completedTasks.forEach(task => {
-        dispatch({ type: 'DELETE_TASK', payload: task.id });
-      });
-    }
-  };
-
-  // 快速安排日期
-  const handleScheduleTask = (taskId: string, date: string) => {
-    const task = state.tasks.find(t => t.id === taskId);
-    if (!task) return;
-    dispatch({
-      type: 'UPDATE_TASK',
-      payload: { ...task, date, updatedAt: new Date().toISOString() }
-    });
-  };
-
-  // 退出系統與備份
-  const handleExit = () => {
-    setShowExitModal(true);
-  };
-
-  const confirmExitWithBackup = async () => {
-    try {
-      const result = await exportDataWithDialog();
-      if (result.success) {
-        if (result.filePath) {
-          alert(`數據已成功匯出至: ${result.filePath}\n程式將自動關閉。`);
-        } else if (result.method !== 'download') {
-          alert('數據匯出完成！程式將自動關閉。');
-        }
-        setShowExitModal(false);
-
-        // 自動退出
-        if (typeof (window as any).electronAPI !== 'undefined') {
-          (window as any).electronAPI.quitApp();
-        } else {
-          // 網頁版無法直接關閉，提示關閉分頁
-          window.close(); // 嘗試關閉
-          if (!window.closed) {
-            alert('請手動關閉此分頁。');
-          }
-        }
-      }
-    } catch (err: any) {
-      alert(`匯出失敗: ${err.message}`);
-    }
-  };
-
-  // 更新過濾條件
-  const handleFilterChange = (newFilter: any) => {
-    dispatch({ type: 'SET_FILTER', payload: newFilter });
-  };
-
-  // 清除過濾條件
-  const handleClearFilter = () => {
-    dispatch({ type: 'SET_FILTER', payload: { priority: undefined, category: undefined, status: 'all', search: '' } });
-  };
-
-  // 打開設定
-  const handleOpenSettings = () => {
-    setShowSettings(true);
-  };
-
-  // 關閉設定
-  const handleCloseSettings = () => {
-    setShowSettings(false);
-  };
-
-  // 更新設定
-  const handleSettingsChange = (newSettings: any) => {
-    dispatch({ type: 'SET_SETTINGS', payload: newSettings });
-  };
-
-  // 保存任務
-  const handleSaveTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      // 驗證必填字段
-      if (!taskData.title?.trim()) {
-        throw new Error('任務標題不能為空');
-      }
-
-      // 只有當 editingTask 存在且有 id 時才是真正的「編輯」
-      // 如果 editingTask 只是用來傳遞預設值（如 { date: '' }），則視為新增
-      if (editingTask && editingTask.id) {
-        dispatch({
-          type: 'UPDATE_TASK',
-          payload: {
-            ...editingTask,
-            ...taskData,
-            updatedAt: new Date().toISOString()
-          }
-        });
-      } else {
-        const newTask: Task = {
-          ...taskData,
-          id: Date.now().toString(),
-          order: state.tasks.length,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          completed: false
-        };
-        dispatch({ type: 'ADD_TASK', payload: newTask });
-      }
-
+    },
+    onSearchFocus: () => {
+      setActiveView('tasks');
+      window.dispatchEvent(new CustomEvent('focus-search'));
+    },
+    onCloseModal: () => {
       setShowTaskForm(false);
-      setEditingTask(undefined);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '保存失敗，請稍後再試');
-    } finally {
-      setIsLoading(false);
+      setShowSettings(false);
+      setShowTaskList(false);
+      setShowExitModal(false);
+    },
+    onGoToToday: () => {
+      setCurrentMonth(new Date());
+      state.setSelectedDate(new Date().toISOString());
+      setActiveView('calendar');
     }
-  };
-
-  // 切換任務完成狀態
-  const handleToggleComplete = (taskId: string) => {
-    dispatch({ type: 'TOGGLE_TASK_COMPLETION', payload: taskId });
-  };
-
-  // 處理狀態變更 (看板拖拽)
-  const handleStatusChange = (taskId: string, newStatus: any) => {
-    const task = state.tasks.find(t => t.id === taskId);
-    if (!task) return;
-
-    const isDone = newStatus === 'done';
-    dispatch({
-      type: 'UPDATE_TASK',
-      payload: {
-        ...task,
-        status: newStatus,
-        completed: isDone,
-        updatedAt: new Date().toISOString()
-      }
-    });
-  };
-
-  // 處理重新排序
-  const handleReorderTasks = (updatedTasks: Task[]) => {
-    dispatch({ type: 'REORDER_TASKS', payload: updatedTasks });
-  };
+  });
 
   // 選擇日期
   const handleDateSelect = (date: Date) => {
@@ -487,94 +200,94 @@ const App = () => {
             </div>
 
             <nav className="nav-menu">
-              {/* 1. 使用說明 */}
+              {/* 1. 新增任務 (Primary Action) */}
               <div
-                className={`nav-item ${activeView === 'guide' ? 'active' : ''}`}
-                onClick={() => setActiveView('guide')}
-                title="使用說明"
+                className="nav-item btn-add-global"
+                onClick={() => setShowTaskForm(true)}
+                title={translate('addTask')}
               >
                 <div className="tooltip">
-                  <i className="ri-book-open-line"></i>
-                  <span>使用說明</span>
-                  <span className="tooltip-text">了解工具的核心功能與頁面關聯</span>
+                  <i className="ri-add-circle-fill"></i>
+                  <span>{translate('addTask')}</span>
+                  <span className="tooltip-text">隨時隨地快速建立新任務 (N)</span>
                 </div>
               </div>
 
               <div className="nav-divider"></div>
 
-              {/* 2. 新增任務 (Global FAB) */}
+              {/* 2. 月曆視圖 */}
               <div
-                className="nav-item btn-add-global"
-                onClick={() => setShowTaskForm(true)}
-                title="新增任務 (快捷鍵: N)"
-              >
-                <div className="tooltip">
-                  <i className="ri-add-circle-fill"></i>
-                  <span>新增任務</span>
-                  <span className="tooltip-text">隨時隨地快速建立新任務</span>
-                </div>
-              </div>
-
-              {/* 3. 月曆視圖 */}
-              <div
-                className={`nav-item ${activeView === 'calendar' ? 'active' : ''}`}
+                className={'nav-item ' + (activeView === 'calendar' ? 'active' : '')}
                 onClick={() => setActiveView('calendar')}
-                title="月曆視圖"
+                title={translate('calendarView')}
               >
                 <div className="tooltip">
                   <i className="ri-calendar-event-line"></i>
-                  <span>月曆視圖</span>
-                  <span className="tooltip-text">查看整體排程與每日任務分布</span>
+                  <span>{translate('calendarView')}</span>
+                  <span className="tooltip-text">{translate('calendarViewTooltip')}</span>
                 </div>
               </div>
 
-              {/* 4. 任務列表 */}
+              {/* 3. 我的任務 */}
               <div
-                className={`nav-item ${['tasks', 'pending', 'all_tasks'].includes(activeView) ? 'active' : ''}`}
+                className={'nav-item ' + (['tasks', 'pending', 'all_tasks'].includes(activeView) ? 'active' : '')}
                 onClick={() => setActiveView('tasks')}
-                title="查看任務列表"
+                title={translate('myTasks')}
               >
                 <div className="tooltip">
                   <i className="ri-list-check"></i>
-                  <span>任務列表</span>
-                  <span className="tooltip-text">查看所有任務 (可切換已排程 / 待辦)</span>
+                  <span>{translate('myTasks')}</span>
+                  <span className="tooltip-text">{translate('myTasksTooltip')}</span>
                 </div>
               </div>
 
-
-              {/* 6. 看板管理 */}
+              {/* 4. 看板視圖 */}
               <div
-                className={`nav-item ${activeView === 'kanban' ? 'active' : ''}`}
+                className={'nav-item ' + (activeView === 'kanban' ? 'active' : '')}
                 onClick={() => setActiveView('kanban')}
-                title="顯示看板視圖"
+                title={translate('kanbanBoard')}
               >
                 <div className="tooltip">
                   <i className="ri-layout-column-line"></i>
-                  <span>看板管理</span>
-                  <span className="tooltip-text">透過看板管理任務進度，支援拖拉更換狀態</span>
+                  <span>{translate('kanbanBoard')}</span>
+                  <span className="tooltip-text">{translate('kanbanBoardTooltip')}</span>
                 </div>
               </div>
 
-              {/* 7. 數據洞察 */}
+              {/* 5. 數據洞察 */}
               <div
-                className={`nav-item ${activeView === 'dashboard' ? 'active' : ''}`}
+                className={'nav-item ' + (activeView === 'dashboard' ? 'active' : '')}
                 onClick={() => setActiveView('dashboard')}
-                title="查看數據統計"
+                title={translate('insights')}
               >
                 <div className="tooltip">
                   <i className="ri-bar-chart-fill"></i>
-                  <span>數據洞察</span>
-                  <span className="tooltip-text">了解任務完成趨勢與分配情況</span>
+                  <span>{translate('insights')}</span>
+                  <span className="tooltip-text">{translate('insightsTooltip')}</span>
                 </div>
               </div>
 
+              <div className="nav-divider"></div>
 
-              {/* 9. 系統設定 */}
+              {/* 6. 使用說明 */}
+              <div
+                className={'nav-item ' + (activeView === 'guide' ? 'active' : '')}
+                onClick={() => setActiveView('guide')}
+                title={translate('guide')}
+              >
+                <div className="tooltip">
+                  <i className="ri-book-open-line"></i>
+                  <span>{translate('guide')}</span>
+                  <span className="tooltip-text">{translate('guideTooltip')}</span>
+                </div>
+              </div>
+
+              {/* 7. 系統設定 */}
               <div className="nav-item">
-                <div className="tooltip" onClick={handleOpenSettings} title="應用程式設定">
+                <div className="tooltip" onClick={handleOpenSettings} title={translate('settings')}>
                   <i className="ri-settings-4-line"></i>
-                  <span>系統設定</span>
-                  <span className="tooltip-text">調整應用程式外觀、語言及其他個人偏好設定</span>
+                  <span>{translate('settings')}</span>
+                  <span className="tooltip-text">{translate('settingsDesc')}</span>
                 </div>
               </div>
 
@@ -582,10 +295,10 @@ const App = () => {
 
               {/* 8. 安全退出 */}
               <div className="nav-item exit-item" onClick={handleExit}>
-                <div className="tooltip" title="安全退出系統">
+                <div className="tooltip" title={translate('exitSystem')}>
                   <i className="ri-logout-box-r-line"></i>
-                  <span>退出系統</span>
-                  <span className="tooltip-text">安全離開系統並提醒備份數據</span>
+                  <span>{translate('exitSystem')}</span>
+                  <span className="tooltip-text">{translate('exitTooltip')}</span>
                 </div>
               </div>
             </nav>
@@ -607,26 +320,6 @@ const App = () => {
         </aside>
       )}
 
-      {/* 手機版底部導航欄 */}
-      {isMobile && (
-        <nav className="mobile-nav">
-          <div className={`mobile-nav-item ${activeView === 'calendar' ? 'active' : ''}`} onClick={() => setActiveView('calendar')}>
-            <i className="ri-calendar-2-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${['tasks', 'all_tasks', 'pending'].includes(activeView) ? 'active' : ''}`} onClick={() => setActiveView('tasks')}>
-            <i className="ri-list-check"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'kanban' ? 'active' : ''}`} onClick={() => setActiveView('kanban')}>
-            <i className="ri-layout-column-line"></i>
-          </div>
-          <div className={`mobile-nav-item ${activeView === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveView('dashboard')}>
-            <i className="ri-bar-chart-fill"></i>
-          </div>
-          <div className="mobile-nav-item" onClick={handleOpenSettings}>
-            <i className="ri-settings-4-line"></i>
-          </div>
-        </nav>
-      )}
 
       {/* 主內容區域 */}
       <main className="main-content">
@@ -844,6 +537,46 @@ const App = () => {
       )}
 
       {/* 提醒彈窗 (使用 Queue 避免同時多個提醒被覆蓋) */}
+
+      {/* 手機版底部導航欄 */}
+      {isMobile && (
+        <nav className="mobile-nav">
+          <div 
+            className={'mobile-nav-item ' + (activeView === 'calendar' ? 'active' : '')} 
+            onClick={() => setActiveView('calendar')}
+          >
+            <i className="ri-calendar-event-line"></i>
+            <span style={{ fontSize: '10px', marginTop: '4px' }}>{translate('calendarView')}</span>
+          </div>
+          <div 
+            className={'mobile-nav-item ' + (['tasks', 'pending', 'all_tasks'].includes(activeView) ? 'active' : '')} 
+            onClick={() => setActiveView('tasks')}
+          >
+            <i className="ri-list-check"></i>
+            <span style={{ fontSize: '10px', marginTop: '4px' }}>{translate('myTasks')}</span>
+          </div>
+          <div 
+            className="mobile-nav-item" 
+            onClick={() => setShowTaskForm(true)}
+          >
+            <i className="ri-add-circle-fill" style={{ fontSize: '32px', color: 'var(--primary-color)' }}></i>
+          </div>
+          <div 
+            className={'mobile-nav-item ' + (activeView === 'kanban' ? 'active' : '')} 
+            onClick={() => setActiveView('kanban')}
+          >
+            <i className="ri-layout-column-line"></i>
+            <span style={{ fontSize: '10px', marginTop: '4px' }}>{translate('kanbanBoard')}</span>
+          </div>
+          <div 
+            className={'mobile-nav-item ' + (activeView === 'dashboard' ? 'active' : '')} 
+            onClick={() => setActiveView('dashboard')}
+          >
+            <i className="ri-bar-chart-fill"></i>
+            <span style={{ fontSize: '10px', marginTop: '4px' }}>{translate('insights')}</span>
+          </div>
+        </nav>
+      )}
       <ReminderModal
         isOpen={reminderQueue.length > 0}
         onClose={() => setReminderQueue(prev => prev.slice(1))}

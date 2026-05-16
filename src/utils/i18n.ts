@@ -12,9 +12,9 @@ export const translations = {
     guide: '使用說明',
     myTasks: '我的任務',
     calendarView: '月曆視圖',
-    pendingList: '待辦清單',
+    pendingList: '靈感待辦',
     scheduledList: '已排程清單',
-    kanbanBoard: '看板管理',
+    kanbanBoard: '看板視圖',
     insights: '數據洞察',
     
     // Tooltips

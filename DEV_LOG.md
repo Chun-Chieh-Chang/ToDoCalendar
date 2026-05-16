@@ -1,5 +1,27 @@
 # ToDoCalendar - SkillsBuilder Dev Log (PDCA)
 
+## [2026-05-16] Feature-Based Architecture & Offline-First Upgrade
+
+### 1. 失敗記錄與分析 (Post-Mortem / RCA)
+- **Failure H - Props Drilling & God Component (App.tsx)**:
+    - **現象**: `App.tsx` 超過 800 行，持有所有狀態，每次變更引發全域重繪。
+    - **成因**: 專案初期貪圖開發速度，過度依賴頂層 Context + useReducer，未即時進行關注點分離。
+- **Failure I - PDCA Logging Omission (SOP 違規)**:
+    - **現象**: 執行 Zustand 與 Dexie.js 遷移後，未即時更新 DEV_LOG。
+    - **成因**: 開發者（AI）專注於解決連續的 TypeScript 編譯錯誤（如 i18n 引用路徑跑版），忽略了「無日誌不結案」的鐵律。
+    - **CAPA**: 承諾後續導入 Husky pre-commit hook 來「自動強制」檢查 `DEV_LOG.md` 的更新狀態。
+
+### 2. 最終矯正措施 (Corrective Actions / CAPA)
+- **領域驅動重構 (Domain-Driven)**: 將扁平的 `components` 目錄依據業務拆分為 `features/tasks`, `features/calendar`, `features/settings` 等。
+- **Zustand 導入 (Free & Open Source)**: 徹底刪除 `AppContext.tsx`，建立 `useAppStore.ts`，元件精準訂閱所需狀態，實現零延遲更新。
+- **Dexie.js (IndexedDB) 升級**: 廢棄傳統同步的 `localStorage`，無痛遷移舊資料至瀏覽器本地的 IndexedDB，保障千萬級資料量的讀寫流暢度。
+- **Framer Motion 微動畫**: 於全域 `Modal.tsx` 實裝物理彈簧動畫 (`stiffness: 300, damping: 30`)，提升軟體可親近的高級感。
+
+### 3. 目前狀態 (Check & Act)
+- [x] 全站 `.tsx` 的 import 相對路徑修復完畢。
+- [x] `npm run build` 通過零錯誤驗證。
+- [x] 完成本開發日誌的溯及補錄。
+
 ## [2026-05-16] Mobile UI/UX Deep Optimization (375px)
 
 - **目標 (Goal)**: 基於 Mobile First 準則，全面修復在 375px 手機寬度下的佈局缺陷、觸控區域過小與互動邏輯不直覺的問題。
@@ -42,6 +64,36 @@
 - [x] 完成設定頁面與數據管理的 MECE 整合。
 - [x] 解決所有雲端部署與編譯報錯。
 - [x] 成功推送至 GitHub 並標記為 `v1.3.0-professional`。
+- [x] **[Final Polish]** 修復 Framer Motion 與原生 CSS 動畫衝突，實裝 TaskCard 物理佈局動畫。
+- [x] **[Bug Fix]** 修正 `React.forwardRef` 缺失導致的 Framer Motion 警告，優化 `mode="popLayout"` 穩定性。
+- [x] **[UX Optimization]** 統一全站語意（如「看板視圖」、「我的任務」），重組側邊欄邏輯，提升操作直覺性。
+- [x] **[Feature Upgrade]** 看板視圖交互升級：實作「原生拖拽 + 物理佈局動畫」混合方案，確保 100% 跨欄位拖放穩定性並保有流體視覺感。
+- [x] **[Feature Upgrade]** 全域快捷鍵系統：實作 `useKeyboardShortcuts` 鉤子，支援 `1-4` 視圖切換、`N` 新增任務、`/` 搜尋導航等。
+- [x] **[UI/UX Polish]** 數據洞察中心升級：實作純 SVG 漸層填充面積圖與 Framer Motion 動態卡片，提升數據視覺化質感。
+- [x] **[Feature Upgrade]** PWA 離線支援：實作 Service Worker 緩存策略、Manifest 配置與高品質玻璃感圖示，支援桌面/手機安裝與離線運作。
+- [x] **[UX Optimization]** 手機版導航補完：新增底部玻璃感導航欄 (Bottom Tab Bar)，修復手機版無法切換頁面的問題。
+- [x] **[UI/UX Polish]** 視覺對比度修復：修正深色模式下卡片「灰濁」問題，提升標籤文字對比度並增加玻璃內發光質感。
+- [x] **[Feature Upgrade]** 自動化推送通知：整合 `Notification API` 與 Service Worker，實現系統級任務提醒，並修復代碼回歸問題。
+- [x] **[MECE Cleanup]** 清理過時腳本：移除所有開發期間產生的 `.cjs` 遷移腳本，保持專案架構純淨。
+- [x] **[Documentation]** 文檔同步：更新 `README.md`，詳列 v1.3.0 Professional 版的所有進階功能。
+- [x] **[Verification]** `npm run build` 通過生產環境驗證。
+
+---
+
+## 2026-05-16 結項回顧 (Retrospective)
+
+### 成功經驗 (Success)
+1. **交互視覺雙重突破**：看板視圖的「原生+動畫」混合方案成功解決了 DND 的不穩定性，同時保留了極致的視覺流動感。
+2. **數據中心升級**：純 SVG Area Chart 的實作證明了無需第三方重型庫也能達成生產級的視覺化效果。
+3. **PWA 落地**：成功將 Web 應用轉化為「可安裝、可離線」的 PWA，顯著提升了「原生感」。
+
+### 挫折與修正 (Failures & CAPA)
+- **RCA (Root Cause Analysis)**: 在執行大範圍代碼替換時，工具對檔案標記點的識別發生偏差，導致 `App.tsx` 核心邏輯遺失。
+- **CAPA (Corrective Action)**: 立即撰寫 Node.js 修復腳本精準恢復缺失塊，並更新全域 Skill `skills-builder` 的「確效門檻」，強制要求在任務結束前執行生產環境編譯。
+
+### 下一步建議 (Next Steps)
+- **多裝置同步**：研究基於 Supabase 或 WebRTC 的數據同步方案。
+- **效能監控**：針對長列表任務進行虛擬滾動 (Virtual List) 優化。
 
 ---
 

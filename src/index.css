@@ -23,6 +23,7 @@
   --bg-color: #f1f5f9; /* Soft Slate background for better glass contrast */
   --surface-color: rgba(255, 255, 255, 0.8);
   --primary-color: #3B82F6; /* Royal Blue as per Rule */
+  --primary-color-rgb: 59, 130, 246;
   --primary-gradient: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
 
   --sidebar-bg: rgba(255, 255, 255, 0.85);
@@ -75,17 +76,19 @@
 
 /* Dark Theme Variables */
 [data-theme="dark"] {
-  --bg-color: #0F172A;
-  --surface-color: #1E293B;
+  --bg-color: #0F172A; /* Deep Slate 900 */
+  --surface-color: rgba(30, 41, 59, 0.7); /* Slate 800 with glass */
   --sidebar-bg: rgba(2, 6, 23, 0.85);
 
-  --text-primary: #F1F5F9;
-  --text-secondary: #94A3B8;
-  --border-color: #334155;
-  --glass-rgb: 30, 41, 59; /* Dark Slate with transparency */
+  --text-primary: #F1F5F9; /* Slate 100 */
+  --text-secondary: #94A3B8; /* Slate 400 */
+  --border-color: rgba(255, 255, 255, 0.08);
+  --glass-rgb: 30, 41, 59;
+  --glass-bg: rgba(var(--glass-rgb), 0.45);
   --border-rgb: 255, 255, 255;
+  --border-glass: rgba(255, 255, 255, 0.12);
   --accent-glow: rgba(192, 132, 252, 0.15);
-  --inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
 
   --task-blue-bg: rgba(30, 58, 138, 0.5);
   --task-blue-text: #C7D2FE;
