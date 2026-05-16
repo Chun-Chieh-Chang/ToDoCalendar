@@ -1,5 +1,17 @@
 # ToDoCalendar - SkillsBuilder Dev Log (PDCA)
 
+## [2026-05-16] Mobile UI/UX Deep Optimization (375px)
+
+- **目標 (Goal)**: 基於 Mobile First 準則，全面修復在 375px 手機寬度下的佈局缺陷、觸控區域過小與互動邏輯不直覺的問題。
+- **預防措施 (Prevention)**: 
+    - 採用外科手術式修改，針對單一元件 (如 Calendar, TaskCard, Filter) 獨立修復，避免全局樣式污染。
+    - 確保修改後依然兼容 Desktop 版面的「合理留白」。
+- **執行計畫**:
+    1. **互動邏輯**: 移除 Calendar Cell 上的雙擊開啟任務，改為單擊 (`onClick`)。
+    2. **觸控區域**: 強制所有行動按鈕 (Edit, Delete, Navigation arrows) 符合 `min-width: 44px; min-height: 44px` 規範。
+    3. **排版降噪**: TaskListModal 過濾器改為 `flex-col`，修復過長 Placeholder，優化毛玻璃的雜訊比例。
+    4. **導航簡化**: 底部導航列將「設定」按鈕移出或精簡以擴大點擊區。
+
 ## [2026-05-16] v1.3.0 Professional - MECE UX Refactoring & Stabilization
 
 ### 1. 失敗記錄與分析 (Post-Mortem / RCA)

@@ -436,6 +436,7 @@
 
   .task-modal-filter {
     padding: 12px 20px;
+    background-image: none;
   }
 
   .task-modal-body {

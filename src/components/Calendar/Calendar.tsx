@@ -131,11 +131,13 @@ const Calendar = ({
               } ${isSelected ? 'selected' : ''} ${day.getDay() === 6 ? 'is-saturday' : ''} ${
                 day.getDay() === 0 ? 'is-sunday' : ''
               }`}
-              onClick={() => onDateSelect(day)}
-              onDoubleClick={() => isCurrentMonth && onDateDoubleClick(day)}
+              onClick={() => {
+                onDateSelect(day);
+                if (isCurrentMonth) onDateDoubleClick(day);
+              }}
               title={tasksForDay.length > 0 
-                ? `${t('tasksOnThisDay').replace('{count}', tasksForDay.length.toString())}\n${taskListTooltip}\n\n${t('doubleClickToView')}` 
-                : t('doubleClickToTaskList')
+                ? `${t('tasksOnThisDay').replace('{count}', tasksForDay.length.toString())}\n${taskListTooltip}` 
+                : t('doubleClickToTaskList') // Note: keeping key for now to avoid translation breakage
               }
             >
               <div className="day-number">{day.getDate()}</div>
