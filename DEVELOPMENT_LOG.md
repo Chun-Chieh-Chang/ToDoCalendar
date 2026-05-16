@@ -28,6 +28,14 @@
 - Project state is verified as "v1.3.0 Professional".
 - Ready for GitHub synchronization using `chun-chieh-chang` account.
 
+### 5. Failure Records & Self-Evolution (Critical)
+- **Failure E - CI/CD Build Failure (Missing Dependencies)**:
+    - **Symptom**: GitHub Actions failed with "Failed to resolve import @supabase/supabase-js".
+    - **RCA (Root Cause Analysis)**: Post-rebase neglect. A remote branch introduced Supabase features, but the model failed to execute `npm install` and verify the project's buildability before pushing. This skipped the "Check" phase of PDCA.
+    - **CAPA (Corrective & Preventive Action)**:
+        - **Mandatory Runtime Check**: Any push **MUST** be preceded by a local `npm run dev` and a console error sweep.
+        - **Dependency Audit**: After any `git pull` or `rebase`, a mandatory check of `package.json` against the source code imports is required.
+
 ---
 
 ## [2026-05-16] UI/UX Optimization & Restoration
