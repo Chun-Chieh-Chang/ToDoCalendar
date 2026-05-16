@@ -84,13 +84,13 @@ const App = () => {
   useEffect(() => {
     const root = document.documentElement;
     if (state.settings.glassOpacity !== undefined) {
-      root.style.setProperty('--glass-opacity', state.settings.glassOpacity.toString());
+      root.style.setProperty('--glass-opacity', (state.settings.glassOpacity / 100).toString());
     }
     if (state.settings.glassBlur !== undefined) {
       root.style.setProperty('--glass-blur', `${state.settings.glassBlur}px`);
     }
     if (state.settings.borderOpacity !== undefined) {
-      root.style.setProperty('--border-opacity', state.settings.borderOpacity.toString());
+      root.style.setProperty('--border-opacity', (state.settings.borderOpacity / 100).toString());
     }
   }, [state.settings.glassOpacity, state.settings.glassBlur, state.settings.borderOpacity]);
 
