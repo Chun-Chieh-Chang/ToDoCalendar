@@ -378,14 +378,14 @@ h6 {
 [data-theme="dark"] .input,
 [data-theme="dark"] .select,
 [data-theme="dark"] .textarea {
-  background: #000000;
-  border-color: #333333;
-  color: #e5e7eb;
+  background: var(--glass-bg-dark);
+  border-color: var(--border-glass);
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .card {
-  background: #000000;
-  border-color: #333333;
+  background: var(--glass-bg-dark);
+  border-color: var(--border-glass);
 }
 
 /* Native Date/Time Picker Indicators Fix */
