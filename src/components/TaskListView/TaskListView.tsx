@@ -35,21 +35,25 @@ const TaskListView = ({
     viewMode = 'list'
 }: TaskListViewProps) => {
     const [quickAddTitle, setQuickAddTitle] = (React as any).useState('');
+    const [subTab, setSubTab] = (React as any).useState<'all' | 'scheduled' | 'pending'>('all');
+
+    // 根據子標籤進行內部二次過濾
+    const subFilteredTasks = (React as any).useMemo(() => {
+        if (subTab === 'scheduled') return tasks.filter(t => t.date);
+        if (subTab === 'pending') return tasks.filter(t => !t.date);
+        return tasks;
+    }, [tasks, subTab]);
 
     const handleQuickAdd = (e: React.FormEvent) => {
         e.preventDefault();
         if (!quickAddTitle.trim()) return;
-
-        // Use NLP to parse if needed, but App.tsx handleSaveTask handles adding.
-        // We'll pass the parsed data if we want, or just the title.
-        // Actually, handleSaveTask in App.tsx expects the full task but handles id/creation.
-
         onAddTask(quickAddTitle);
         setQuickAddTitle('');
     };
+
     const sortedTasks = (React as any).useMemo(() => {
-        return taskUtils.sortTasks(tasks);
-    }, [tasks]);
+        return taskUtils.sortTasks(subFilteredTasks);
+    }, [subFilteredTasks]);
 
     return (
         <div className="task-page-container">
@@ -57,18 +61,40 @@ const TaskListView = ({
                 <div className="header-info">
                     <h1>{title}</h1>
                     <div className="page-stats">
-                        <span className="stat-pill">總計：{tasks.length}</span>
-                        <span className="stat-pill">待處理：{tasks.filter(t => !t.completed).length}</span>
+                        <span className="stat-pill">總計：{subFilteredTasks.length}</span>
+                        <span className="stat-pill">待處理：{subFilteredTasks.filter(t => !t.completed).length}</span>
                     </div>
                 </div>
                 <div className="header-actions">
-                    {onClearCompleted && tasks.some(t => t.completed) && (
+                    {onClearCompleted && subFilteredTasks.some(t => t.completed) && (
                         <button className="clear-completed-btn" onClick={onClearCompleted}>
                             <i className="ri-delete-bin-line"></i> 清除已完成
                         </button>
                     )}
                 </div>
             </header>
+
+            {/* 子分頁切換器 */}
+            <div className="view-switcher-tabs">
+                <button 
+                    className={`subtab-btn ${subTab === 'all' ? 'active' : ''}`}
+                    onClick={() => setSubTab('all')}
+                >
+                    <i className="ri-stack-line"></i> 全部
+                </button>
+                <button 
+                    className={`subtab-btn ${subTab === 'scheduled' ? 'active' : ''}`}
+                    onClick={() => setSubTab('scheduled')}
+                >
+                    <i className="ri-calendar-todo-line"></i> 已排程
+                </button>
+                <button 
+                    className={`subtab-btn ${subTab === 'pending' ? 'active' : ''}`}
+                    onClick={() => setSubTab('pending')}
+                >
+                    <i className="ri-lightbulb-line"></i> 靈感待辦
+                </button>
+            </div>
 
             <div className="page-filters">
                 <Filter
@@ -91,10 +117,15 @@ const TaskListView = ({
                     </button>
                 </form>
 
-                {tasks.length === 0 ? (
+                {subFilteredTasks.length === 0 ? (
                     <div className="empty-state">
-                        <div className="empty-illustration">📝</div>
-                        <h3>目前沒有任務</h3>
+                        <div className="empty-illustration">
+                            {subTab === 'pending' ? '💡' : subTab === 'scheduled' ? '📅' : '📝'}
+                        </div>
+                        <h3>
+                            {subTab === 'pending' ? '目前沒有靈感任務' : 
+                             subTab === 'scheduled' ? '尚未排定任何日程' : '目前沒有任務'}
+                        </h3>
                         <p>開始規劃您的第一項任務吧！</p>
                     </div>
                 ) : (

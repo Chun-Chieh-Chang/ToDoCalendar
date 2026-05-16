@@ -1,120 +1,109 @@
-/* 
- * KanbanBoard - SkillsBuilder Premium Unification (Fixed)
- */
-
 .kanban-board {
-    display: flex;
-    gap: 32px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
     height: 100%;
-    padding: 16px;
+    padding: 10px;
     background: transparent;
     overflow-x: auto;
 }
 
 .kanban-column {
-    background: var(--surface-glass);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border-radius: 28px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.1);
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
-    min-width: 360px;
-    max-width: 360px;
-    border: 1px solid var(--border-soft);
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-    padding: 8px;
-    box-shadow: var(--shadow-premium);
-}
-
-[data-theme="dark"] .kanban-column {
-    background: rgba(0, 0, 0, 0.2);
+    min-width: 320px;
+    max-height: calc(100vh - 200px);
+    border: 1px solid var(--border-glass);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        var(--shadow-sm),
+        var(--inner-glow);
 }
 
 .kanban-column:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(59, 130, 246, 0.3); /* Subtle blue, not harsh */
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
 }
 
 .column-header {
-    padding: 24px 16px;
+    padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    top: 0;
+    background: inherit;
+    border-radius: 16px 16px 0 0;
+    z-index: 10;
 }
 
 .column-header h3 {
     margin: 0;
-    font-size: 1.15rem;
-    color: var(--text-pure);
+    font-size: 1.1rem;
+    color: var(--text-primary);
     font-weight: 800;
-    font-family: 'Outfit', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    letter-spacing: -0.02em;
 }
 
-.column-header h3::before {
-    content: '';
-    width: 4px;
-    height: 20px;
-    background: var(--gradient-neon);
-    border-radius: 4px;
-}
-
-/* Kanban Cards - FULL RECONSTRUCTION */
-.kanban-column .task-card {
-    background: var(--surface-glass) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border-soft) !important;
-    padding: 20px;
-    border-radius: 20px;
-    margin-bottom: 16px;
-    box-shadow: var(--shadow-premium);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.kanban-column .task-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    border-color: var(--primary-neon) !important;
-    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15);
-}
-
-/* Override existing task card internal styles to remove boxy borders */
-.kanban-column .task-card * {
-    border-color: transparent !important;
-}
-
-.kanban-column .task-card .task-header {
-    margin-bottom: 12px;
-    display: flex;
-    gap: 8px;
-}
-
-.kanban-column .task-card .priority-badge,
-.kanban-column .task-card .category-badge {
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 0.7rem;
-    font-weight: 800;
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--primary-neon);
+.task-count {
+    background: var(--bg-color);
+    color: var(--text-secondary);
+    padding: 4px 12px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1px solid var(--border-color);
 }
 
 .column-content {
-    padding: 8px;
+    padding: 12px;
     flex: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    gap: 12px;
 }
 
-.task-count {
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--primary-neon);
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 800;
+/* Custom scrollbar for columns */
+.column-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.column-content::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 10px;
+}
+
+.draggable-task {
+    cursor: grab;
+}
+
+.draggable-task:active {
+    cursor: grabbing;
+}
+
+.draggable-task .task-card {
+    margin: 0;
+    pointer-events: auto;
+}
+
+/* Dark mode and general colors are handled via variables in App.css */
+[data-theme="dark"] .kanban-column {
+    background: var(--surface-color);
+    border-color: var(--border-color);
+}
+
+@media (max-width: 1024px) {
+    .kanban-board {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        height: auto;
+    }
+
+    .kanban-column {
+        max-height: none;
+    }
 }
