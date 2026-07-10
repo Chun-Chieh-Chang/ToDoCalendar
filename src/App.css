@@ -874,6 +874,10 @@ body {
     padding-bottom: 80px; /* Space for mobile nav */
   }
 
+  .app-container {
+    padding-bottom: 70px;
+  }
+
   .calendar-header {
     flex-direction: column;
     gap: 16px;
