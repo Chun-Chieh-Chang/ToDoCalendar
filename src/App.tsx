@@ -351,8 +351,14 @@ const App = () => {
     return () => window.removeEventListener('changeView', handleChangeView);
   }, []);
 
+  const cssVars = {
+    '--glass-opacity': state.settings.glassOpacity,
+    '--glass-blur': `${state.settings.glassBlur}px`,
+    '--border-opacity': state.settings.borderOpacity,
+  } as React.CSSProperties;
+
   return (
-    <div className="app" data-theme={state.settings.theme}>
+    <div className="app" data-theme={state.settings.theme} style={cssVars}>
       {/* 左側導航欄 - 僅在非手機版顯示 */}
       {!isMobile && (
         <aside className="sidebar">

@@ -84,9 +84,9 @@
   --text-secondary: #94A3B8; /* Slate 400 */
   --border-color: rgba(255, 255, 255, 0.08);
   --glass-rgb: 30, 41, 59;
-  --glass-bg: rgba(var(--glass-rgb), 0.45);
+  --glass-bg: rgba(var(--glass-rgb), var(--glass-opacity));
   --border-rgb: 255, 255, 255;
-  --border-glass: rgba(255, 255, 255, 0.12);
+  --border-glass: rgba(var(--border-rgb), var(--border-opacity));
   --accent-glow: rgba(192, 132, 252, 0.15);
   --inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
 
