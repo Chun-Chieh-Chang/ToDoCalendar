@@ -1,4 +1,25 @@
 
+## [2026-07-18] Fix glass opacity/blur/border settings not applying
+
+### 1. 失敗記錄與分析 (Post-Mortem / RCA)
+- **Bug - 視覺效果設定無作用**:
+    - **現象**: 設定頁面「玻璃不透明度」、「模糊強度」、「邊框不透明度」三個滑桿調整後無任何視覺變化。
+    - **根因**: 
+        1. `App.tsx` 從未將這三個 settings 值同步到 CSS 變數，CSS 使用的是 `index.css` 中的硬編碼預設值。
+        2. dark mode (`[data-theme="dark"]`) 下 `--glass-bg` 和 `--border-glass` 也直接寫死數值，跳過了 `var(--glass-opacity)` 和 `var(--border-opacity)`。
+    - **水平展開**: 無其他 settings 欄位有類似遺漏 (theme/language 等均有正確應用)。
+
+### 2. 最終矯正措施 (Corrective Actions / CAPA)
+- **App.tsx**: 在根 `div.app` 上透過 inline style 將 `settings.glassOpacity` → `--glass-opacity`、`settings.glassBlur`(px) → `--glass-blur`、`settings.borderOpacity` → `--border-opacity` 同步到 CSS 變數。
+- **index.css**: dark mode 區塊的 `--glass-bg` 改為 `rgba(var(--glass-rgb), var(--glass-opacity))`、`--border-glass` 改為 `rgba(var(--border-rgb), var(--border-opacity))`。
+
+### 3. 目前狀態 (Check & Act)
+- [x] `src/App.tsx` 新增 inline style 同步 CSS 變數。
+- [x] `src/index.css` dark mode 修正為使用變數而非硬編碼。
+- [x] 視覺效果三個滑桿調整後即時生效。
+
+---
+
 ## [2026-07-18] Fix missing `changeView` event listener
 
 ### 1. 失敗記錄與分析 (Post-Mortem / RCA)
