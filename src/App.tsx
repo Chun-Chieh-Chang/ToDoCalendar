@@ -467,6 +467,9 @@ const App = () => {
                 <p>v1.3.0 Professional</p>
               </div>
             </div>
+            <div className="sidebar-credit">
+              Developed by Wesley Chang @ Mouldex, 2026.
+            </div>
           </div>
         </aside>
       )}

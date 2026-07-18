@@ -1,3 +1,23 @@
+
+## [2026-07-18] Sidebar Author Credit
+
+### 1. 失敗記錄與分析 (Post-Mortem / RCA)
+- **Failure - SOP Violation: DEV_LOG.md Not Updated**:
+    - **現象**: 前端 UI 修改未同步更新 DEV_LOG.md，觸發 Husky pre-commit hook 阻擋。
+    - **成因**: 開發者專注於 UI 修改，忽略了 PDCA 日誌記錄 SOP。
+    - **CAPA**: 本次修改即時補錄至此日誌，並確認 commit 流程完整。
+
+### 2. 最終矯正措施 (Corrective Actions / CAPA)
+- **側邊欄作者署名**: 於 `src/App.tsx` 的 sidebar-footer 區域新增 `.sidebar-credit` 區塊，顯示 "Developed by Wesley Chang @ Mouldex, 2026."。
+- **CSS 樣式**: 於 `src/App.css` 新增對應樣式，支援淺色/深色主題自動適配。
+
+### 3. 目前狀態 (Check & Act)
+- [x] `src/App.tsx` 新增 sidebar-credit 區塊。
+- [x] `src/App.css` 新增 .sidebar-credit 樣式（含 dark mode 支援）。
+- [x] `npm run build` 待驗證。
+
+---
+
 # ToDoCalendar - SkillsBuilder Dev Log (PDCA)
 
 ## [2026-05-16] Feature-Based Architecture & Offline-First Upgrade

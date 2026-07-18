@@ -942,3 +942,21 @@ body {
     width: 100%;
   }
 }
+/* Sidebar Credit */
+.sidebar-credit {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  text-align: center;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .sidebar-credit {
+  color: #94A3B8;
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
