@@ -339,6 +339,18 @@ const App = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // 監聽從 AppGuide「立即開始使用」按鈕發送的視圖切換事件
+  useEffect(() => {
+    const handleChangeView = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        setActiveView(customEvent.detail);
+      }
+    };
+    window.addEventListener('changeView', handleChangeView);
+    return () => window.removeEventListener('changeView', handleChangeView);
+  }, []);
+
   return (
     <div className="app" data-theme={state.settings.theme}>
       {/* 左側導航欄 - 僅在非手機版顯示 */}

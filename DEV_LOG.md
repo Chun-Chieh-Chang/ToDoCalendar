@@ -1,4 +1,23 @@
 
+## [2026-07-18] Fix missing `changeView` event listener
+
+### 1. 失敗記錄與分析 (Post-Mortem / RCA)
+- **Bug - AppGuide CTA 按鈕無作用**:
+    - **現象**: 使用說明頁面最下方的「立即開始使用」按鈕點擊後無任何反應。
+    - **根因**: 按鈕透過 `window.dispatchEvent(new CustomEvent('changeView', ...))` 發送視圖切換事件，但 `App.tsx` 完全未監聽此 custom event，事件無人處理。
+    - **水平展開**: 掃描全專案 `dispatchEvent(new CustomEvent(...))` 共 2 處 — `changeView` 與 `focus-search`；後者已有對應 listener (`Filter.tsx`)，無其他遺漏。
+
+### 2. 最終矯正措施 (Corrective Actions / CAPA)
+- **App.tsx**: 新增 `useEffect` 使用 `addEventListener('changeView', handleChangeView)` 監聽事件，並呼叫 `setActiveView(detail)` 切換至月曆視圖。
+- **水平驗證**: 確認 `focus-search` 的 dispatch/listener pair 正常運作。
+
+### 3. 目前狀態 (Check & Act)
+- [x] `src/App.tsx` 新增 changeView 事件監聽。
+- [x] 確認「立即開始使用」按鈕點擊可正常切換至月曆視圖。
+- [x] 完成水平展開檢查，無其他類似遺漏。
+
+---
+
 ## [2026-07-18] Sidebar Author Credit
 
 ### 1. 失敗記錄與分析 (Post-Mortem / RCA)
