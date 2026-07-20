@@ -1,4 +1,42 @@
 
+## [2026-07-20] Project-Wide Code Cleanup & MECE Reorganization
+
+### 1. 失敗記錄與分析 (Post-Mortem / RCA)
+- **發現 - 多項程式碼品質問題**:
+  - **損毀引用**: `src/main.tsx` 導入不存在的 `./store/AppContext`（該檔案早已刪除），`AppProvider` 符號從未使用。
+  - **孤立檔案**: 5 個無任何導入引用的孤兒檔案（`authService.ts`, `cssScanner.ts`, `configLoader.ts`, `contrastConfig.ts`, `css-tree.d.ts`），其中 3 個使用 Node.js `fs`/`path` 模組，若意外被瀏覽器程式碼導入將導致運行時錯誤。
+  - **.gitignore 錯字**: `backups/` 目錄名稱錯誤（多了 's'），導致 `backup/` 目錄下的 JSON 備份檔 (~6.2 MB) 未被忽略。
+  - **重複邏輯**: `cssScanner.ts` 與 `contrastUtils.ts` 各自獨立實作了完全相同的顏色解析函式與 148 行色彩名稱映射表。
+  - **過時開發工具**: `.kiro/` 目錄（Kiro 工具規格）、`scratch/`（測試腳本）為開發過程遺留產物。
+- **根因**:
+  1. 歷次重構（Context → Zustand、components/ → features/）後未執行全面的反向依賴掃描。
+  2. 無自動化機制（如 lint rule 或 CI 步驟）檢測孤立檔案與損毀引用。
+  3. 開發流程中未建立「清理清單」檢查點。
+
+### 2. 最終矯正措施 (Corrective Actions / CAPA)
+- **修復損毀引用**: 刪除 `main.tsx` 中 `import { AppProvider } from './store/AppContext'`。
+- **刪除孤立檔案**: 
+  - `src/services/authService.ts`（Google OAuth 服務，未導入）
+  - `src/utils/cssScanner.ts`、`src/utils/configLoader.ts`（Node.js 工具，未導入）
+  - `src/types/contrastConfig.ts`、`src/types/css-tree.d.ts`（僅被上述孤兒檔案使用）
+- **清理 npm 依賴**: 移除 `css-tree`（僅被孤兒 `cssScanner.ts` 使用）。
+- **修正 .gitignore**: `backups/` → `backup/`，確保備份目錄被正確忽略。
+- **刪除歷史備份**: 刪除 3 個舊版備份，保留最新 `todo_calendar_backup.json`。
+- **刪除開發遺留**: 移除 `.kiro/`（Kiro 工具規格）與 `scratch/`（測試腳本）目錄。
+- **玻璃變數二修**: 修復 `rgba(var(--glass-rgb), var(--glass-opacity))` 嵌套 `var()` 在部分瀏覽器無法重解析的問題，改在 `App.tsx` 中由 JavaScript 直接計算最終 `rgba()` 值。
+
+### 3. 目前狀態 (Check & Act)
+- [x] `src/main.tsx` 移除損毀引用，無編譯錯誤。
+- [x] 5 個孤兒檔案已刪除，`css-tree` 依賴已移除。
+- [x] `.gitignore` 修正為 `backup/`。
+- [x] 刪除 3 個歷史備份檔案（保留最新）。
+- [x] `.kiro/`、`scratch/` 目錄已移除。
+- [x] 玻璃不透明度與邊框不透明度滑桿修復完成。
+- [x] `npm run build` 通過驗證。
+- [x] 文檔同步更新（DEV_LOG.md、CONSOLIDATED_DOCUMENTATION.md）。
+
+---
+
 ## [2026-07-18] Fix glass opacity/blur/border settings not applying
 
 ### 1. 失敗記錄與分析 (Post-Mortem / RCA)

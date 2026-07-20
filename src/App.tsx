@@ -351,10 +351,19 @@ const App = () => {
     return () => window.removeEventListener('changeView', handleChangeView);
   }, []);
 
+  const theme = state.settings.theme;
+  const glassRgb = theme === 'dark' ? '30, 41, 59' : '255, 255, 255';
+  const borderRgb = '255, 255, 255';
+  const glassOpacity = state.settings.glassOpacity;
+  const borderOpacity = state.settings.borderOpacity;
   const cssVars = {
-    '--glass-opacity': state.settings.glassOpacity,
+    '--glass-opacity': glassOpacity,
     '--glass-blur': `${state.settings.glassBlur}px`,
-    '--border-opacity': state.settings.borderOpacity,
+    '--border-opacity': borderOpacity,
+    '--glass-bg': `rgba(${glassRgb}, ${glassOpacity})`,
+    '--glass-bg-dark': `rgba(${glassRgb}, ${glassOpacity})`,
+    '--border-glass': `rgba(${borderRgb}, ${borderOpacity})`,
+    '--border-glass-strong': `rgba(${borderRgb}, ${Math.min(borderOpacity + 0.2, 1)})`,
   } as React.CSSProperties;
 
   return (
