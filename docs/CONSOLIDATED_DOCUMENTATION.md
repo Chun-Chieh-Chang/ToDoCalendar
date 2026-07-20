@@ -1,11 +1,84 @@
 # ToDoCalendar Consolidated Documentation
 
+> **Current Version:** v1.3.0 Professional (2026-07-20)
+> **Latest Cleanup:** 2026-07-20 — Orphan file removal, broken import fix, MECE reorganization
+
 ## Table of Contents
-1. [User Manual](#user-manual)
-2. [UI Redesign Summary](#ui-redesign-summary)
-3. [Optimization Completion Report](#optimization-completion-report)
-4. [Project Cleanup Report](#project-cleanup-report)
-5. [Recent Updates Log](#recent-updates-log)
+1. [Current Architecture Overview](#current-architecture-overview)
+2. [User Manual](#user-manual)
+3. [UI Redesign Summary](#ui-redesign-summary)
+4. [Optimization Completion Report](#optimization-completion-report)
+5. [Project Cleanup Report](#project-cleanup-report)
+6. [Recent Updates Log](#recent-updates-log)
+
+---
+
+## Current Architecture Overview
+
+### Technology Stack
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 18, TypeScript |
+| Build Tool | Vite 7 |
+| State Management | Zustand 5 |
+| Local Database | Dexie (IndexedDB) |
+| Cloud Sync | Supabase |
+| Desktop | Electron 33 |
+| Animations | Framer Motion 12 |
+| Icons | Remixicon 4 |
+| i18n | Custom (zh-TW / en) |
+
+### Project Structure
+```
+ToDoCalendar/
+├── src/
+│   ├── main.tsx                    # Entry point
+│   ├── App.tsx / App.css           # Root component & layout
+│   ├── index.css                   # Global design system (CSS variables, glass morphism)
+│   ├── constants/defaults.ts       # Default settings & filter state
+│   ├── store/useAppStore.ts        # Zustand store: tasks, settings, filter
+│   ├── types/index.ts              # Core type definitions
+│   ├── utils/
+│   │   ├── i18n.ts                 # Translation (170+ keys)
+│   │   └── nlpUtils.ts             # NLP task parsing (priority, category, time, date)
+│   ├── services/
+│   │   ├── storage.ts              # Dexie CRUD + localStorage migration + Supabase sync
+│   │   ├── db.ts                   # IndexedDB schema (tasks, appData)
+│   │   └── supabase.ts             # Supabase client (conditional)
+│   ├── hooks/
+│   │   └── useKeyboardShortcuts.ts # Global shortcuts (1-4, N, /, T, Esc)
+│   ├── shared/
+│   │   ├── components/Modal/       # Reusable modal with spring animations
+│   │   └── utils/                  # Date, contrast, notification utilities
+│   └── features/
+│       ├── calendar/               # Month grid with task previews
+│       ├── tasks/                  # Task CRUD, filter, cards, list views
+│       ├── dashboard/              # Analytics (SVG area chart, stats)
+│       ├── kanban/                 # Kanban board (HTML5 DnD + Framer Motion)
+│       ├── settings/               # Settings modal (General/Visual/Data tabs)
+│       └── guide/                  # User guide with CTA onboarding
+├── electron/
+│   ├── main.cjs                    # Electron main process
+│   └── preload.cjs                 # Electron bridge API
+├── public/                         # PWA assets (manifest, service worker, icons)
+├── backup/                         # JSON data backup files
+└── docs/                           # Documentation
+```
+
+### Glass Effect Design System
+- **CSS Variables**: `--glass-bg`, `--glass-blur`, `--border-glass` injected via inline style on `.app`
+- **Controls**: Settings → Visual tab (glass opacity, blur intensity, border opacity)
+- **Implementation**: Pre-computed `rgba()` values in JavaScript to avoid browser CSS variable nesting issues
+
+### Key Features
+- 📅 Multi-view (Calendar, Kanban, Task List, Dashboard)
+- 🌓 Light/Dark theme with glass morphism
+- 📱 Responsive (375px mobile to desktop)
+- 🔔 PWA notifications + Service Worker caching
+- ⌨️ Keyboard shortcuts
+- 🌐 i18n zh-TW / en
+- 💾 Offline-first with IndexedDB
+- 🔄 Supabase cloud sync (optional)
 
 ---
 
@@ -35,14 +108,15 @@
 ## 2. 安裝與啟動
 
 ### 使用獨立執行檔 (推薦)
-1. 下載最新版本的 `ToDoCalendar-Portable.exe`。
+1. 從 GitHub Releases 下載最新版本的 `ToDoCalendar-Portable.exe`。
 2. 直接雙擊檔案即可運行，無需安裝。
 
 ### 開發者模式
 如果您希望進行開發或修改：
-1. 確保已安裝 Node.js。
-2. 執行 `開發模式.bat` 啟動開發伺服器。
-3. 執行 `打包應用.bat` 重新構建應用程式。
+1. 確保已安裝 Node.js 18+。
+2. 執行 `npm run dev` 啟動開發伺服器。
+3. 執行 `npm run build` 構建生產版本。
+4. 執行 `npm run pack` 打包為 Electron 獨立執行檔。
 
 ## 3. 介面概覽
 
@@ -232,16 +306,16 @@ A: 最新版本已增加任務文字大小，提升可讀性。如仍有問題�
 
 ## 檔案清單
 
-### 新增/修改的檔案
+### 新增/修改的檔案（當前路徑）
 1. **index.html** - 新增 Remix Icon CDN
 2. **src/App.tsx** - 重構佈局，新增側邊欄和狀態欄
 3. **src/App.css** - 完全重寫，實現新的設計系統
-4. **src/components/Calendar/Calendar.css** - 重寫月曆樣式
-5. **src/components/Calendar/Calendar.tsx** - 更新任務顯示邏輯
+4. **src/features/calendar/components/Calendar/Calendar.css** - 重寫月曆樣式
+5. **src/features/calendar/components/Calendar/Calendar.tsx** - 更新任務顯示邏輯
 
 ### 新增的文檔檔案
-1. **docs/UI_REDESIGN_PLAN.md** - UI 重新設計計劃
-2. **docs/UI_REDESIGN_SUMMARY.md** - 本摘要文件
+1. **docs/UI_REDESIGN_PLAN.md** - UI 重新設計計劃（已歸檔）
+2. **docs/UI_REDESIGN_SUMMARY.md** - 本摘要文件（已整合至此）
 
 ## 設計參考
 - **深色主題**: `UI_Improved/深色主題.html`
@@ -578,6 +652,35 @@ ToDo/
 ## Recent Updates Log
 
 # 近期更新日誌
+
+## 2026-07-20: Project-Wide Cleanup & MECE Reorganization (v1.3.0)
+
+### 清理作業
+- **修復損毀引用**: 移除 `main.tsx` 中對已刪除 `AppContext.tsx` 的導入
+- **刪除孤立檔案**: 移除 5 個無任何導入引用的孤兒檔案（`authService.ts`, `cssScanner.ts`, `configLoader.ts`, `contrastConfig.ts`, `css-tree.d.ts`）
+- **npm 依賴清理**: 移除 `css-tree`（僅被孤兒檔案使用）
+- **修正 .gitignore**: `backups/` → `backup/`，確保備份檔不被 git 追蹤
+- **刪除歷史備份**: 移除 3 個舊版備份，釋放 ~4.7 MB
+- **移除開發遺留**: 刪除 `.kiro/` 與 `scratch/` 目錄
+
+### 玻璃效果修復
+- 修復 `--glass-opacity` 與 `--border-opacity` CSS 變數因嵌套 `var()` 在 `rgba()` 中無法生效的問題
+- 改由 JavaScript 直接計算最終 `rgba()` 值並注入為 CSS 變數
+
+### 檔案修改清單
+1. `src/App.tsx` — CSS 變數注入邏輯重寫
+2. `src/main.tsx` — 移除損毀導入
+3. `.gitignore` — 修正備份目錄名稱
+4. `package.json` — 移除 `css-tree` 依賴
+5. `DEV_LOG.md` — 新增本次清理記錄
+6. `docs/CONSOLIDATED_DOCUMENTATION.md` — 同步更新至 v1.3.0 狀態
+
+### 驗證狀態
+- ✅ `npm run build` 通過零錯誤
+- ✅ 玻璃效果三個滑桿正常運作
+- ✅ 淺色/深色主題切換正常
+
+---
 
 ## 2025-12-18: 功能增強與視覺優化更新
 

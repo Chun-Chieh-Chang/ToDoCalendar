@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4",
-    "css-tree": "^3.2.1",
     "date-fns": "^2.30.0",
     "dexie": "^4.4.2",
     "framer-motion": "^12.38.0",
