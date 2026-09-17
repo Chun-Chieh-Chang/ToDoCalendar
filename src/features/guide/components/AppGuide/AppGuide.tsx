@@ -1,4 +1,3 @@
-import React from 'react';
 import './AppGuide.css';
 
 const AppGuide = () => {

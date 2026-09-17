@@ -549,10 +549,10 @@ export function checkContrastCompliance(ratio: number): ContrastResult {
   
   if (ratio < 2) {
     severity = 'critical';
+  } else if (ratio < 3) {
+    severity = 'minor';
   } else if (ratio < 4.5) {
     severity = 'warning';
-  } else if (ratio < 4.5) {
-    severity = 'minor';
   } else {
     severity = 'pass';
   }

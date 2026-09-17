@@ -24,7 +24,6 @@ import './App.css';
 
 const App = () => {
   const state = useAppStore();
-  const isLoaded = state.isLoaded;
   const dispatch = (action: any) => {
     switch(action.type) {
       case "SET_TASKS": state.setTasks(action.payload); break;
@@ -325,8 +324,6 @@ const App = () => {
   };
 
   const filteredDateTasks = taskUtils.filterTasks(state.tasks.filter(t => t.date === state.selectedDate), state.filter);
-  const filteredAllPlannedTasks = taskUtils.filterTasks(state.tasks.filter(t => t.date), state.filter);
-  const filteredPendingTasks = taskUtils.filterTasks(state.tasks.filter(t => !t.date), state.filter);
   const filteredAllTasks = taskUtils.filterTasks(state.tasks, state.filter);
 
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Modal from '../../../../shared/components/Modal/Modal';
 import { Task } from '../../../../types';
 import './ReminderModal.css';

@@ -1,4 +1,14 @@
 
+## [2026-09-17b] Dead Code Removal & Logic Bug Fix
+
+### 修正清單
+- `main.tsx` — 移除硬編碼版本字串 console.log（遺留死碼）。
+- `App.tsx` — 移除 `isLoaded`（從未讀取）及 `filteredAllPlannedTasks`、`filteredPendingTasks`（計算後從未使用）三個死變數。
+- `db.ts`、`storage.ts` — 移除未使用的 `AppState` import。
+- `ReminderModal.tsx` — 移除從未呼叫的 `useEffect` import。
+- `AppGuide.tsx`、`Filter.tsx` — 移除不必要的 `React` namespace import（已採用 Automatic JSX Runtime）。
+- `contrastUtils.ts` — 修正 `checkContrastCompliance` 函數的邏輯 Bug：重複 `ratio < 4.5` 條件導致 `'minor'` 嚴重性永遠無法被賦值；修正閾值為 `<2 critical / <3 minor / <4.5 warning / pass`。
+
 ## [2026-09-17] Taiwan Holidays Feature + Full Audit & Doc Sync (v1.4.0)
 
 ### 1. 需求背景

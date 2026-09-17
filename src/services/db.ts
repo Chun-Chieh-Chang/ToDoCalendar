@@ -1,5 +1,5 @@
 import Dexie, { Table } from 'dexie';
-import { Task, AppState } from '../types';
+import { Task } from '../types';
 
 export class AppDatabase extends Dexie {
   tasks!: Table<Task, string>; // Primary key is 'id' of type string
