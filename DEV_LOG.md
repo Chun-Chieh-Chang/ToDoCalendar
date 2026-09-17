@@ -1,4 +1,16 @@
 
+## [2026-09-17d] Documentation SSOT Sync (v1.4.0)
+
+### 更新清單
+- `README.md` — 完整重寫：技術棧從 React Context API 更正為 Zustand 5，補充 Dexie/Framer Motion/Remixicon/Supabase，專案結構從 `components/` 更新為 `features/`，移除已刪除的 `.bat` 參照，更新年份與版本號至 v1.4.0。
+- `docs/CONSOLIDATED_DOCUMENTATION.md` — 修正 User Manual（LocalStorage → IndexedDB、雙擊 → 點擊）；新增 `data/twHolidays.ts` 至架構圖；更新版本頁首、年份與 Recent Updates Log。
+
+## [2026-09-17c] Version Bump & i18n Year Fix
+
+### 更新清單
+- `package.json` — version `1.3.0` → `1.4.0`（對應台灣假日新功能）。
+- `src/utils/i18n.ts` — `developer` 欄位年份 2025 → 2026（zh-TW + en 兩處）。
+
 ## [2026-09-17b] Dead Code Removal & Logic Bug Fix
 
 ### 修正清單

@@ -157,7 +157,7 @@ export const translations = {
     savingTask: '正在保存任務',
 
     // 其他
-    developer: 'Developed by Wesley Chang, 2025.',
+    developer: 'Developed by Wesley Chang, 2026.',
     items: '項',
     kanban: '看板視圖',
     todo: '待處理',
@@ -333,7 +333,7 @@ export const translations = {
     savingTask: 'Saving Task',
 
     // Others
-    developer: 'Developed by Wesley Chang, 2025.',
+    developer: 'Developed by Wesley Chang, 2026.',
     items: 'items',
     kanban: 'Kanban View',
     todo: 'To Do',
