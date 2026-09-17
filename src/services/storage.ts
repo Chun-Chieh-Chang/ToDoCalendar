@@ -1,4 +1,4 @@
-import { AppState, Task } from '../types';
+import { Task } from '../types';
 import { supabase } from './supabase';
 import { db } from './db';
 

@@ -8,8 +8,7 @@ const StrictMode = (React as any).StrictMode;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {console.log('ToDoCalendar Loaded: v1.3.0 ' + new Date().toISOString())}
-      <App />
+    <App />
   </StrictMode>,
 )
 
