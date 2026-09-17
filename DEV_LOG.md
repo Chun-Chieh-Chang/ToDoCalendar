@@ -1,4 +1,40 @@
 
+## [2026-09-17] Taiwan Holidays Feature + Full Audit & Doc Sync (v1.4.0)
+
+### 1. 需求背景
+- 使用者要求月曆顯示台灣國定假日，方便直觀掌握假日分佈。
+- 同步執行全專案代碼盤點、文件同步、安全掃描。
+
+### 2. 實作 (Do)
+
+#### 新增功能
+- 新增 `src/data/twHolidays.ts`：靜態假日資料 2024–2027（含補假），60+ 筆，匯出 `getTWHoliday(dateStr)` 函數。
+- 更新 `src/features/calendar/components/Calendar/Calendar.tsx`：每格查詢假日、套用 `is-holiday` class、顯示 `.holiday-label`、Tooltip 整合。
+- 更新 `src/features/calendar/components/Calendar/Calendar.css`：`.is-holiday` 琥珀色底色、`.holiday-label` 橙色文字，深色模式自動切換。
+
+#### 死碼清理
+- 移除 `src/main.tsx:11` 硬編碼版本字串 `console.log('ToDoCalendar Loaded: v1.3.0 ...')`。
+
+#### 一致性修正
+- `src/utils/i18n.ts` — `developer` 欄位年份統一為 2026（zh-TW + en）。
+- `package.json` — version `1.3.0` → `1.4.0`。
+
+#### 文件同步
+- `README.md` — 完整重寫（技術棧、專案結構、年份、.bat 參照移除）。
+- `docs/CONSOLIDATED_DOCUMENTATION.md` — 修正 User Manual LocalStorage → IndexedDB、雙擊 → 點擊、新增 data/ 至架構圖、更新版本。
+
+### 3. 驗收確認 (Check)
+- [x] 月曆顯示假日標籤（實測：2026/9 中秋節 ✅、2026/10 國慶日 ✅）
+- [x] 假日深色/淺色主題樣式正確
+- [x] 假日格與週六（綠）、週日（紅）可正確疊加
+- [x] `npm run build` 零錯誤零警告
+- [x] 安全掃描：無硬編碼密鑰，`.env` 已 gitignore
+
+### 4. 後續行動 (Act)
+- 每年初於 `src/data/twHolidays.ts` 新增次年假日資料（參考行政院人事行政總處公告）。
+
+---
+
 ## [2026-07-20] Project-Wide Code Cleanup & MECE Reorganization
 
 ### 1. 失敗記錄與分析 (Post-Mortem / RCA)

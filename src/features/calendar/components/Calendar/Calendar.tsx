@@ -4,6 +4,7 @@ import './Calendar.css';
 import { Task, CategoryConfig } from '../../../../types';
 import { useAppStore } from '../../../../store/useAppStore';
 import { getBestContrastForOverlay } from '../../../../shared/utils/contrastUtils';
+import { getTWHoliday } from '../../../../data/twHolidays';
 
 interface CalendarProps {
   t: (key: string) => string;
@@ -91,11 +92,14 @@ const Calendar = ({
 
       <div className="calendar-grid">
         {days.map((day: Date, index: number) => {
+          const dateStr = format(day, 'yyyy-MM-dd');
           const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
-          const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
-          const isSelected = format(day, 'yyyy-MM-dd') === selectedDate;
+          const isToday = dateStr === format(new Date(), 'yyyy-MM-dd');
+          const isSelected = dateStr === selectedDate;
           const tasksForDay = getTasksForDate(day);
           const hasTasks = tasksForDay.length > 0;
+          const holiday = isCurrentMonth ? getTWHoliday(dateStr) : null;
+          const holidayName = holiday?.name ?? null;
 
           // 懸停時顯示完整任務列表
           const taskListTooltip = tasksForDay.map((task: any) => {
@@ -136,17 +140,25 @@ const Calendar = ({
                 isToday ? 'today' : ''
               } ${isSelected ? 'selected' : ''} ${day.getDay() === 6 ? 'is-saturday' : ''} ${
                 day.getDay() === 0 ? 'is-sunday' : ''
-              }`}
+              } ${holidayName ? 'is-holiday' : ''}`}
               onClick={() => {
                 onDateSelect(day);
                 if (isCurrentMonth) onDateDoubleClick(day);
               }}
-              title={tasksForDay.length > 0 
-                ? `${t('tasksOnThisDay').replace('{count}', tasksForDay.length.toString())}\n${taskListTooltip}` 
-                : t('doubleClickToTaskList') // Note: keeping key for now to avoid translation breakage
+              title={
+                holidayName
+                  ? tasksForDay.length > 0
+                    ? `🎌 ${holidayName}\n${t('tasksOnThisDay').replace('{count}', tasksForDay.length.toString())}\n${taskListTooltip}`
+                    : `🎌 ${holidayName}`
+                  : tasksForDay.length > 0
+                    ? `${t('tasksOnThisDay').replace('{count}', tasksForDay.length.toString())}\n${taskListTooltip}`
+                    : t('doubleClickToTaskList')
               }
             >
               <div className="day-number">{day.getDate()}</div>
+              {holidayName && (
+                <div className="holiday-label">{holidayName}</div>
+              )}
 
               {/* 任務預覽 - 顯示前2個任務 */}
               {hasTasks && (
