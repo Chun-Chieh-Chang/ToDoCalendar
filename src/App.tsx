@@ -97,9 +97,21 @@ const App = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showTaskList, setShowTaskList] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+
+  // Closing the form always drops the edit target, so a later "Add Task"
+  // (or quick add) can never update a previously edited task
+  const closeTaskForm = () => {
+    setShowTaskForm(false);
+    setEditingTask(undefined);
+  };
+  const openNewTaskForm = () => {
+    setEditingTask(undefined);
+    setShowTaskForm(true);
+  };
+
   // 註冊全域快捷鍵
   useKeyboardShortcuts({
-    onNewTask: () => setShowTaskForm(true),
+    onNewTask: () => openNewTaskForm(),
     onSwitchView: (view: any) => {
       setActiveView(view);
       if (view === 'tasks') {
@@ -111,7 +123,7 @@ const App = () => {
       window.dispatchEvent(new CustomEvent('focus-search'));
     },
     onCloseModal: () => {
-      setShowTaskForm(false);
+      closeTaskForm();
       setShowSettings(false);
       setShowTaskList(false);
       setShowExitModal(false);
@@ -272,8 +284,7 @@ const App = () => {
       }
       // Timed tasks trigger reminders; ask for permission inside this user gesture
       if (taskData.time) void notificationUtils.requestPermission();
-      setShowTaskForm(false);
-      setEditingTask(undefined);
+      closeTaskForm();
     } catch (err) {
       setError(err instanceof Error ? err.message : translate('saveFailed'));
     } finally {
@@ -367,7 +378,7 @@ const App = () => {
               {/* 1. 新增任務 (Primary Action) */}
               <div
                 className="nav-item btn-add-global"
-                onClick={() => setShowTaskForm(true)}
+                onClick={openNewTaskForm}
                 title={translate('addTask')}
               >
                 <div className="tooltip">
@@ -646,7 +657,7 @@ const App = () => {
 
       <TaskForm
         isOpen={showTaskForm}
-        onClose={() => setShowTaskForm(false)}
+        onClose={closeTaskForm}
         onSave={handleSaveTask}
         initialTask={editingTask}
         selectedDate={state.selectedDate}
@@ -725,7 +736,7 @@ const App = () => {
           </div>
           <div 
             className="mobile-nav-item" 
-            onClick={() => setShowTaskForm(true)}
+            onClick={openNewTaskForm}
           >
             <i className="ri-add-circle-fill" style={{ fontSize: '32px', color: 'var(--primary-color)' }}></i>
           </div>

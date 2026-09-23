@@ -24,7 +24,7 @@ const TaskForm = ({
 }: TaskFormProps) => {
   const state = useAppStore();
   const t = useTranslation(state.settings.language);
-  const [formData, setFormData] = useState<Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'completed'>>({
+  const emptyForm = (): Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'completed'> => ({
     title: '',
     description: '',
     date: selectedDate,
@@ -36,11 +36,14 @@ const TaskForm = ({
     status: 'todo',
     recurrence: 'none'
   });
+  const [formData, setFormData] = useState(emptyForm);
 
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Re-initialise on every open so a new task never inherits the previous one's fields
   useEffect(() => {
+    if (!isOpen) return;
     if (initialTask) {
       setFormData({
         title: initialTask.title || '',
@@ -55,16 +58,11 @@ const TaskForm = ({
         recurrence: initialTask.recurrence || 'none'
       });
     } else {
-      setFormData(prev => ({
-        ...prev,
-        date: selectedDate,
-        time: '',
-        subtasks: [],
-        status: 'todo'
-      }));
+      setFormData(emptyForm());
     }
+    setNewSubtaskTitle('');
     setErrors({});
-  }, [initialTask, selectedDate]);
+  }, [isOpen, initialTask, selectedDate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
