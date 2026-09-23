@@ -63,10 +63,10 @@ const Settings = ({
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         if (event.target?.result) {
-          const success = storageService.importData(event.target.result as string);
-          if (success) {
+          const result = await storageService.importData(event.target.result as string);
+          if (result) {
             alert(t('importSuccess'));
             window.location.reload();
           } else {
