@@ -19,17 +19,6 @@ export interface RGBColor {
 }
 
 /**
- * Represents an HSL color with values in the range 0-1 for H, S, L
- * and 0-1 for alpha (optional)
- */
-export interface HSLColor {
-  h: number;
-  s: number;
-  l: number;
-  alpha?: number;
-}
-
-/**
  * Represents a parsed color with its original format and parsed values
  */
 export interface ParsedColor {
@@ -37,23 +26,6 @@ export interface ParsedColor {
   original: string;
   rgb: RGBColor;
   alpha: number;
-}
-
-/**
- * Configuration for opacity calculations
- */
-export interface OpacityConfig {
-  background?: string; // Background color for opacity blending (default: white)
-}
-
-/**
- * Contrast ratio result with compliance information
- */
-export interface ContrastResult {
-  ratio: number;
-  passesNormalText: boolean; // 4.5:1 for normal text
-  passesLargeText: boolean; // 3:1 for large text
-  severity?: 'critical' | 'warning' | 'minor' | 'pass';
 }
 
 // ============================================================================
@@ -422,18 +394,6 @@ export function linearizeSrgb(value: number): number {
 }
 
 /**
- * Convert linearized value back to sRGB
- * @param value - Linearized value (0-1)
- * @returns sRGB value (0-255)
- */
-export function delinearizeSrgb(value: number): number {
-  if (value <= 0.0031308) {
-    return Math.round(value * 12.92 * 255);
-  }
-  return Math.round((1.055 * Math.pow(value, 1 / 2.4) - 0.055) * 255);
-}
-
-/**
  * Calculate relative luminance using WCAG formula
  * L = 0.2126*R + 0.7152*G + 0.0722*B (where R, G, B are linearized sRGB values)
  * @param color - RGB color
@@ -483,119 +443,6 @@ export function calculateEffectiveColor(color: RGBColor, background: RGBColor = 
   };
 }
 
-/**
- * Darken a color by a percentage
- * @param color - RGB color
- * @param percent - Percentage to darken (0-100)
- * @returns Darkened RGB color
- */
-export function darkenColor(color: RGBColor, percent: number): RGBColor {
-  const factor = 1 - percent / 100;
-  
-  return {
-    r: Math.max(0, Math.round(color.r * factor)),
-    g: Math.max(0, Math.round(color.g * factor)),
-    b: Math.max(0, Math.round(color.b * factor)),
-    alpha: color.alpha,
-  };
-}
-
-/**
- * Lighten a color by a percentage
- * @param color - RGB color
- * @param percent - Percentage to lighten (0-100)
- * @returns Lightened RGB color
- */
-export function lightenColor(color: RGBColor, percent: number): RGBColor {
-  const factor = percent / 100;
-  
-  return {
-    r: Math.min(255, Math.round(color.r + (255 - color.r) * factor)),
-    g: Math.min(255, Math.round(color.g + (255 - color.g) * factor)),
-    b: Math.min(255, Math.round(color.b + (255 - color.b) * factor)),
-    alpha: color.alpha,
-  };
-}
-
-/**
- * Adjust color brightness by a percentage
- * Positive values lighten, negative values darken
- * @param color - RGB color
- * @param percent - Percentage to adjust (-100 to 100)
- * @returns Adjusted RGB color
- */
-export function adjustColorBrightness(color: RGBColor, percent: number): RGBColor {
-  if (percent > 0) {
-    return lightenColor(color, percent);
-  } else {
-    return darkenColor(color, Math.abs(percent));
-  }
-}
-
-// ============================================================================
-// Contrast Compliance Utilities
-// ============================================================================
-
-/**
- * Check if a contrast ratio meets WCAG 2.1 AA requirements
- * @param ratio - Contrast ratio
- * @returns ContrastResult with compliance information
- */
-export function checkContrastCompliance(ratio: number): ContrastResult {
-  const passesNormalText = ratio >= 4.5;
-  const passesLargeText = ratio >= 3;
-  
-  let severity: ContrastResult['severity'];
-  
-  if (ratio < 2) {
-    severity = 'critical';
-  } else if (ratio < 3) {
-    severity = 'minor';
-  } else if (ratio < 4.5) {
-    severity = 'warning';
-  } else {
-    severity = 'pass';
-  }
-  
-  return {
-    ratio,
-    passesNormalText,
-    passesLargeText,
-    severity,
-  };
-}
-
-/**
- * Get minimum contrast ratio needed for a given text size and weight
- * @param fontSizePx - Font size in pixels
- * @param isBold - Whether text is bold
- * @returns Required contrast ratio
- */
-export function getRequiredContrastRatio(fontSizePx: number, isBold: boolean): number {
-  // Large text: 18pt (24px) or larger, OR bold text 14pt (18.67px) or larger
-  const isLargeText = fontSizePx >= 24 || (isBold && fontSizePx >= 18.67);
-  return isLargeText ? 3 : 4.5;
-}
-
-/**
- * Calculate contrast ratio for a color pair with opacity support
- * @param foreground - Foreground color (text)
- * @param background - Background color
- * @param config - Opacity configuration
- * @returns Contrast ratio
- */
-export function calculateContrastWithOpacity(
-  foreground: RGBColor,
-  background: RGBColor,
-  config: OpacityConfig = {}
-): number {
-  // Calculate effective colors with opacity
-  const effectiveForeground = calculateEffectiveColor(foreground, background);
-  const effectiveBackground = calculateEffectiveColor(background, config.background ? parseHexColor(config.background) ?? { r: 255, g: 255, b: 255 } : { r: 255, g: 255, b: 255 });
-  
-  return calculateContrastRatio(effectiveForeground, effectiveBackground);
-}
-
 // ============================================================================
 // Color Conversion Utilities
 // ============================================================================
@@ -612,47 +459,6 @@ export function rgbToHex(color: RGBColor): string {
   };
   
   return `#${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}`;
-}
-
-/**
- * Convert RGB to HSL
- * @param color - RGB color
- * @returns HSLColor object
- */
-export function rgbToHsl(color: RGBColor): HSLColor {
-  const r = color.r / 255;
-  const g = color.g / 255;
-  const b = color.b / 255;
-  
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  let h = 0;
-  let s = 0;
-  const l = (max + min) / 2;
-  
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    
-    switch (max) {
-      case r:
-        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-        break;
-      case g:
-        h = ((b - r) / d + 2) / 6;
-        break;
-      case b:
-        h = ((r - g) / d + 4) / 6;
-        break;
-    }
-  }
-  
-  return {
-    h: Math.round(h * 360),
-    s: Math.round(s * 100),
-    l: Math.round(l * 100),
-    alpha: color.alpha ?? 1,
-  };
 }
 
 /**
@@ -715,53 +521,4 @@ export function getBestContrastForOverlay(
 
   // Now use the existing best contrast logic on the blended color
   return getBestContrastColor(blendedHex, darkColor, lightColor);
-}
-
-/**
- * Ensures a color has a minimum contrast ratio against a background by adjusting its lightness
- * @param colorStr - Color to adjust
- * @param bgStr - Background color
- * @param minRatio - Minimum contrast ratio (default: 4.5 for WCAG AA)
- * @returns Adjusted hex color string
- */
-export function ensureMinimumContrast(
-  colorStr: string,
-  bgStr: string,
-  minRatio: number = 4.5
-): string {
-  const color = parseColor(colorStr);
-  const bg = parseColor(bgStr);
-  
-  if (!color || !bg) return colorStr;
-  
-  const effectiveBg = calculateEffectiveColor(bg.rgb);
-  let ratio = calculateContrastRatio(color.rgb, effectiveBg);
-  
-  if (ratio >= minRatio) return colorStr;
-  
-  // If contrast is insufficient, adjust lightness
-  const hsl = rgbToHsl(color.rgb);
-  const bgLuminance = calculateLuminance(effectiveBg);
-  
-  // If background is light, darken the color; if dark, lighten the color
-  
-  if (bgLuminance > 0.5) {
-    // Darken until ratio is met
-    for (let l = hsl.l; l > 0; l -= 2) {
-      const rgb = hslToRgb(hsl.h / 360, hsl.s / 100, l / 100);
-      if (calculateContrastRatio(rgb, effectiveBg) >= minRatio) {
-        return rgbToHex(rgb);
-      }
-    }
-  } else {
-    // Lighten until ratio is met
-    for (let l = hsl.l; l < 100; l += 2) {
-      const rgb = hslToRgb(hsl.h / 360, hsl.s / 100, l / 100);
-      if (calculateContrastRatio(rgb, effectiveBg) >= minRatio) {
-        return rgbToHex(rgb);
-      }
-    }
-  }
-  
-  return colorStr;
 }

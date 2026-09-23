@@ -1,4 +1,9 @@
 
+## [2026-09-23c] Type Safety, Lint Restoration, Privacy & Final Doc Sync
+
+### 原子提交紀錄
+- `chore(contrast)`：提交上一輪未入庫的 `contrastUtils.ts` 死碼清理（移除 11 個無引用匯出：`HSLColor`、`OpacityConfig`、`ContrastResult`、`delinearizeSrgb`、`darkenColor`、`lightenColor`、`adjustColorBrightness`、`checkContrastCompliance`、`calculateContrastWithOpacity`、`rgbToHsl`、`ensureMinimumContrast`；全倉 grep 確認僅 `Calendar.tsx` 使用 `getBestContrastForOverlay`）。新增 `contrastUtils.test.ts` 19 個回歸測試守護僅存消費路徑（含 8 位 hex alpha 被忽略的現行行為錨點）。測試 66 → 85 全數通過。
+
 ## [2026-09-23b] Project-Wide Audit, Cleanup & Security Pass
 
 ### 還原基準點
