@@ -166,9 +166,12 @@
   overflow: hidden;
 }
 
-/* Pill chips pressed into the tile */
+/* Pill chips pressed into the tile.
+ * Invariant: pills MUST stay single-line — .task-preview caps height at 60px
+ * (2 pills + 6px gap), so a two-line pill gets clipped mid-glyph. */
 .task-preview-item {
   font-size: 13px;
+  line-height: 1.4;
   padding: 4px 8px;
   border-radius: 8px;
   font-weight: 600;
@@ -183,11 +186,11 @@
   background-color: var(--surface-color);
 }
 
-/* Task Time */
+/* Task Time — inline prefix so the pill remains a single line */
 .task-time {
   font-size: 13px;
-  display: block;
-  margin-bottom: 2px;
+  display: inline;
+  margin-right: 6px;
   font-weight: 700;
 }
 
