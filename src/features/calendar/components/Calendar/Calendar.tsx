@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import * as React from 'react';
 import './Calendar.css';
-import { Task, CategoryConfig } from '../../../../types';
+import { Task } from '../../../../types';
 import { useAppStore } from '../../../../store/useAppStore';
 import { getBestContrastForOverlay } from '../../../../shared/utils/contrastUtils';
 import { getTWHoliday, getHolidayDisplayName } from '../../../../data/twHolidays';
@@ -11,9 +11,8 @@ interface CalendarProps {
   currentMonth: Date;
   selectedDate: string;
   tasks: Task[];
-  onDateSelect: (date: string) => void;
-  onDateDoubleClick: (date: string) => void;
-  onMonthChange: (date: Date) => void;
+  onDateSelect: (date: Date) => void;
+  onDateDoubleClick: (date: Date) => void;
   categories: any[];
   theme?: string;
 }
@@ -25,7 +24,6 @@ const Calendar = ({
   tasks,
   onDateSelect,
   onDateDoubleClick,
-  onMonthChange,
   categories,
   theme: propTheme
 }: CalendarProps) => {
@@ -34,7 +32,7 @@ const Calendar = ({
   const theme = propTheme || storeTheme || 'light';
   
   // 使用 useMemo 優化性能
-  const days = (React as any).useMemo(() => {
+  const days = React.useMemo(() => {
     const getMonthDays = (date: Date) => {
       const days = [];
       const safeDate = isNaN(date.getTime()) ? new Date() : date;
@@ -58,14 +56,16 @@ const Calendar = ({
     return getMonthDays(currentMonth);
   }, [currentMonth]);
 
-  const tasksByDate = (React as any).useMemo(() => {
+  const tasksByDate = React.useMemo(() => {
     const map = new Map<string, Task[]>();
     tasks.forEach(task => {
       if (task.date) {
-        if (!map.has(task.date)) {
-          map.set(task.date, []);
+        const list = map.get(task.date);
+        if (list) {
+          list.push(task);
+        } else {
+          map.set(task.date, [task]);
         }
-        map.get(task.date)!.push(task);
       }
     });
     return map;
@@ -81,7 +81,7 @@ const Calendar = ({
   return (
     <div className="calendar">
       <div className="calendar-weekdays">
-        {t('weekdays').map((day, index) => (
+        {(t('weekdays') as unknown as string[]).map((day, index) => (
           <div 
             key={day} 
             className={`weekday ${index === 0 ? 'is-sunday' : index === 6 ? 'is-saturday' : ''}`}

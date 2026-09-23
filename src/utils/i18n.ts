@@ -529,7 +529,8 @@ export const getTranslation = (language: 'zh-TW' | 'en' | string, key: string): 
     }
   }
 
-  return (typeof value === 'string' || Array.isArray(value)) ? value : key;
+  // 少數鍵（如 weekdays）的值為字串陣列；陣列消費端需在使用處自行斷言型別
+  return (typeof value === 'string' || Array.isArray(value)) ? (value as string) : key;
 };
 
 // 創建一個hook來使用翻譯

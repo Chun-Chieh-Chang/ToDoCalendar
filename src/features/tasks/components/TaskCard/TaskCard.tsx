@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { Task } from '../../../../types';
 import { useAppStore } from '../../../../store/useAppStore';
 import { useTranslation } from '../../../../utils/i18n';
@@ -9,7 +9,7 @@ interface TaskCardProps {
   task: Task;
   onToggleComplete: (id: string, completed: boolean) => void;
   onEdit: (task: Task) => void;
-  onDelete: (id: string | number) => void;
+  onDelete: (id: string) => void;
   onSchedule?: (id: string, date: string) => void;
 }
 

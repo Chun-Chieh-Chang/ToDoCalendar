@@ -1,4 +1,3 @@
-import React from 'react';
 import Modal from '../../../../shared/components/Modal/Modal';
 import { Task } from '../../../../types';
 import { useAppStore } from '../../../../store/useAppStore';

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useAppStore } from './store/useAppStore';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
-import { storageService } from './services/storage';
 import { Task } from './types';
 import { dateUtils } from './shared/utils/dateUtils';
 import { taskUtils } from './features/tasks/utils/taskUtils';
@@ -231,7 +230,7 @@ const App = () => {
         }
       }
     } catch (err) {
-      alert(`${translate('exportFailed')}: ${err.message}`);
+      alert(`${translate('exportFailed')}: ${err instanceof Error ? err.message : String(err)}`);
     }
   };
 
@@ -309,10 +308,6 @@ const App = () => {
   };
 
   // 處理重新排序
-  const handleReorderTasks = (updatedTasks: Task[]) => {
-    dispatch({ type: 'REORDER_TASKS', payload: updatedTasks });
-  };
-
 
   // 處理年份變更
   const handleYearChange = (e: any) => {
@@ -563,7 +558,6 @@ const App = () => {
               selectedDate={state.selectedDate}
               onDateSelect={handleDateSelect}
               onDateDoubleClick={handleDateDoubleClick}
-              onMonthChange={handleMonthChange}
               tasks={state.tasks}
               categories={state.settings.categories}
               theme={state.settings.theme}
@@ -576,7 +570,6 @@ const App = () => {
               onEdit={handleEditTask}
               onDelete={handleDeleteTask}
               onStatusChange={handleStatusChange}
-              onReorder={handleReorderTasks}
               t={translate}
             />
           )}

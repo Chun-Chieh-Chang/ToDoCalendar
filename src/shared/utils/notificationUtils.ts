@@ -39,7 +39,7 @@ export const notificationUtils = {
                         badge: 'icon-512.png',
                         vibrate: [200, 100, 200],
                         ...options
-                    });
+                    } as NotificationOptions);
                 });
             } else {
                 // 退而求其次使用普通通知

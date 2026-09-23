@@ -10,7 +10,6 @@ interface KanbanBoardProps {
     onEdit: (task: Task) => void;
     onDelete: (id: string) => void;
     onStatusChange: (taskId: string, newStatus: TaskStatus) => void;
-    onReorder: (tasks: Task[]) => void;
     t: (key: string) => string;
 }
 
@@ -20,7 +19,6 @@ const KanbanBoard = ({
     onEdit,
     onDelete,
     onStatusChange,
-    onReorder,
     t
 }: KanbanBoardProps) => {
     const columns: { id: TaskStatus; title: string }[] = [

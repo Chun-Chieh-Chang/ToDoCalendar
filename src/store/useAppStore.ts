@@ -20,7 +20,7 @@ interface AppStore extends AppState {
   loadData: () => Promise<void>;
 }
 
-export const useAppStore = create<AppStore>((set, get) => ({
+export const useAppStore = create<AppStore>((set) => ({
   tasks: [],
   selectedDate: dateUtils.dateToString(new Date()),
   filter: { ...defaultFilter },

@@ -39,11 +39,11 @@ const TaskListView = ({
 }: TaskListViewProps) => {
     const language = useAppStore(state => state.settings.language);
     const t = useTranslation(language);
-    const [quickAddTitle, setQuickAddTitle] = (React as any).useState('');
-    const [subTab, setSubTab] = (React as any).useState<'all' | 'scheduled' | 'pending'>('all');
+    const [quickAddTitle, setQuickAddTitle] = React.useState('');
+    const [subTab, setSubTab] = React.useState<'all' | 'scheduled' | 'pending'>('all');
 
     // 根據子標籤進行內部二次過濾
-    const subFilteredTasks = (React as any).useMemo(() => {
+    const subFilteredTasks = React.useMemo(() => {
         if (subTab === 'scheduled') return tasks.filter(t => t.date);
         if (subTab === 'pending') return tasks.filter(t => !t.date);
         return tasks;
@@ -56,7 +56,7 @@ const TaskListView = ({
         setQuickAddTitle('');
     };
 
-    const sortedTasks = (React as any).useMemo(() => {
+    const sortedTasks = React.useMemo(() => {
         return taskUtils.sortTasks(subFilteredTasks);
     }, [subFilteredTasks]);
 
