@@ -3,6 +3,7 @@
 
 ### 原子提交紀錄
 - `chore(contrast)`：提交上一輪未入庫的 `contrastUtils.ts` 死碼清理（移除 11 個無引用匯出：`HSLColor`、`OpacityConfig`、`ContrastResult`、`delinearizeSrgb`、`darkenColor`、`lightenColor`、`adjustColorBrightness`、`checkContrastCompliance`、`calculateContrastWithOpacity`、`rgbToHsl`、`ensureMinimumContrast`；全倉 grep 確認僅 `Calendar.tsx` 使用 `getBestContrastForOverlay`）。新增 `contrastUtils.test.ts` 19 個回歸測試守護僅存消費路徑（含 8 位 hex alpha 被忽略的現行行為錨點）。測試 66 → 85 全數通過。
+- `chore(repo)`：**資安／隱私** — `backup/todo_calendar_backup.json`（1.5MB 真實使用者任務資料）在 `backup/` 納入 `.gitignore` 之前已被追蹤入庫，存在個資外洩風險。以 `git rm --cached` 解除追蹤（本地檔案保留），後續受 `.gitignore` 保護。註：歷史版本中仍可取得該檔，如需徹底抹除須另行 rewrite history（本次保留歷史以維持可回溯基準）。
 
 ## [2026-09-23b] Project-Wide Audit, Cleanup & Security Pass
 
