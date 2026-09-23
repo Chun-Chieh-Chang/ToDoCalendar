@@ -13,7 +13,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 )
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}service-worker.js`).catch(err => console.log('SW fail', err));
-  });
+  if (import.meta.env.PROD && location.protocol !== 'file:') {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}service-worker.js`).catch(err => console.log('SW fail', err));
+    });
+  } else if (import.meta.env.DEV) {
+    // The cache-first worker would otherwise serve stale dev modules
+    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+  }
 }

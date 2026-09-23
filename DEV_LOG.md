@@ -10,6 +10,7 @@
 - `fix(electron)`：**RCA** — `vite.config` 的 `base: '/ToDoCalendar/'` 使產出的 `index.html` 以絕對路徑引用資源，Electron 以 `loadFile`（file://）載入時解析到磁碟根目錄，JS/CSS 全數 404，桌面版白畫面。**CAPA** — 改為相對 `base: './'`，Pages 與 Electron 共用同一份建置（無客戶端路由，相對路徑安全）。以隱藏 Electron 視窗實測：修正前 React 未掛載、2 個請求失敗；修正後掛載成功、35 格日曆、0 失敗請求。
 - `fix(pwa)`：**RCA** — `notificationUtils.requestPermission` 從未被呼叫，網頁／PWA 版權限永遠停在 `default`，提醒只出現在 App 內彈窗、不會推送桌面通知；通知圖示使用 `/icon-512.png` 絕對路徑，在 Pages 子路徑下 404；`send()` 直接讀取 `Notification.permission`，在無 Notification API 的瀏覽器會拋錯。**CAPA** — 儲存「有設定時間」的任務時（使用者手勢內）請求權限；已拒絕則不再詢問；Electron 直接走原生通知；圖示改相對路徑；`send()` 加上 API 存在檢查。新增 7 個單元測試。
 - `fix(task-form)`：**RCA** — (1) `TaskForm` 的重設只在 `initialTask`/`selectedDate` 改變時執行且僅重設部分欄位，儲存後再按「新增任務」會帶入上一筆的標題、描述、優先級、時間與記事；(2) 關閉表單未清除 `editingTask`，取消編輯後按「新增任務」或快速新增會開成「編輯任務」並覆寫舊任務。**CAPA** — 每次開啟表單都以 `emptyForm()` 重新初始化；App 統一以 `closeTaskForm()`（一律清除編輯目標）與 `openNewTaskForm()` 開關表單（側欄、手機底欄、N 快捷鍵、Esc、儲存後）。瀏覽器實測三種情境皆正確。
+- `fix(pwa)`（Service Worker）：**RCA** — `main.tsx` 在開發模式也註冊 cache-first 的 Service Worker，攔截並快取 Vite 的原始碼模組，導致修改後重新整理仍執行舊程式碼（本輪驗證中兩度誤判的根因）；Electron 的 file:// 亦無法註冊。**CAPA** — 僅在正式建置且非 file:// 時註冊；開發模式主動解除既有註冊。實測開發模式 0 個註冊、正式建置仍含註冊、Electron 正常掛載。
 
 ## [2026-09-23] Neumorphic UI Redesign + Full zh-TW / en Localization
 
