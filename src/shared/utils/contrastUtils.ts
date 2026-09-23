@@ -194,7 +194,7 @@ const NAMED_COLORS: Record<string, string> = {
  */
 export function parseHexColor(hex: string): RGBColor | null {
   // Remove # prefix
-  let cleanHex = hex.trim().replace(/^#/, '');
+  const cleanHex = hex.trim().replace(/^#/, '');
   
   // Handle hex with alpha (8 digits: RRGGBBAA)
   if (cleanHex.length === 8) {

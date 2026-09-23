@@ -48,7 +48,7 @@ export const parseTaskTitle = (input: string): ParsedTask => {
     const timeRegex = /@(\d{1,2}(?::\d{2})?(?:\s?[ap]m)?)/i;
     const timeMatch = title.match(timeRegex);
     if (timeMatch) {
-        let timeStr = timeMatch[1].toLowerCase();
+        const timeStr = timeMatch[1].toLowerCase();
 
         // Convert to HH:mm format
         if (timeStr.includes('pm') || timeStr.includes('am')) {

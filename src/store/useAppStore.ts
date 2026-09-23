@@ -53,7 +53,7 @@ export const useAppStore = create<AppStore>((set) => ({
     // Handle Recurrence spawning
     if (newCompletedStatus && taskToToggle.recurrence && taskToToggle.recurrence !== 'none' && taskToToggle.date) {
       const currentDate = new Date(taskToToggle.date);
-      let nextDate = new Date(currentDate);
+      const nextDate = new Date(currentDate);
 
       if (taskToToggle.recurrence === 'daily') {
         nextDate.setDate(currentDate.getDate() + 1);

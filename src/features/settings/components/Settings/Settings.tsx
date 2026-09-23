@@ -34,7 +34,7 @@ const Settings = ({
   }, [isOpen]);
 
   const handleSettingChange = (key: string, value: any) => {
-    let newSettings = { ...settings, [key]: value };
+    const newSettings = { ...settings, [key]: value };
     onSettingsChange(newSettings);
   };
 
