@@ -11,6 +11,7 @@
 - `fix(pwa)`：**RCA** — `notificationUtils.requestPermission` 從未被呼叫，網頁／PWA 版權限永遠停在 `default`，提醒只出現在 App 內彈窗、不會推送桌面通知；通知圖示使用 `/icon-512.png` 絕對路徑，在 Pages 子路徑下 404；`send()` 直接讀取 `Notification.permission`，在無 Notification API 的瀏覽器會拋錯。**CAPA** — 儲存「有設定時間」的任務時（使用者手勢內）請求權限；已拒絕則不再詢問；Electron 直接走原生通知；圖示改相對路徑；`send()` 加上 API 存在檢查。新增 7 個單元測試。
 - `fix(task-form)`：**RCA** — (1) `TaskForm` 的重設只在 `initialTask`/`selectedDate` 改變時執行且僅重設部分欄位，儲存後再按「新增任務」會帶入上一筆的標題、描述、優先級、時間與記事；(2) 關閉表單未清除 `editingTask`，取消編輯後按「新增任務」或快速新增會開成「編輯任務」並覆寫舊任務。**CAPA** — 每次開啟表單都以 `emptyForm()` 重新初始化；App 統一以 `closeTaskForm()`（一律清除編輯目標）與 `openNewTaskForm()` 開關表單（側欄、手機底欄、N 快捷鍵、Esc、儲存後）。瀏覽器實測三種情境皆正確。
 - `fix(pwa)`（Service Worker）：**RCA** — `main.tsx` 在開發模式也註冊 cache-first 的 Service Worker，攔截並快取 Vite 的原始碼模組，導致修改後重新整理仍執行舊程式碼（本輪驗證中兩度誤判的根因）；Electron 的 file:// 亦無法註冊。**CAPA** — 僅在正式建置且非 file:// 時註冊；開發模式主動解除既有註冊。實測開發模式 0 個註冊、正式建置仍含註冊、Electron 正常掛載。
+- `refactor(version)`：**RCA** — 版本號散落四處且不一致（`package.json` 1.4.0；側欄、設定頁尾、匯出檔寫死 1.3.0）；側欄開發者署名寫死且與 i18n `developer` 鍵內容不同。**CAPA** — `vite.config` 以 `define` 注入 `__APP_VERSION__`（唯一來源：`package.json`），三處改引用；署名統一使用 `developer` 鍵。
 
 ## [2026-09-23] Neumorphic UI Redesign + Full zh-TW / en Localization
 

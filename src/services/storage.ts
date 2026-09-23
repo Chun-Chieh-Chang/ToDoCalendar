@@ -74,7 +74,7 @@ export const storageService = {
     const data = await this.getLocalData();
     const exportData = {
       ...data,
-      version: '1.3.0',
+      version: __APP_VERSION__,
       exportDate: new Date().toISOString()
     };
     return JSON.stringify(exportData, null, 2);

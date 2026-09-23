@@ -488,11 +488,11 @@ const App = () => {
               )}
               <div className="user-info">
                 <h4>{state.settings.userName || 'User Name'}</h4>
-                <p>v1.3.0 Professional</p>
+                <p>v{__APP_VERSION__} Professional</p>
               </div>
             </div>
             <div className="sidebar-credit">
-              Developed by Wesley Chang @ Mouldex, 2026.
+              {translate('developer')}
             </div>
           </div>
         </aside>

@@ -188,7 +188,7 @@ const Settings = ({
         </div>
 
         <div className="settings-footer">
-          <p className="version-info">v1.3.0 Professional</p>
+          <p className="version-info">v{__APP_VERSION__} Professional</p>
           <button className="btn-primary" onClick={onClose}>
             {t('finish')}
           </button>
