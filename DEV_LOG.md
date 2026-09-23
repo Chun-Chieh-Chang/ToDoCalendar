@@ -1,4 +1,13 @@
 
+## [2026-09-23b] Project-Wide Audit, Cleanup & Security Pass
+
+### 還原基準點
+- 完整歷史備份：`../ToDoCalendar-restore-2026-09-23.bundle`（`git bundle --all`，已 verify）；本地 tag `pre-cleanup-2026-09-23`。
+- 作業分支：`chore/cleanup-2026-09`，驗證完成後才併回 `main`。
+
+### 原子提交紀錄
+- `test`：導入 Vitest，新增 6 個測試檔（NLP 解析、任務篩選／排序、日期、i18n 鍵對齊、國定假日、Store 動作與資料遷移）；基準 58 通過 + 1 個已知缺陷（`it.fails`）。瀏覽器核心流程 15 項基準全數通過。
+
 ## [2026-09-23] Neumorphic UI Redesign + Full zh-TW / en Localization
 
 ### 1. 需求背景 (Plan)
