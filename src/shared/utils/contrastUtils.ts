@@ -201,7 +201,8 @@ export function parseHexColor(hex: string): RGBColor | null {
     const r = parseInt(cleanHex.substring(0, 2), 16);
     const g = parseInt(cleanHex.substring(2, 4), 16);
     const b = parseInt(cleanHex.substring(4, 6), 16);
-    return { r, g, b };
+    const a = parseInt(cleanHex.substring(6, 8), 16) / 255;
+    return { r, g, b, alpha: Math.round(a * 1000) / 1000 };
   }
   
   // Handle standard hex (3 or 6 digits)

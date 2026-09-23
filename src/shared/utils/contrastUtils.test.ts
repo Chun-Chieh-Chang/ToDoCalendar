@@ -21,8 +21,11 @@ describe('contrastUtils', () => {
       expect(parseHexColor('#fff')).toEqual({ r: 255, g: 255, b: 255 });
     });
 
-    it('parses 8-digit hex (alpha channel is currently ignored)', () => {
-      expect(parseHexColor('#11223380')).toEqual({ r: 17, g: 34, b: 51 });
+    it('parses 8-digit hex with alpha channel', () => {
+      const parsed = parseHexColor('#11223380');
+      expect(parsed).not.toBeNull();
+      expect(parsed).toMatchObject({ r: 17, g: 34, b: 51 });
+      expect(parsed!.alpha).toBeCloseTo(0.502, 2);
     });
 
     it('returns null for invalid hex', () => {
