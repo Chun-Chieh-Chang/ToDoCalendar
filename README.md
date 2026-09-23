@@ -14,8 +14,8 @@
 - **🧩 看板視圖**：拖拉任務在「待處理 / 進行中 / 完成」欄位間流轉。
 - **📊 數據洞察**：SVG 面積圖追蹤任務完成趨勢。
 - **⏰ 智能提醒**：整合 Notification API，任務時間到達時自動推送 OS 通知。
-- **🌐 多語言**：繁體中文 / English，即時切換。
-- **🎨 深色 / 淺色主題**：玻璃態毛玻璃設計系統（可調透明度、模糊強度）。
+- **🌐 多語言**：繁體中文 / English，即時切換（含介面、使用說明、國定假日名稱）。
+- **🎨 深色 / 淺色主題**：新擬態 (Neumorphism)「Inset Focus」設計系統，凸起 / 凹陷雙向陰影，兩種主題皆符合 WCAG 4.5:1 對比。
 - **💾 Offline-First**：IndexedDB 本機儲存，可選 Supabase 雲端同步。
 - **⌨️ 全域快捷鍵**：`1-4` 切換視圖、`N` 新增、`/` 搜尋、`T` 跳今天、`Esc` 關閉。
 - **📱 響應式設計**：375px 手機到桌面全規格支援。
@@ -75,7 +75,7 @@ release\ToDoCalendar-Portable.exe
 | Desktop | Electron 33 + Electron Builder |
 | Animations | Framer Motion 12 |
 | Icons | Remixicon 4 |
-| i18n | 自建（zh-TW / en，170+ keys） |
+| i18n | 自建（zh-TW / en，230+ keys） |
 
 ## 📁 專案結構
 
@@ -84,14 +84,14 @@ ToDoCalendar/
 ├── src/
 │   ├── main.tsx                    # Entry point
 │   ├── App.tsx / App.css           # Root component & layout
-│   ├── index.css                   # Global design system (CSS variables, glass morphism)
+│   ├── index.css                   # Global design system (neumorphic tokens, light/dark themes)
 │   ├── constants/defaults.ts       # Default settings & filter state
 │   ├── store/useAppStore.ts        # Zustand store (tasks, settings, filter)
 │   ├── types/index.ts              # Core type definitions
 │   ├── data/
 │   │   └── twHolidays.ts           # Taiwan national holidays 2024–2027
 │   ├── utils/
-│   │   ├── i18n.ts                 # Translation (170+ keys, zh-TW / en)
+│   │   ├── i18n.ts                 # Translation (230+ keys, zh-TW / en)
 │   │   └── nlpUtils.ts             # NLP task parsing
 │   ├── services/
 │   │   ├── storage.ts              # Dexie CRUD + localStorage migration + Supabase sync
@@ -107,7 +107,7 @@ ToDoCalendar/
 │       ├── tasks/                  # Task CRUD, filter, cards, list views
 │       ├── dashboard/              # Analytics (SVG area chart, stats)
 │       ├── kanban/                 # Kanban board (HTML5 DnD + Framer Motion)
-│       ├── settings/               # Settings modal (General / Visual / Data tabs)
+│       ├── settings/               # Settings modal (General / Data tabs)
 │       └── guide/                  # User guide & onboarding CTA
 ├── electron/
 │   ├── main.cjs                    # Electron main process

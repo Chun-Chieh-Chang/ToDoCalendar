@@ -1,4 +1,6 @@
 import { useRef, useEffect } from 'react';
+import { useAppStore } from '../../../../store/useAppStore';
+import { useTranslation } from '../../../../utils/i18n';
 import './Filter.css';
 
 interface FilterProps {
@@ -12,6 +14,8 @@ const Filter = ({
   onFilterChange,
   onClearFilter
 }: FilterProps) => {
+  const language = useAppStore(state => state.settings.language);
+  const t = useTranslation(language);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -26,24 +30,24 @@ const Filter = ({
   }, []);
 
   const priorityOptions = [
-    { value: '', label: '全部優先級' },
-    { value: 'high', label: '高' },
-    { value: 'medium', label: '中' },
-    { value: 'low', label: '低' }
+    { value: '', label: t('allPriorities') },
+    { value: 'high', label: t('high') },
+    { value: 'medium', label: t('medium') },
+    { value: 'low', label: t('low') }
   ];
 
   const categoryOptions = [
-    { value: '', label: '全部分類' },
-    { value: 'work', label: '工作' },
-    { value: 'study', label: '學習' },
-    { value: 'life', label: '生活' },
-    { value: 'other', label: '其他' }
+    { value: '', label: t('allCategories') },
+    { value: 'work', label: t('work') },
+    { value: 'study', label: t('study') },
+    { value: 'life', label: t('life') },
+    { value: 'other', label: t('other') }
   ];
 
   const statusOptions = [
-    { value: 'all', label: '全部狀態' },
-    { value: 'pending', label: '未完成' },
-    { value: 'completed', label: '已完成' }
+    { value: 'all', label: t('allStatuses') },
+    { value: 'pending', label: t('incomplete') },
+    { value: 'completed', label: t('completed') }
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +67,7 @@ const Filter = ({
           <input
             ref={inputRef}
             type="text"
-            placeholder="搜尋任務標題、描述或記事..."
+            placeholder={t('searchPlaceholder')}
             value={filter.search || ''}
             onChange={handleInputChange}
             className="search-input"
@@ -113,37 +117,37 @@ const Filter = ({
         <button
           className={`filter-btn ${hasActiveFilters ? 'active' : ''}`}
           onClick={onClearFilter}
-          title="清除所有篩選條件"
+          title={t('clearAllFilters')}
         >
-          🗑️ 清除篩選
+          🗑️ {t('clearFilters')}
         </button>
       </div>
 
       {hasActiveFilters && (
         <div className="active-filters">
-          <span className="filter-label">已套用篩選：</span>
+          <span className="filter-label">{t('appliedFilters')}</span>
           <div className="filter-chips">
             {filter.search && (
               <span className="filter-chip">
-                搜尋: "{filter.search}"
+                {t('search')}: "{filter.search}"
                 <button onClick={() => onFilterChange({ ...filter, search: '' })}>×</button>
               </span>
             )}
             {filter.priority && (
               <span className="filter-chip">
-                優先級: {filter.priority === 'high' ? '高' : filter.priority === 'medium' ? '中' : '低'}
+                {t('taskPriority')}: {t(filter.priority)}
                 <button onClick={() => onFilterChange({ ...filter, priority: undefined })}>×</button>
               </span>
             )}
             {filter.category && (
               <span className="filter-chip">
-                分類: {filter.category === 'work' ? '工作' : filter.category === 'study' ? '學習' : filter.category === 'life' ? '生活' : '其他'}
+                {t('taskCategory')}: {t(filter.category)}
                 <button onClick={() => onFilterChange({ ...filter, category: undefined })}>×</button>
               </span>
             )}
             {filter.status && filter.status !== 'all' && (
               <span className="filter-chip">
-                狀態: {filter.status === 'completed' ? '已完成' : '未完成'}
+                {t('statusLabel')}: {filter.status === 'completed' ? t('completed') : t('incomplete')}
                 <button onClick={() => onFilterChange({ ...filter, status: 'all' })}>×</button>
               </span>
             )}

@@ -1,7 +1,7 @@
 # ToDoCalendar Consolidated Documentation
 
 > **Current Version:** v1.4.0 (2026-09-17)
-> **Latest Update:** 2026-09-17 — Taiwan national holidays, dead code removal, full doc sync
+> **Latest Update:** 2026-09-23 — Neumorphic UI redesign, full zh-TW / en localization, glass settings removed
 
 ## Table of Contents
 1. [Current Architecture Overview](#current-architecture-overview)
@@ -34,12 +34,12 @@ ToDoCalendar/
 ├── src/
 │   ├── main.tsx                    # Entry point
 │   ├── App.tsx / App.css           # Root component & layout
-│   ├── index.css                   # Global design system (CSS variables, glass morphism)
+│   ├── index.css                   # Global design system (neumorphic tokens, light/dark themes)
 │   ├── constants/defaults.ts       # Default settings & filter state
 │   ├── store/useAppStore.ts        # Zustand store: tasks, settings, filter
 │   ├── types/index.ts              # Core type definitions
 │   ├── utils/
-│   │   ├── i18n.ts                 # Translation (170+ keys)
+│   │   ├── i18n.ts                 # Translation (230+ keys, zh-TW / en)
 │   │   └── nlpUtils.ts             # NLP task parsing (priority, category, time, date)
 │   ├── services/
 │   │   ├── storage.ts              # Dexie CRUD + localStorage migration + Supabase sync
@@ -57,7 +57,7 @@ ToDoCalendar/
 │       ├── tasks/                  # Task CRUD, filter, cards, list views
 │       ├── dashboard/              # Analytics (SVG area chart, stats)
 │       ├── kanban/                 # Kanban board (HTML5 DnD + Framer Motion)
-│       ├── settings/               # Settings modal (General/Visual/Data tabs)
+│       ├── settings/               # Settings modal (General/Data tabs)
 │       └── guide/                  # User guide with CTA onboarding
 ├── electron/
 │   ├── main.cjs                    # Electron main process
@@ -67,14 +67,15 @@ ToDoCalendar/
 └── docs/                           # Documentation
 ```
 
-### Glass Effect Design System
-- **CSS Variables**: `--glass-bg`, `--glass-blur`, `--border-glass` injected via inline style on `.app`
-- **Controls**: Settings → Visual tab (glass opacity, blur intensity, border opacity)
-- **Implementation**: Pre-computed `rgba()` values in JavaScript to avoid browser CSS variable nesting issues
+### Neumorphic Design System ("Inset Focus")
+- **Principle**: surfaces share the page colour (`--surface-color` = `--bg-color`) and are shaped only by paired light/dark shadows. Raised = idle; inset = pressed, selected, inputs and progress tracks.
+- **Tokens** (`src/index.css`): shadow sources `--neu-shadow-dark` / `--neu-shadow-light` per theme; composites `--neu-raised(-sm|-lg)`, `--neu-inset(-sm)`, `--neu-focus`, `--neu-pressed-fill`, `--modal-shadow`. Composites are declared on `:root, [data-theme]` so they resolve against the active theme.
+- **Colour**: soft-blue primary (`#3A64C8` light / `#8AADF4` dark); `--primary-gradient` for fills carrying white text. All text colours meet WCAG 4.5:1 on their surface; minimum font size 13px.
+- **Rule**: component CSS references tokens only — no hard-coded colours.
 
 ### Key Features
 - 📅 Multi-view (Calendar, Kanban, Task List, Dashboard)
-- 🌓 Light/Dark theme with glass morphism
+- 🌓 Light/Dark theme with neumorphic design
 - 📱 Responsive (375px mobile to desktop)
 - 🔔 PWA notifications + Service Worker caching
 - ⌨️ Keyboard shortcuts
@@ -654,6 +655,24 @@ ToDo/
 ## Recent Updates Log
 
 # 近期更新日誌
+
+## 2026-09-23: Neumorphic UI Redesign + Full Localization
+
+### 介面風格
+- 全介面由毛玻璃 (glassmorphism) 改為新擬態「Inset Focus」風格：凸起表示一般狀態，凹陷表示按下／選取／輸入框。
+- 設計 token 集中於 `index.css`，14 個元件樣式檔改為僅引用 token；淺色／深色兩套配色。
+- 對比度全面符合 WCAG 4.5:1；最小字級 13px（含手機底部導覽列）。
+
+### 設定
+- 移除已失效的「視覺」分頁（玻璃透明度、模糊、邊框三個滑桿）及對應的設定欄位；舊資料載入時自動清除。
+- 修正語言選項值 `en-US` → `en`（原值不存在於翻譯表，選英文無法生效）；舊資料自動遷移。
+
+### 多語言
+- 所有介面文字改用翻譯鍵（主畫面、任務表單、篩選器、清單、看板、數據洞察、使用說明、提醒、系統訊息）。
+- 內建分類依語言顯示（`taskUtils.getCategoryLabel`），自訂分類保留原名。
+- 國定假日新增英文名稱（`getHolidayDisplayName`），自動處理合併假日與補假 (Observed)。
+
+---
 
 ## 2026-09-17: Taiwan National Holidays + Full Code & Doc Audit (v1.4.0)
 

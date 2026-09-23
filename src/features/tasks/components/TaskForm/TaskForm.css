@@ -19,50 +19,51 @@
 .form-group label {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   letter-spacing: 0.5px;
 }
 
+/* Inset wells */
 .form-group input,
 .form-group select,
 .form-group textarea {
   padding: 12px 14px;
-  border: 1px solid var(--border-glass);
-  border-radius: 12px;
+  border: none;
+  border-radius: 14px;
   font-size: 14px;
-  background: var(--glass-bg); /* Use glassy background */
-  backdrop-filter: blur(4px);
+  background: var(--surface-color);
   color: var(--text-primary);
-  box-shadow: var(--inner-glow); /* Inner glow for boundary definition */
-  transition: all 0.2s ease;
+  box-shadow: var(--neu-inset);
+  transition: box-shadow 0.2s ease;
   font-family: inherit;
+}
+
+.form-group input[type="checkbox"] {
+  padding: 0;
+  box-shadow: none;
+  accent-color: var(--primary-color);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 
-    0 0 0 3px var(--accent-glow),
-    var(--inner-glow);
-  background: var(--surface-color); /* Become solid on focus for readability */
+  box-shadow: var(--neu-inset), var(--neu-focus);
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: #9ca3af;
+  color: var(--text-secondary);
 }
 
 .form-group input.error,
 .form-group textarea.error {
-  border-color: #e74c3c;
-  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  box-shadow: var(--neu-inset), 0 0 0 2px var(--danger-color);
 }
 
 .error-message {
-  color: #e74c3c;
-  font-size: 12px;
+  color: var(--danger-color);
+  font-size: 13px;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -76,121 +77,62 @@
 
 .char-count {
   text-align: right;
-  font-size: 12px;
-  color: #4b5563;
+  font-size: 13px;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   justify-content: flex-end;
-  padding-top: 8px;
-  border-top: 1px solid #eef2f7;
+  padding-top: 16px;
+  border-top: none;
+  box-shadow: 0 -2px 0 -1px var(--neu-shadow-light), 0 -1px 0 0 var(--neu-shadow-dark);
 }
 
 .btn-cancel,
 .btn-submit {
   padding: 12px 20px;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   letter-spacing: 0.5px;
+  box-shadow: var(--neu-raised-sm);
 }
 
 .btn-cancel {
-  background: var(--glass-bg);
-  color: var(--text-primary);
-  border: 1px solid var(--border-glass);
+  background: var(--surface-color);
+  color: var(--text-secondary);
 }
 
 .btn-cancel:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
-  color: #111827;
-  transform: translateY(-1px);
+  color: var(--text-primary);
+  box-shadow: var(--neu-raised);
+}
+
+.btn-cancel:active {
+  box-shadow: var(--neu-inset-sm);
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
-  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+  background: var(--primary-gradient);
+  color: var(--on-primary);
 }
 
 .btn-submit:hover {
-  background: linear-gradient(135deg, #2980b9, #21618c);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+  filter: brightness(1.06);
+  box-shadow: var(--neu-raised);
 }
 
 .btn-submit:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+  box-shadow: var(--neu-pressed-fill);
 }
 
-/* Dark mode styles for Task Form text */
-
-[data-theme="dark"] .form-group label {
-  color: #f1f5f9; /* Primary Text Dark */
-}
-
-[data-theme="dark"] .form-group input,
-[data-theme="dark"] .form-group select,
-[data-theme="dark"] .form-group textarea {
-  background: var(--glass-bg);
-  color: var(--text-primary);
-  border-color: var(--border-glass-strong); /* Stronger border for dark mode */
-}
-
-/* Removing redundant Horizontal Expansion Grid to restore original UX */
-
-/* Fix Date & Time Icon Contrast */
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  filter: opacity(0.5);
-  transition: filter 0.2s ease;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator:hover,
-input[type="time"]::-webkit-calendar-picker-indicator:hover {
-  filter: opacity(1);
-}
-
-[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
-[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) opacity(0.7); /* Make icons white in dark mode */
-}
-
-[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator:hover,
-[data-theme="dark"]
-  input[type="time"]::-webkit-calendar-picker-indicator:hover {
-  filter: invert(1) opacity(1);
-}
-
-[data-theme="dark"] .form-group input::placeholder,
-[data-theme="dark"] .form-group textarea::placeholder {
-  color: #94a3b8; /* Secondary Text Dark */
-}
-
-[data-theme="dark"] .char-count {
-  color: #94a3b8; /* Secondary Text Dark */
-}
-
-[data-theme="dark"] .btn-cancel {
-  background: var(--glass-bg-dark);
-  color: var(--text-primary);
-  border-color: var(--border-glass);
-}
-
-[data-theme="dark"] .btn-cancel:hover {
-  background: #444444;
-  border-color: #555555;
-  color: #ffffff;
-}
+/* Date & time picker icon contrast is handled globally in index.css */
 
 /* 响应式设计 */
 @media (max-width: 480px) {
@@ -218,8 +160,8 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.9em;
-  color: #666;
+  font-size: 13px;
+  color: var(--text-secondary);
 }
 
 .pending-checkbox input[type="checkbox"] {
@@ -239,18 +181,22 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .magic-btn {
-  background: #f0f7ff;
-  border: 1px solid #cce4ff;
-  border-radius: 8px;
+  background: var(--surface-color);
+  border: none;
+  border-radius: 12px;
   padding: 8px 12px;
   cursor: pointer;
   font-size: 1.2em;
-  transition: all 0.2s;
+  transition: box-shadow 0.2s;
+  box-shadow: var(--neu-raised-sm);
 }
 
 .magic-btn:hover {
-  background: #e0efff;
-  transform: scale(1.1);
+  box-shadow: var(--neu-raised);
+}
+
+.magic-btn:active {
+  box-shadow: var(--neu-inset-sm);
 }
 
 /* Subtasks Styles */
@@ -266,11 +212,17 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 
 .btn-add-subtask {
   padding: 8px 16px;
-  background: #3498db;
-  color: white;
+  background: var(--primary-gradient);
+  color: var(--on-primary);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: var(--neu-raised-sm);
+}
+
+.btn-add-subtask:active {
+  box-shadow: var(--neu-pressed-fill);
 }
 
 .subtasks-list {
@@ -287,17 +239,15 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   align-items: center;
   gap: 10px;
   padding: 12px;
-  background: var(--glass-bg);
-  border: 1px solid var(--border-glass);
-  box-shadow: var(--inner-glow);
-  border-radius: 12px;
-  transition: all 0.2s;
+  background: var(--surface-color);
+  border: none;
+  box-shadow: var(--neu-raised-sm);
+  border-radius: 14px;
+  transition: box-shadow 0.2s;
 }
 
 .subtask-item:hover {
-  background: var(--surface-color);
-  border-color: var(--primary-color);
-  transform: translateX(4px);
+  box-shadow: var(--neu-raised);
 }
 
 .subtask-item input[type="checkbox"] {
@@ -313,31 +263,16 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 
 .subtask-item span.completed {
   text-decoration: line-through;
-  color: #6B7280; /* Secondary Text Light */
+  color: var(--text-secondary);
 }
 
 .btn-remove-subtask {
   background: none;
   border: none;
-  color: #ef4444;
+  color: var(--danger-color);
   font-size: 18px;
   cursor: pointer;
   padding: 0 4px;
-}
-
-/* Dark mode for new elements */
-[data-theme="dark"] .magic-btn {
-  background: #1e293b;
-  border-color: #334155;
-}
-
-[data-theme="dark"] .subtask-item span.completed {
-  color: #94A3B8; /* Secondary Text Dark */
-}
-
-/* Dark mode for pending checkbox */
-[data-theme="dark"] .pending-checkbox {
-  color: #94A3B8; /* Secondary Text Dark */
 }
 /* 24-Hour Time Select Styles */
 .time-select-group {
@@ -355,8 +290,4 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 .time-separator {
     font-weight: bold;
     color: var(--text-primary);
-}
-
-[data-theme="dark"] .time-separator {
-    color: #f1f5f9;
 }

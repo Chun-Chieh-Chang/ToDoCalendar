@@ -1,6 +1,8 @@
 import React from 'react';
 import Modal from '../../../../shared/components/Modal/Modal';
 import { Task } from '../../../../types';
+import { useAppStore } from '../../../../store/useAppStore';
+import { useTranslation } from '../../../../utils/i18n';
 import './ReminderModal.css';
 
 interface ReminderModalProps {
@@ -11,6 +13,9 @@ interface ReminderModalProps {
 }
 
 const ReminderModal = ({ isOpen, onClose, task, onComplete }: ReminderModalProps) => {
+    const language = useAppStore(state => state.settings.language);
+    const t = useTranslation(language);
+
     if (!task) return null;
 
     return (
@@ -20,7 +25,7 @@ const ReminderModal = ({ isOpen, onClose, task, onComplete }: ReminderModalProps
             title={
                 <div className="reminder-title-wrapper">
                     <span className="reminder-icon">⏰</span>
-                    <span>任務提醒</span>
+                    <span>{t('reminderTitle')}</span>
                 </div>
             }
             className="reminder-modal"
@@ -32,7 +37,7 @@ const ReminderModal = ({ isOpen, onClose, task, onComplete }: ReminderModalProps
 
                 <div className="reminder-actions">
                     <button className="btn btn-secondary" onClick={onClose}>
-                        我知道了
+                        {t('gotIt')}
                     </button>
                     <button
                         className="btn btn-primary"
@@ -41,7 +46,7 @@ const ReminderModal = ({ isOpen, onClose, task, onComplete }: ReminderModalProps
                             onClose();
                         }}
                     >
-                        完成任務
+                        {t('reminderComplete')}
                     </button>
                 </div>
             </div>

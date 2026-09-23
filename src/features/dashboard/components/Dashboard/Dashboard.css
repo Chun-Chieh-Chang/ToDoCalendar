@@ -13,10 +13,7 @@
     font-size: 2rem;
     font-weight: 800;
     margin-bottom: 8px;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
 }
 
 .dashboard-header p {
@@ -32,72 +29,57 @@
     margin-bottom: 32px;
 }
 
+/* Raised panel (class name kept for markup compatibility) */
 .glass-card {
-    background: linear-gradient(135deg, rgba(var(--glass-rgb, 30, 41, 59), 0.4) 0%, rgba(var(--glass-rgb, 30, 41, 59), 0.2) 100%);
-    backdrop-filter: blur(var(--glass-blur, 16px)) saturate(180%);
-    -webkit-backdrop-filter: blur(var(--glass-blur, 16px)) saturate(180%);
-    border: 1px solid var(--border-glass);
-    border-radius: 24px;
+    background: var(--surface-color);
+    border: none;
+    border-radius: var(--neu-radius-lg);
     padding: 24px;
-    box-shadow: 
-        0 8px 32px 0 rgba(0, 0, 0, 0.3),
-        var(--inner-glow);
+    box-shadow: var(--neu-raised);
     position: relative;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: box-shadow 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.glass-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
-    pointer-events: none;
-}
-
-.glass-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--primary-color);
-}
-
+/* Metric tiles (reference "128 USERS / 47 TASKS ...") */
 .stat-card {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-card:hover {
+    box-shadow: var(--neu-raised-lg);
 }
 
 .stat-card .stat-value {
     font-size: 2.2rem;
     font-weight: 800;
-    margin-bottom: 4px;
-    position: relative;
-    z-index: 1;
+    line-height: 1.2;
+    color: var(--primary-color);
 }
 
 .stat-card .stat-label {
-    color: var(--text-primary);
-    opacity: 0.8;
+    color: var(--text-secondary);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-top: 4px;
+    letter-spacing: 0.12em;
 }
 
 .card-bg-icon {
-    position: absolute;
-    right: -10px;
-    bottom: -10px;
-    font-size: 80px;
-    opacity: 0.05;
-    transform: rotate(-15deg);
+    font-size: 24px;
+    line-height: 1;
+    color: var(--primary-color);
     pointer-events: none;
 }
 
-.stat-card.primary .stat-value { color: var(--primary-color); }
-.stat-card.success .stat-value { color: var(--success-safe, #10B981); }
-.stat-card.warning .stat-value { color: var(--warning-error, #F59E0B); }
+.stat-card.success .stat-value,
+.stat-card.success .card-bg-icon { color: var(--success-color); }
+.stat-card.warning .stat-value,
+.stat-card.warning .card-bg-icon { color: var(--warning-color); }
 
 /* Dashboard Grid */
 .dashboard-grid {
@@ -146,7 +128,7 @@
 }
 
 .axis-label {
-    font-size: 12px;
+    font-size: 13px;
     fill: var(--text-secondary);
 }
 
@@ -187,16 +169,18 @@
     opacity: 0.9;
 }
 
+/* Inset track, as in the reference progress bar */
 .progress-bg {
-    height: 8px;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
+    height: 10px;
+    background: var(--surface-color);
+    border-radius: 5px;
+    box-shadow: var(--neu-inset-sm);
     overflow: hidden;
 }
 
-.progress-fill {
+.progress-bg .progress-fill {
     height: 100%;
-    border-radius: 4px;
+    border-radius: 5px;
 }
 
 /* Priority Distribution */
@@ -219,7 +203,8 @@
 .priority-bar-wrapper {
     width: 32px;
     height: 120px;
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--surface-color);
+    box-shadow: var(--neu-inset-sm);
     border-radius: 16px;
     display: flex;
     align-items: flex-end;
@@ -237,26 +222,16 @@
 .priority-item.low .priority-bar { background: var(--priority-low-text); }
 
 .priority-label {
-    font-size: 0.75rem;
+    font-size: 13px;
     font-weight: 800;
-    color: var(--text-primary);
-    opacity: 0.7;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
 }
 
 .priority-value {
     font-weight: 800;
     color: var(--text-primary);
 }
-
-/* Dark Mode Overrides */
-[data-theme="dark"] .progress-bg,
-[data-theme="dark"] .priority-bar-wrapper {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="dark"] .point-label { fill: #fff; }
-[data-theme="dark"] .axis-label { fill: rgba(255, 255, 255, 0.7); }
-[data-theme="dark"] .axis-line { stroke: rgba(255, 255, 255, 0.1); }
 
 @media (max-width: 1024px) {
     .stats-overview {

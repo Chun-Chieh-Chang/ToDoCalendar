@@ -16,24 +16,19 @@
   grid-template-columns: repeat(7, 1fr);
   padding: 0 10px;
   margin-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 16px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  box-shadow: var(--neu-inset-sm);
 }
 
 .weekday {
   text-align: center;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 1px;
   padding: 8px 0;
-}
-
-[data-theme="dark"] .weekday {
-  color: var(--text-primary);
-  opacity: 0.7;
-  font-weight: 700;
 }
 
 /* Calendar Grid */
@@ -41,40 +36,32 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(5, 1fr);
-  gap: 12px;
+  gap: 14px;
   flex: 1;
 }
 
-/* Day Cell */
+/* Day Cell - raised tile */
 .calendar-day {
   background-color: var(--surface-color);
-  border-radius: 12px;
+  border-radius: var(--neu-radius);
   padding: 12px;
   position: relative;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  border: 1px solid var(--border-color);
-  transition: all 0.2s ease;
+  border: none;
+  box-shadow: var(--neu-raised-sm);
+  transition: box-shadow 0.25s ease;
   min-height: 100px;
   overflow: hidden;
 }
 
 .calendar-day:hover {
-  border-color: var(--text-tertiary);
-  background-color: var(--bg-color);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--neu-raised);
 }
 
-[data-theme="dark"] .calendar-day {
-  background-color: var(--surface-color);
-  border: 1px solid var(--border-color);
-}
-
-[data-theme="dark"] .calendar-day:hover {
-  border-color: var(--text-secondary);
-  background-color: #2A2A2A;
+.calendar-day:active {
+  box-shadow: var(--neu-inset-sm);
 }
 
 /* Day Number */
@@ -92,20 +79,11 @@
   transition: all 0.2s ease;
 }
 
-/* Holiday Cell */
-.calendar-day.is-holiday {
-  background-color: rgba(245, 158, 11, 0.07);
-}
-
-[data-theme="dark"] .calendar-day.is-holiday {
-  background-color: rgba(251, 191, 36, 0.07);
-}
-
 /* Holiday Label */
 .holiday-label {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
-  color: #d97706;
+  color: var(--warning-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -114,112 +92,48 @@
   letter-spacing: 0.3px;
 }
 
-[data-theme="dark"] .holiday-label {
-  color: #fbbf24;
-}
-
-/* Other Month Days */
+/* Other Month Days - flush with the surface (no relief) */
 .calendar-day.other-month {
-  opacity: 0.3;
-  background-color: transparent;
+  opacity: 0.4;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-.calendar-day.other-month:hover {
-  border-color: transparent;
-  background-color: transparent;
-  transform: none;
+.calendar-day.other-month:hover,
+.calendar-day.other-month:active {
   box-shadow: none;
 }
 
-[data-theme="dark"] .calendar-day.other-month {
-  background-color: transparent;
-}
-
-/* Weekend Styling - Suble Morandi Tints */
-.calendar-day.is-saturday {
-  background-color: rgba(16, 185, 129, 0.05); /* Refresing Greenish */
-}
-
+/* Weekend Styling - colour on the numerals only, surface stays neutral */
 .calendar-day.is-saturday .day-number,
 .weekday.is-saturday {
-  color: #059669; /* Emerald 600 */
-}
-
-.calendar-day.is-sunday {
-  background-color: rgba(239, 68, 68, 0.05); /* Soft Reddish */
+  color: var(--success-color);
 }
 
 .calendar-day.is-sunday .day-number,
 .weekday.is-sunday {
-  color: #dc2626; /* Red 600 */
+  color: var(--danger-color);
 }
 
-/* Dark Mode Weekends */
-[data-theme="dark"] .calendar-day.is-saturday {
-  background-color: rgba(52, 211, 153, 0.08);
-}
-
-[data-theme="dark"] .calendar-day.is-saturday .day-number,
-[data-theme="dark"] .weekday.is-saturday {
-  color: #34d399; /* Emerald 400 */
-}
-
-[data-theme="dark"] .calendar-day.is-sunday {
-  background-color: rgba(248, 113, 113, 0.08);
-}
-
-[data-theme="dark"] .calendar-day.is-sunday .day-number,
-[data-theme="dark"] .weekday.is-sunday {
-  color: #f87171; /* Red 400 */
-}
-
-/* Today */
-.calendar-day.today {
-  background-color: var(--highlight-current);
-  border-color: var(--task-green-border);
-}
-
+/* Today - raised numeral badge */
 .calendar-day.today .day-number {
-  background-color: #10B981;
-  color: white;
-  font-weight: 700;
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+  background: var(--primary-gradient);
+  color: var(--on-primary);
+  box-shadow: var(--neu-raised-sm);
 }
 
-[data-theme="dark"] .calendar-day.today {
-  background-color: rgba(129, 199, 132, 0.15);
-  border: 1px solid var(--accent-green);
-}
-
-[data-theme="dark"] .calendar-day.today .day-number {
-  background-color: var(--accent-green);
-  color: #000;
-  font-weight: 700;
-}
-
-/* Selected */
-.calendar-day.selected {
-  background-color: var(--highlight-selected);
-  border-color: var(--primary-color);
+/* Selected - "pressed in" cell, the Inset Focus signature */
+.calendar-day.selected,
+.calendar-day.selected:hover {
+  box-shadow: var(--neu-inset);
 }
 
 .calendar-day.selected .day-number {
-  background-color: var(--primary-color);
-  color: white;
-  font-weight: 700;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  color: var(--primary-color);
 }
 
-[data-theme="dark"] .calendar-day.selected {
-  background-color: rgba(100, 181, 246, 0.15);
-  border: 1px solid var(--accent-blue);
-}
-
-[data-theme="dark"] .calendar-day.selected .day-number {
-  background-color: var(--accent-blue);
-  color: #000;
-  font-weight: 700;
+.calendar-day.today.selected .day-number {
+  color: var(--on-primary);
 }
 
 /* Task Indicator */
@@ -229,24 +143,17 @@
   right: 10px;
   width: 28px;
   height: 28px;
-  background-color: var(--task-purple-bg);
-  color: var(--task-purple-text);
+  background: var(--primary-gradient);
+  color: var(--on-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  border: 2px solid var(--surface-color);
-  box-shadow: var(--shadow-sm);
+  border: none;
+  box-shadow: var(--neu-raised-sm);
   z-index: 2;
-}
-
-[data-theme="dark"] .task-indicator {
-  background-color: var(--accent-purple);
-  color: #fff;
-  border-color: var(--surface-color);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* Task Preview */
@@ -259,79 +166,43 @@
   overflow: hidden;
 }
 
+/* Pill chips pressed into the tile */
 .task-preview-item {
-  font-size: 12px;
-  padding: 6px 8px;
-  border-radius: 6px;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 8px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-left: 3px solid;
-  box-shadow: var(--shadow-sm);
+  border-left: 3px solid currentColor;
+  box-shadow: var(--neu-inset-sm);
   transition: all 0.2s ease;
   text-align: left;
   color: var(--text-primary);
-  background-color: rgba(var(--glass-rgb), 0.1);
+  background-color: var(--surface-color);
 }
 
-.task-preview-item:hover {
-  transform: translateX(2px);
-}
-
-/* Task Colors - Light Theme */
+/* Task Colors - semantic tokens handle both themes */
 .task-preview-item.task-blue {
-  background-color: #FFF1F2;
-  color: #DB2777;
-  border-left-color: #F472B6;
+  color: var(--task-blue-text);
 }
 
 .task-preview-item.task-green {
-  background-color: #ECFDF5;
-  color: #047857;
-  border-left-color: #10B981;
+  color: var(--task-green-text);
 }
 
 .task-preview-item.task-yellow {
-  background-color: #FFFBEB;
-  color: #B45309;
-  border-left-color: #F59E0B;
+  color: var(--task-yellow-text);
 }
 
 .task-preview-item.task-purple {
-  background-color: #F5F3FF;
-  color: #6D28D9;
-  border-left-color: #8B5CF6;
-}
-
-/* Task Colors - Dark Theme */
-[data-theme="dark"] .task-preview-item.task-blue {
-  background-color: rgba(37, 99, 235, 0.2);
-  color: #93C5FD;
-  border-left-color: #3B82F6;
-}
-
-[data-theme="dark"] .task-preview-item.task-green {
-  background-color: rgba(16, 185, 129, 0.2);
-  color: #6EE7B7;
-  border-left-color: #10B981;
-}
-
-[data-theme="dark"] .task-preview-item.task-yellow {
-  background-color: rgba(245, 158, 11, 0.2);
-  color: #FDE68A;
-  border-left-color: #F59E0B;
-}
-
-[data-theme="dark"] .task-preview-item.task-purple {
-  background-color: rgba(139, 92, 246, 0.2);
-  color: #DDD6FE;
-  border-left-color: #8B5CF6;
+  color: var(--task-purple-text);
 }
 
 /* Task Time */
 .task-time {
-  font-size: 10px;
+  font-size: 13px;
   display: block;
   margin-bottom: 2px;
   font-weight: 700;
@@ -381,7 +252,7 @@
   }
 
   .weekday {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .calendar-grid {
@@ -403,13 +274,13 @@
   .task-indicator {
     width: 22px;
     height: 22px;
-    font-size: 10px;
+    font-size: 13px;
     bottom: 6px;
     right: 6px;
   }
 
   .task-preview-item {
-    font-size: 11px;
+    font-size: 13px;
     padding: 4px 6px;
   }
 }
@@ -420,7 +291,7 @@
   }
 
   .weekday {
-    font-size: 10px;
+    font-size: 13px;
     padding: 6px 0;
   }
 
@@ -435,15 +306,15 @@
   }
 
   .day-number {
-    font-size: 12px;
-    width: 20px;
-    height: 20px;
+    font-size: 13px;
+    width: 22px;
+    height: 22px;
   }
 
   .task-indicator {
-    width: 18px;
-    height: 18px;
-    font-size: 9px;
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
     bottom: 4px;
     right: 4px;
   }
@@ -454,11 +325,6 @@
 }
 
 /* Accessibility */
-.calendar-day:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--primary-color);
-}
-
 .calendar-day:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;

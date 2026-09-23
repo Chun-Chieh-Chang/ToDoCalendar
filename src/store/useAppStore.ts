@@ -133,6 +133,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
       let newSettings = { ...defaultSettings };
       if (Object.keys(savedSettings).length > 0) {
         const migratedSettings = { ...savedSettings };
+        // Older builds saved 'en-US', which has no entry in translations
+        if (migratedSettings.language === 'en-US') {
+          migratedSettings.language = 'en';
+        }
+        // Glass-effect sliders were removed with the neumorphic redesign
+        delete migratedSettings.glassOpacity;
+        delete migratedSettings.glassBlur;
+        delete migratedSettings.borderOpacity;
         if (migratedSettings.categories && Array.isArray(migratedSettings.categories) && migratedSettings.theme === 'dark') {
           migratedSettings.categories = migratedSettings.categories.map((category: any) => {
             if (category.id === 'work' && (category.color === '#3B82F6' || category.color === '#FEF3C7')) {

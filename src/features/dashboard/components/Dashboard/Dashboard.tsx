@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { useAppStore } from '../../../../store/useAppStore';
 import { dateUtils } from '../../../../shared/utils/dateUtils';
 import { CategoryConfig } from '../../../../types';
+import { getTranslation, useTranslation } from '../../../../utils/i18n';
+import { taskUtils } from '../../../tasks/utils/taskUtils';
 import { motion } from 'framer-motion';
 import './Dashboard.css';
 
@@ -104,6 +106,7 @@ const Dashboard = () => {
     const settings = state?.settings || {};
     const categories: CategoryConfig[] = settings?.categories || [];
     const language = (settings?.language === 'en' || settings?.language === 'zh-TW') ? settings.language : 'zh-TW';
+    const t = useTranslation(language);
 
     const stats = useMemo(() => {
         const total = tasks.length;
@@ -127,7 +130,7 @@ const Dashboard = () => {
             date.setDate(date.getDate() - (6 - i));
             const dateStr = dateUtils.dateToString(date);
             return {
-                label: i === 6 ? (language === 'en' ? 'Today' : '今天') : dateUtils.formatDate(date, 'MM/dd', language),
+                label: i === 6 ? getTranslation(language, 'today') : dateUtils.formatDate(date, 'MM/dd', language),
                 count: tasks.filter(t => t.date === dateStr && t.completed).length
             };
         });
@@ -140,8 +143,8 @@ const Dashboard = () => {
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
-                <h1>{language === 'en' ? 'Productivity Dashboard' : '數據洞察中心'}</h1>
-                <p>{language === 'en' ? 'Track your task trends and distribution' : '您的任務趨勢與執行效率分析'}</p>
+                <h1>{t('dashboardTitle')}</h1>
+                <p>{t('dashboardSubtitle')}</p>
             </header>
 
             <div className="stats-overview">
@@ -155,39 +158,39 @@ const Dashboard = () => {
                             {stats.completionRate}%
                         </motion.span>
                     </div>
-                    <div className="stat-label">{language === 'en' ? 'Completion' : '完成率'}</div>
+                    <div className="stat-label">{t('statCompletion')}</div>
                 </div>
                 <div className="stat-card glass-card">
                     <div className="card-bg-icon"><i className="ri-task-line"></i></div>
                     <div className="stat-value">{stats.total}</div>
-                    <div className="stat-label">{language === 'en' ? 'Total' : '總任務'}</div>
+                    <div className="stat-label">{t('statTotal')}</div>
                 </div>
                 <div className="stat-card success glass-card">
                     <div className="card-bg-icon"><i className="ri-checkbox-circle-line"></i></div>
                     <div className="stat-value">{stats.completed}</div>
-                    <div className="stat-label">{language === 'en' ? 'Done' : '已完成'}</div>
+                    <div className="stat-label">{t('completed')}</div>
                 </div>
                 <div className="stat-card warning glass-card">
                     <div className="card-bg-icon"><i className="ri-time-line"></i></div>
                     <div className="stat-value">{stats.pending}</div>
-                    <div className="stat-label">{language === 'en' ? 'Pending' : '待處理'}</div>
+                    <div className="stat-label">{t('todo')}</div>
                 </div>
             </div>
 
             <div className="dashboard-grid">
                 <section className="dashboard-section chart-section glass-card full-width">
-                    <h3><i className="ri-pulse-line"></i> {language === 'en' ? 'Weekly Productivity Trend' : '生產力趨勢 (近七日)'}</h3>
+                    <h3><i className="ri-pulse-line"></i> {t('weeklyTrend')}</h3>
                     <AreaChart data={stats.last7Days} maxCount={stats.maxTrendCount} />
                 </section>
 
                 <section className="dashboard-section category-section glass-card">
-                    <h3><i className="ri-pie-chart-2-line"></i> {language === 'en' ? 'Category Distribution' : '任務領域分布'}</h3>
+                    <h3><i className="ri-pie-chart-2-line"></i> {t('categoryDistribution')}</h3>
                     <div className="cat-list">
                         {[...stats.catStats].sort((a, b) => b.count - a.count).map(cat => (
                             <div key={cat.id} className="cat-stat-item">
                                 <div className="cat-info">
                                     <span className="cat-dot" style={{ backgroundColor: cat.color }}></span>
-                                    <span className="cat-name">{cat.name}</span>
+                                    <span className="cat-name">{taskUtils.getCategoryLabel(cat, t)}</span>
                                     <span className="cat-count">{cat.count}</span>
                                 </div>
                                 <div className="progress-bg">
@@ -205,11 +208,11 @@ const Dashboard = () => {
                 </section>
 
                 <section className="dashboard-section priority-section glass-card">
-                    <h3><i className="ri-flag-2-line"></i> {language === 'en' ? 'Priority Distribution' : '優先級分佈'}</h3>
+                    <h3><i className="ri-flag-2-line"></i> {t('priorityDistribution')}</h3>
                     <div className="priority-stats-container">
                         {['high', 'medium', 'low'].map(p => (
                             <div key={p} className={`priority-item ${p}`}>
-                                <div className="priority-label">{p.toUpperCase()}</div>
+                                <div className="priority-label">{t(p)}</div>
                                 <div className="priority-bar-wrapper">
                                     <motion.div 
                                         className="priority-bar"

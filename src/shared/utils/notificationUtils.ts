@@ -2,7 +2,7 @@ export const notificationUtils = {
     // 請求權限
     requestPermission: async (): Promise<boolean> => {
         if (!('Notification' in window)) {
-            console.log('此瀏覽器不支援桌面通知');
+            console.log('Desktop notifications are not supported in this browser');
             return false;
         }
 

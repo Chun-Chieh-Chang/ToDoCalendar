@@ -6,7 +6,7 @@ import { storageService } from './services/storage';
 import { Task } from './types';
 import { dateUtils } from './shared/utils/dateUtils';
 import { taskUtils } from './features/tasks/utils/taskUtils';
-import { useTranslation, translations } from './utils/i18n';
+import { useTranslation, getTranslation, translations } from './utils/i18n';
 import { parseTaskTitle } from './utils/nlpUtils';
 import { notificationUtils } from './shared/utils/notificationUtils';
 import Calendar from './features/calendar/components/Calendar/Calendar';
@@ -71,8 +71,10 @@ const App = () => {
               remindedKeys.add(key);
 
               // 發送系統通知
-              notificationUtils.send('任務提醒', {
-                body: `任務: ${task.title}${task.time ? `\n時間: ${task.time}` : ''}`,
+              const lang = state.settings.language;
+              const timeLine = task.time ? `\n${getTranslation(lang, 'notifyTimeLine').replace('{time}', task.time)}` : '';
+              notificationUtils.send(getTranslation(lang, 'reminderTitle'), {
+                body: getTranslation(lang, 'notifyTaskLine').replace('{title}', task.title) + timeLine,
                 tag: task.id
               });
             }
@@ -88,7 +90,7 @@ const App = () => {
     const intervalId = setInterval(checkReminders, 60000);
     checkReminders();
     return () => clearInterval(intervalId);
-  }, [state.tasks, remindedKeys]);
+  }, [state.tasks, remindedKeys, state.settings.language]);
 
 
   const [showTaskForm, setShowTaskForm] = useState(false);
@@ -177,7 +179,7 @@ const App = () => {
   const handleClearCompleted = (targetTasks: Task[]) => {
     const completedTasks = targetTasks.filter(t => t.completed);
     if (completedTasks.length === 0) return;
-    if (confirm(`確定要清除這 ${completedTasks.length} 項已完成的任務嗎？`)) {
+    if (confirm(translate('confirmClearCompleted').replace('{count}', String(completedTasks.length)))) {
       completedTasks.forEach(task => {
         dispatch({ type: 'DELETE_TASK', payload: task.id });
       });
@@ -204,20 +206,20 @@ const App = () => {
       const result = await exportDataWithDialog();
       if (result.success) {
         if (result.filePath) {
-          alert(`數據已成功匯出至: ${result.filePath}\n程式將自動關閉。`);
+          alert(`${translate('exportSuccess')}: ${result.filePath}\n${translate('exitAutoClose')}`);
         } else if (result.method !== 'download') {
-          alert('數據匯出完成！程式將自動關閉。');
+          alert(`${translate('exportDone')}\n${translate('exitAutoClose')}`);
         }
         setShowExitModal(false);
         if (typeof (window as any).electronAPI !== 'undefined') {
           (window as any).electronAPI.quitApp();
         } else {
           window.close();
-          if (!window.closed) alert('請手動關閉此分頁。');
+          if (!window.closed) alert(translate('closeTabManually'));
         }
       }
     } catch (err) {
-      alert(`匯出失敗: ${err.message}`);
+      alert(`${translate('exportFailed')}: ${err.message}`);
     }
   };
 
@@ -251,7 +253,7 @@ const App = () => {
     try {
       setIsLoading(true);
       setError(null);
-      if (!taskData.title?.trim()) throw new Error('任務標題不能為空');
+      if (!taskData.title?.trim()) throw new Error(translate('titleRequired'));
       if (editingTask && editingTask.id) {
         dispatch({
           type: 'UPDATE_TASK',
@@ -271,7 +273,7 @@ const App = () => {
       setShowTaskForm(false);
       setEditingTask(undefined);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '保存失敗');
+      setError(err instanceof Error ? err.message : translate('saveFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -348,23 +350,8 @@ const App = () => {
     return () => window.removeEventListener('changeView', handleChangeView);
   }, []);
 
-  const theme = state.settings.theme;
-  const glassRgb = theme === 'dark' ? '30, 41, 59' : '255, 255, 255';
-  const borderRgb = '255, 255, 255';
-  const glassOpacity = state.settings.glassOpacity;
-  const borderOpacity = state.settings.borderOpacity;
-  const cssVars = {
-    '--glass-opacity': glassOpacity,
-    '--glass-blur': `${state.settings.glassBlur}px`,
-    '--border-opacity': borderOpacity,
-    '--glass-bg': `rgba(${glassRgb}, ${glassOpacity})`,
-    '--glass-bg-dark': `rgba(${glassRgb}, ${glassOpacity})`,
-    '--border-glass': `rgba(${borderRgb}, ${borderOpacity})`,
-    '--border-glass-strong': `rgba(${borderRgb}, ${Math.min(borderOpacity + 0.2, 1)})`,
-  } as React.CSSProperties;
-
   return (
-    <div className="app" data-theme={state.settings.theme} style={cssVars}>
+    <div className="app" data-theme={state.settings.theme}>
       {/* 左側導航欄 - 僅在非手機版顯示 */}
       {!isMobile && (
         <aside className="sidebar">
@@ -384,7 +371,7 @@ const App = () => {
                 <div className="tooltip">
                   <i className="ri-add-circle-fill"></i>
                   <span>{translate('addTask')}</span>
-                  <span className="tooltip-text">隨時隨地快速建立新任務 (N)</span>
+                  <span className="tooltip-text">{translate('addTaskTooltip')}</span>
                 </div>
               </div>
 
@@ -532,14 +519,14 @@ const App = () => {
                 <button
                   className="nav-btn"
                   onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                  title="上個月"
+                  title={translate('lastMonth')}
                 >
                   <i className="ri-arrow-left-s-line"></i>
                 </button>
                 <button
                   className="nav-btn"
                   onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                  title="下個月"
+                  title={translate('nextMonth')}
                 >
                   <i className="ri-arrow-right-s-line"></i>
                 </button>
@@ -582,7 +569,7 @@ const App = () => {
           )}
           {['tasks', 'pending', 'all_tasks'].includes(activeView) && (
             <TaskListView
-              title="📋 任務管理中心"
+              title={translate('taskCenterTitle')}
               tasks={filteredAllTasks}
               filter={state.filter}
               onFilterChange={handleFilterChange}
@@ -611,20 +598,20 @@ const App = () => {
         <footer className="status-bar">
           <div className="status-item">
             <span className="status-dot dot-blue"></span>
-            進行中任務 ({state.tasks.filter(t => !t.completed && t.date).length})
+            {translate('inProgressTasks')} ({state.tasks.filter(t => !t.completed && t.date).length})
           </div>
           <div className="status-item">
             <span className="status-dot dot-green"></span>
-            已完成 ({state.tasks.filter(t => t.completed).length})
+            {translate('completed')} ({state.tasks.filter(t => t.completed).length})
           </div>
           <div className="status-item">
             <span className="status-dot dot-yellow"></span>
-            待處理 ({state.tasks.filter(t => !t.date).length})
+            {translate('todo')} ({state.tasks.filter(t => !t.date).length})
           </div>
 
           <div className="progress-wrapper">
             <span className="progress-label">
-              本月完成率 {state.tasks.length > 0 ? Math.round((state.tasks.filter(t => t.completed).length / state.tasks.length) * 100) : 0}%
+              {translate('completionRate')} {state.tasks.length > 0 ? Math.round((state.tasks.filter(t => t.completed).length / state.tasks.length) * 100) : 0}%
             </span>
             <div className="progress-bar">
               <div
@@ -673,18 +660,18 @@ const App = () => {
       <Modal
         isOpen={showExitModal}
         onClose={() => setShowExitModal(false)}
-        title="退出系統"
+        title={translate('exitSystem')}
         className="exit-modal"
       >
         <div className="exit-modal-content">
           <div className="exit-icon">🚪</div>
-          <p>您即將退出系統。為了資料安全，建議您在離開前匯出最新的備份檔案存檔。</p>
+          <p>{translate('exitModalDesc')}</p>
           <div className="exit-actions">
             <button className="btn btn-danger" onClick={confirmExitWithBackup}>
-              <i className="ri-download-2-line"></i> 匯出數據並退出
+              <i className="ri-download-2-line"></i> {translate('exportAndExit')}
             </button>
             <button className="btn btn-secondary" onClick={() => setShowExitModal(false)}>
-              取消
+              {translate('cancel')}
             </button>
           </div>
         </div>
@@ -692,10 +679,10 @@ const App = () => {
 
       {/* 加載狀態 */}
       {isLoading && (
-        <div className="loading-overlay" role="status" aria-label="正在保存任務">
+        <div className="loading-overlay" role="status" aria-label={translate('savingTask')}>
           <div className="loading-spinner">
             <div className="spinner"></div>
-            <div className="text">正在保存任務...</div>
+            <div className="text">{translate('savingTask')}...</div>
           </div>
         </div>
       )}
@@ -708,7 +695,7 @@ const App = () => {
           <button
             className="error-close"
             onClick={() => setError(null)}
-            aria-label="關閉錯誤提示"
+            aria-label={translate('dismissError')}
           >
             ✕
           </button>
@@ -725,14 +712,14 @@ const App = () => {
             onClick={() => setActiveView('calendar')}
           >
             <i className="ri-calendar-event-line"></i>
-            <span style={{ fontSize: '10px', marginTop: '4px' }}>{translate('calendarView')}</span>
+            <span>{translate('calendarView')}</span>
           </div>
           <div 
             className={'mobile-nav-item ' + (['tasks', 'pending', 'all_tasks'].includes(activeView) ? 'active' : '')} 
             onClick={() => setActiveView('tasks')}
           >
             <i className="ri-list-check"></i>
-            <span style={{ fontSize: '10px', marginTop: '4px' }}>{translate('myTasks')}</span>
+            <span>{translate('myTasks')}</span>
           </div>
           <div 
             className="mobile-nav-item" 
@@ -745,14 +732,14 @@ const App = () => {
             onClick={() => setActiveView('kanban')}
           >
             <i className="ri-layout-column-line"></i>
-            <span style={{ fontSize: '10px', marginTop: '4px' }}>{translate('kanbanBoard')}</span>
+            <span>{translate('kanbanBoard')}</span>
           </div>
           <div 
             className={'mobile-nav-item ' + (activeView === 'dashboard' ? 'active' : '')} 
             onClick={() => setActiveView('dashboard')}
           >
             <i className="ri-bar-chart-fill"></i>
-            <span style={{ fontSize: '10px', marginTop: '4px' }}>{translate('insights')}</span>
+            <span>{translate('insights')}</span>
           </div>
         </nav>
       )}

@@ -1,6 +1,16 @@
 import { Task } from '../../../types';
 
+// Built-in category ids have translations; any other category keeps its stored name
+const BUILT_IN_CATEGORY_IDS = ['work', 'study', 'life', 'other'];
+
 export const taskUtils = {
+    /**
+     * 分類顯示名稱：內建分類依語言翻譯，自訂分類沿用名稱
+     */
+    getCategoryLabel(category: { id: string; name: string }, t: (key: string) => string): string {
+        return BUILT_IN_CATEGORY_IDS.includes(category.id) ? t(category.id) : category.name;
+    },
+
     /**
      * 標準化的任務過濾邏輯
      */

@@ -4,6 +4,7 @@ import { Task, Subtask } from '../../../../types';
 import { useAppStore } from '../../../../store/useAppStore';
 import { useTranslation } from '../../../../utils/i18n';
 import { parseTaskTitle } from '../../../../utils/nlpUtils';
+import { taskUtils } from '../../utils/taskUtils';
 import './TaskForm.css';
 
 interface TaskFormProps {
@@ -22,6 +23,7 @@ const TaskForm = ({
   selectedDate
 }: TaskFormProps) => {
   const state = useAppStore();
+  const t = useTranslation(state.settings.language);
   const [formData, setFormData] = useState<Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'completed'>>({
     title: '',
     description: '',
@@ -120,9 +122,9 @@ const TaskForm = ({
     const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = '請輸入任務標題';
+      newErrors.title = t('titleRequired');
     } else if (formData.title.length > 100) {
-      newErrors.title = '標題不能超過100個字符';
+      newErrors.title = t('titleTooLong').replace('{max}', '100');
     }
 
     // Date is now optional for pending tasks
@@ -159,18 +161,18 @@ const TaskForm = ({
   };
 
   const priorityOptions = [
-    { value: 'high', label: '高', color: '#e74c3c' },
-    { value: 'medium', label: '中', color: '#f39c12' },
-    { value: 'low', label: '低', color: '#27ae60' }
+    { value: 'high', label: t('high') },
+    { value: 'medium', label: t('medium') },
+    { value: 'low', label: t('low') }
   ];
 
 
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={initialTask ? '編輯任務' : '新增任務'}>
+    <Modal isOpen={isOpen} onClose={handleClose} title={initialTask ? t('editTask') : t('addTask')}>
       <form onSubmit={handleSubmit} className="task-form">
         <div className="form-group">
-          <label htmlFor="title">任務標題 *</label>
+          <label htmlFor="title">{t('taskTitle')} *</label>
           <div className="title-input-wrapper">
             <input
               type="text"
@@ -179,14 +181,14 @@ const TaskForm = ({
               value={formData.title}
               onChange={handleInputChange}
               className={errors.title ? 'error' : ''}
-              placeholder="請輸入任務標題 (可用 !high #work @14:00 ^today 解析)"
+              placeholder={t('titlePlaceholder')}
               maxLength={100}
             />
             <button
               type="button"
               className="magic-btn"
               onClick={applyMagicParsing}
-              title="智慧解析標籤"
+              title={t('magicParse')}
             >
               🪄
             </button>
@@ -196,13 +198,13 @@ const TaskForm = ({
         </div>
 
         <div className="form-group">
-          <label htmlFor="description">詳細描述</label>
+          <label htmlFor="description">{t('detailDescription')}</label>
           <textarea
             id="description"
             name="description"
             value={formData.description}
             onChange={handleInputChange}
-            placeholder="請描述任務的詳細內容"
+            placeholder={t('descriptionPlaceholder')}
             rows={3}
             maxLength={500}
           />
@@ -211,7 +213,7 @@ const TaskForm = ({
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="date">日期</label>
+            <label htmlFor="date">{t('taskDate')}</label>
             <div className="date-input-wrapper">
               <input
                 type="date"
@@ -235,13 +237,13 @@ const TaskForm = ({
                     }
                   }}
                 />
-                <label htmlFor="pending">待辦清單 (無日期)</label>
+                <label htmlFor="pending">{t('pendingNoDate')}</label>
               </div>
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="time">時間 (24H)</label>
+            <label htmlFor="time">{t('time24h')}</label>
             <div className="time-select-group">
               <select
                 name="hour"
@@ -282,7 +284,7 @@ const TaskForm = ({
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="priority">優先級 *</label>
+            <label htmlFor="priority">{t('taskPriority')} *</label>
             <select
               id="priority"
               name="priority"
@@ -300,7 +302,7 @@ const TaskForm = ({
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="category">分類 *</label>
+            <label htmlFor="category">{t('taskCategory')} *</label>
             <select
               id="category"
               name="category"
@@ -309,39 +311,39 @@ const TaskForm = ({
             >
               {state.settings.categories.map(cat => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.name}
+                  {taskUtils.getCategoryLabel(cat, t)}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="form-group">
-            <label htmlFor="recurrence">重複頻率</label>
+            <label htmlFor="recurrence">{t('recurrence')}</label>
             <select
               id="recurrence"
               name="recurrence"
               value={formData.recurrence || 'none'}
               onChange={handleInputChange}
             >
-              <option value="none">不重複</option>
-              <option value="daily">每日</option>
-              <option value="weekly">每週</option>
-              <option value="monthly">每月</option>
+              <option value="none">{t('recurNone')}</option>
+              <option value="daily">{t('recurDaily')}</option>
+              <option value="weekly">{t('recurWeekly')}</option>
+              <option value="monthly">{t('recurMonthly')}</option>
             </select>
           </div>
         </div>
 
         <div className="form-group">
-          <label>子任務</label>
+          <label>{t('subtasks')}</label>
           <div className="subtask-input-row">
             <input
               type="text"
               value={newSubtaskTitle}
               onChange={(e) => setNewSubtaskTitle(e.target.value)}
-              placeholder="新增子任務..."
+              placeholder={t('subtaskPlaceholder')}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSubtask())}
             />
-            <button type="button" onClick={handleAddSubtask} className="btn-add-subtask">新增</button>
+            <button type="button" onClick={handleAddSubtask} className="btn-add-subtask">{t('add')}</button>
           </div>
           <div className="subtasks-list">
             {formData.subtasks?.map(st => (
@@ -359,13 +361,13 @@ const TaskForm = ({
         </div>
 
         <div className="form-group">
-          <label htmlFor="notes">記事</label>
+          <label htmlFor="notes">{t('notes')}</label>
           <textarea
             id="notes"
             name="notes"
             value={formData.notes || ''}
             onChange={handleInputChange}
-            placeholder="在這裡記錄相關的記事或備忘"
+            placeholder={t('notesPlaceholder')}
             rows={4}
             maxLength={1000}
           />
@@ -374,10 +376,10 @@ const TaskForm = ({
 
         <div className="form-actions">
           <button type="button" onClick={handleClose} className="btn-cancel">
-            取消
+            {t('cancel')}
           </button>
           <button type="submit" className="btn-submit">
-            {initialTask ? '儲存變更' : '新增任務'}
+            {initialTask ? t('saveChanges') : t('addTask')}
           </button>
         </div>
       </form>

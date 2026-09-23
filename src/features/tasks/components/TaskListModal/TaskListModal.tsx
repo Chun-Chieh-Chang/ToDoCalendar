@@ -4,6 +4,8 @@ import Filter from '../Filter/Filter';
 import Modal from '../../../../shared/components/Modal/Modal';
 import { Task } from '../../../../types';
 import { taskUtils } from '../../utils/taskUtils';
+import { useAppStore } from '../../../../store/useAppStore';
+import { useTranslation } from '../../../../utils/i18n';
 import './TaskListModal.css';
 import { AnimatePresence } from 'framer-motion';
 
@@ -42,6 +44,8 @@ const TaskListModal = ({
     title,
     viewMode = 'list'
 }: TaskListModalProps) => {
+    const language = useAppStore(state => state.settings.language);
+    const t = useTranslation(language);
     const [quickAddTitle, setQuickAddTitle] = (React as any).useState('');
 
     const handleQuickAdd = (e: React.FormEvent) => {
@@ -63,7 +67,7 @@ const TaskListModal = ({
     const formatDate = (dateStr: string) => {
         if (!dateStr) return '';
         const date = new Date(dateStr);
-        return date.toLocaleDateString('zh-TW', {
+        return date.toLocaleDateString(language === 'en' ? 'en-US' : 'zh-TW', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -77,7 +81,7 @@ const TaskListModal = ({
 
     const modalTitle = (
         <div className="task-modal-title-section">
-            <h2>{title || '📋 任務列表'}</h2>
+            <h2>{title || t('taskListTitle')}</h2>
             {!title && <span className="task-modal-date">{formatDate(selectedDate)}</span>}
         </div>
     );
@@ -88,9 +92,9 @@ const TaskListModal = ({
                 <button
                     className="task-modal-clear-btn"
                     onClick={onClearCompleted}
-                    title="清除已完成"
+                    title={t('clearCompleted')}
                 >
-                    <i className="ri-delete-bin-line"></i> 清除已完成
+                    <i className="ri-delete-bin-line"></i> {t('clearCompleted')}
                 </button>
             )}
         </div>
@@ -117,14 +121,14 @@ const TaskListModal = ({
                     <i className="ri-flashlight-line"></i>
                     <input
                         type="text"
-                        placeholder="快速新增任務... (Enter)"
+                        placeholder={t('quickAddEnterPlaceholder')}
                         value={quickAddTitle}
                         onChange={(e) => setQuickAddTitle(e.target.value)}
                     />
                     <button
                         type="button"
                         onClick={handleAddButtonClick}
-                        title={quickAddTitle.trim() ? "快速新增" : "開啟完整表單"}
+                        title={quickAddTitle.trim() ? t('quickAdd') : t('openFullForm')}
                         className="quick-add-submit-btn"
                     >
                         <i className={quickAddTitle.trim() ? "ri-add-fill" : "ri-file-add-line"}></i>
@@ -132,16 +136,16 @@ const TaskListModal = ({
                 </form>
 
                 <div className="task-modal-stats">
-                    <span className="stat-item">總計：{tasks.length}</span>
-                    <span className="stat-item">未完成：{tasks.filter(t => !t.completed).length}</span>
-                    <span className="stat-item">已完成：{tasks.filter(t => t.completed).length}</span>
+                    <span className="stat-item">{t('totalCount').replace('{count}', String(tasks.length))}</span>
+                    <span className="stat-item">{t('incompleteCount').replace('{count}', String(tasks.filter(task => !task.completed).length))}</span>
+                    <span className="stat-item">{t('completedCount').replace('{count}', String(tasks.filter(task => task.completed).length))}</span>
                 </div>
 
                 {tasks.length === 0 ? (
                     <div className="task-modal-empty">
                         <div className="empty-icon">📝</div>
-                        <h3>{selectedDate ? '這個日期還沒有任務' : '目前沒有待辦事項'}</h3>
-                        <p>{selectedDate ? '利用上方欄位快速新增，或點擊右側按鈕開啟詳細排程。' : '點擊上方按鈕開始添加您的第一個待辦吧！'}</p>
+                        <h3>{selectedDate ? t('emptyDateTitle') : t('emptyBacklogTitle')}</h3>
+                        <p>{selectedDate ? t('emptyDateHint') : t('emptyBacklogHint')}</p>
                     </div>
                 ) : (
                     <div className={`task-modal-items ${viewMode === 'sticky' ? 'sticky-wall' : ''}`}>

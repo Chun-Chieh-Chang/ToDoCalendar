@@ -45,9 +45,6 @@ export interface SettingsState {
     userAvatar?: string;
     deviceId?: string;
     categories: CategoryConfig[];
-    glassOpacity: number;
-    glassBlur: number;
-    borderOpacity: number;
 }
 
 export type Status = 'all' | 'completed' | 'pending';

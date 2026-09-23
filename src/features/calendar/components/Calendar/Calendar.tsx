@@ -4,7 +4,7 @@ import './Calendar.css';
 import { Task, CategoryConfig } from '../../../../types';
 import { useAppStore } from '../../../../store/useAppStore';
 import { getBestContrastForOverlay } from '../../../../shared/utils/contrastUtils';
-import { getTWHoliday } from '../../../../data/twHolidays';
+import { getTWHoliday, getHolidayDisplayName } from '../../../../data/twHolidays';
 
 interface CalendarProps {
   t: (key: string) => string;
@@ -30,6 +30,7 @@ const Calendar = ({
   theme: propTheme
 }: CalendarProps) => {
   const storeTheme = useAppStore(state => state.settings.theme);
+  const language = useAppStore(state => state.settings.language);
   const theme = propTheme || storeTheme || 'light';
   
   // 使用 useMemo 優化性能
@@ -99,7 +100,7 @@ const Calendar = ({
           const tasksForDay = getTasksForDate(day);
           const hasTasks = tasksForDay.length > 0;
           const holiday = isCurrentMonth ? getTWHoliday(dateStr) : null;
-          const holidayName = holiday?.name ?? null;
+          const holidayName = holiday ? getHolidayDisplayName(holiday, language) : null;
 
           // 懸停時顯示完整任務列表
           const taskListTooltip = tasksForDay.map((task: any) => {
@@ -113,8 +114,8 @@ const Calendar = ({
             const category = categories.find(c => c.id === task.category);
             if (category) {
               // Calculate text color based on the category color blended over the cell background.
-              // In dark mode, the effective background is a blend of surface-color over bg-color.
-              const baseBg = theme === 'dark' ? '#1E293B' : '#FFFFFF';
+              // Must mirror --surface-color in index.css for each theme.
+              const baseBg = theme === 'dark' ? '#1E2636' : '#ECF0F5';
               const textColor = getBestContrastForOverlay(category.color, baseBg, 0.2, '#111827', '#F1F5F9');
               
               return {

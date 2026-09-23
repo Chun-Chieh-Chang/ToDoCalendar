@@ -1,59 +1,25 @@
 .task-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.1);
-  border: 1px solid var(--border-glass);
-  border-radius: 20px;
+  background: var(--surface-color);
+  border: none;
+  border-radius: var(--neu-radius-lg);
   padding: 20px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 
-    var(--shadow-sm),
-    var(--inner-glow);
+  box-shadow: var(--neu-raised);
   display: flex;
   flex-direction: column;
 }
 
 .task-card:hover {
-  border-color: var(--primary-color);
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 
-    var(--shadow-premium),
-    var(--inner-glow);
-  background: var(--surface-color);
+  box-shadow: var(--neu-raised-lg);
 }
 
-.task-card::after {
-  content: "";
-  position: absolute;
-  top: -100%;
-  left: -100%;
-  width: 60px;
-  height: 300%;
-  background: rgba(255, 255, 255, 0.08);
-  transform: rotate(35deg);
-  pointer-events: none;
-  z-index: 10;
-}
-
-.task-card:hover::after {
-  animation: shine 1s ease-in-out;
-}
-
-.task-card.completed {
-  opacity: 0.6;
-  filter: grayscale(0.5);
-  background: var(--bg-color);
-}
-
-.task-card.completed::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #10B981, #34D399);
+/* Completed tasks sink into the surface */
+.task-card.completed,
+.task-card.completed:hover {
+  opacity: 0.75;
+  box-shadow: var(--neu-inset);
 }
 
 .task-card-header {
@@ -84,19 +50,19 @@
   height: 20px;
   width: 20px;
   background: var(--surface-color);
-  border: 2px solid var(--border-color);
+  border: none;
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--neu-inset-sm);
 }
 
 .task-checkbox input:checked+.checkbox-label {
-  background: #10B981;
-  border-color: #10B981;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  background: var(--success-color);
+  box-shadow: var(--neu-raised-sm);
   animation: checkmark 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -129,29 +95,33 @@
 }
 
 .task-checkbox input:hover+.checkbox-label {
-  border-color: #3498db;
   transform: scale(1.05);
 }
 
+.task-checkbox input:focus-visible+.checkbox-label {
+  box-shadow: var(--neu-inset-sm), var(--neu-focus);
+}
+
+/* Status-style pills (reference "Active / Pending / Done") */
 .task-priority {
   padding: 4px 12px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 900;
-  border: 1px solid transparent;
-  letter-spacing: 0.08em;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  border: none;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  box-shadow: var(--shadow-sm);
 }
 
 .task-category {
   padding: 4px 12px;
-  background: var(--bg-color);
+  background: var(--surface-color);
   color: var(--text-secondary);
-  border-radius: 8px;
-  font-size: 11px;
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 700;
-  border: 1px solid var(--border-color);
+  border: none;
+  box-shadow: var(--neu-inset-sm);
 }
 
 .task-actions {
@@ -160,31 +130,20 @@
   gap: 8px;
 }
 
-.action-btn {
-  background: none;
-  border: none;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+/* Round icon buttons; base neumorphic look comes from .action-btn in index.css */
+.task-actions .action-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: 50%;
   justify-content: center;
-  transition: all 0.2s ease;
   font-size: 16px;
-  color: var(--text-primary);
 }
 
-.action-btn:hover {
-  background: var(--bg-color);
-  transform: scale(1.1);
-}
-
-.action-btn:active {
-  transform: scale(0.9);
-  background: var(--accent-glow);
+.task-actions .delete-btn:hover {
+  color: var(--danger-color);
 }
 
 .task-quick-schedule {
@@ -196,24 +155,26 @@
 .task-quick-schedule button {
   padding: 6px 12px;
   background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border: none;
+  border-radius: 12px;
   font-size: 13px;
   font-weight: 700;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   display: flex;
   align-items: center;
   gap: 4px;
+  box-shadow: var(--neu-raised-sm);
 }
 
 .task-quick-schedule button:hover {
-  background: var(--primary-gradient);
-  color: white;
-  border-color: transparent;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px var(--accent-glow);
+  color: var(--primary-color);
+  box-shadow: var(--neu-raised);
+}
+
+.task-quick-schedule button:active {
+  box-shadow: var(--neu-inset-sm);
 }
 
 .task-content {
@@ -238,13 +199,14 @@
 }
 
 .subtask-badge {
-  background: #e0f2fe;
-  color: #0369a1;
-  padding: 2px 8px;
+  background: var(--surface-color);
+  color: var(--primary-color);
+  padding: 2px 10px;
   border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   white-space: nowrap;
+  box-shadow: var(--neu-inset-sm);
 }
 
 .task-card.completed .task-title {
@@ -261,11 +223,12 @@
 }
 
 .task-notes {
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  background: var(--surface-color);
+  border: none;
+  border-radius: 14px;
   padding: 12px;
   margin-top: 12px;
+  box-shadow: var(--neu-inset-sm);
 }
 
 .task-notes h4 {
@@ -290,60 +253,13 @@
   align-items: center;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid var(--border-color);
+  border-top: none;
+  box-shadow: 0 -2px 0 -1px var(--neu-shadow-light), 0 -1px 0 0 var(--neu-shadow-dark);
   font-size: 13px;
   color: var(--text-secondary);
   flex-wrap: wrap;
   gap: 8px;
   font-weight: 500;
-}
-
-/* Dark Mode Overrides for TaskCard */
-[data-theme="dark"] .task-card {
-  background: rgba(30, 41, 59, 0.4);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .task-card:hover {
-  background: rgba(30, 41, 59, 0.6);
-  border-color: var(--primary-color);
-}
-
-[data-theme="dark"] .task-title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .task-description {
-  color: var(--text-primary);
-  opacity: 0.8;
-}
-
-[data-theme="dark"] .task-notes h4 {
-  color: var(--text-primary);
-  opacity: 0.7;
-}
-
-[data-theme="dark"] .task-category {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: var(--text-primary) !important;
-  opacity: 0.9;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-[data-theme="dark"] .task-quick-schedule button {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .checkbox-label {
-  background: transparent;
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .subtask-badge {
-  background: rgba(3, 105, 161, 0.2);
-  color: #7dd3fc;
 }
 
 @media (max-width: 768px) {

@@ -8,24 +8,17 @@
     overflow-x: auto;
 }
 
+/* Columns are recessed lanes; the task cards inside stay raised */
 .kanban-column {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.1);
-    border-radius: 20px;
+    background: var(--surface-color);
+    border-radius: var(--neu-radius-lg);
     display: flex;
     flex-direction: column;
     min-width: 320px;
     max-height: calc(100vh - 200px);
-    border: 1px solid var(--border-glass);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 
-        var(--shadow-sm),
-        var(--inner-glow);
-}
-
-.kanban-column:hover {
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-md);
+    border: none;
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--neu-inset);
 }
 
 .column-header {
@@ -49,13 +42,14 @@
 }
 
 .task-count {
-    background: var(--bg-color);
-    color: var(--text-secondary);
+    background: var(--surface-color);
+    color: var(--primary-color);
     padding: 4px 12px;
-    border-radius: 10px;
-    font-size: 0.85rem;
+    border-radius: 999px;
+    font-size: 13px;
     font-weight: 700;
-    border: 1px solid var(--border-color);
+    border: none;
+    box-shadow: var(--neu-raised-sm);
 }
 
 .draggable-task-container {
@@ -73,19 +67,16 @@
 }
 
 .kanban-column.drag-over {
-    background: rgba(var(--primary-color-rgb, 59, 130, 246), 0.15);
-    border-color: var(--primary-color);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--neu-inset), var(--neu-focus);
 }
 
 .column-content {
-    padding: 12px;
+    padding: 12px 16px 20px;
     flex: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     min-height: 100px; /* Ensure drop target is always visible */
 }
 
@@ -96,12 +87,6 @@
 .draggable-task .task-card {
     margin: 0;
     pointer-events: auto;
-}
-
-/* Dark mode and general colors are handled via variables in App.css */
-[data-theme="dark"] .kanban-column {
-    background: var(--surface-color);
-    border-color: var(--border-color);
 }
 
 @media (max-width: 1024px) {

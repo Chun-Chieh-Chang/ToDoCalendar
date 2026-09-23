@@ -1,4 +1,35 @@
 
+## [2026-09-23] Neumorphic UI Redesign + Full zh-TW / en Localization
+
+### 1. 需求背景 (Plan)
+- 使用者提供「Inset Focus」新擬態參考截圖，要求套用至全介面（含深色模式、主色改為柔藍）。
+- 隨後要求：移除失效的玻璃效果滑桿、補齊缺漏翻譯、將所有寫死的中文改為 i18n。
+
+### 2. 實作 (Do)
+- **設計系統**：`index.css` 新增 `--neu-*` 陰影 token（凸起／凹陷／焦點／按下／浮層），淺色與深色各一組；舊的 `--shadow-*`、`--inner-glow` 映射至新 token。14 個元件 CSS 移除 backdrop-filter 與硬編碼色碼，改為僅引用 token。
+- **設定**：移除「視覺」分頁與 `glassOpacity` / `glassBlur` / `borderOpacity`（types、defaults、App.tsx 注入、CSS 變數）；`loadData` 清除舊欄位。
+- **i18n**：新增約 100 個鍵（zh-TW / en 各 232 鍵，完全對齊）；Settings、App、TaskForm、Filter、TaskListView、TaskListModal、ReminderModal、Dashboard、AppGuide 全面改用 `t()`；新增 `taskUtils.getCategoryLabel` 與 `getHolidayDisplayName`（假日英文名，含合併與補假規則）。
+
+### 3. 問題與根因 (RCA / CAPA)
+- **深色模式文字不可見**：`.app` 未設定 `color`，未自行指定顏色的文字繼承自 `[data-theme]` 範圍外的 `body`（淺色主題文字色）。→ `.app` 補上 `color: var(--text-primary)`。
+- **選英文無效**：語言選項值為 `en-US`，但翻譯表鍵為 `en`，查無後回退中文，且 `translations[language].months` 會取得 undefined。→ 選項改為 `en`，`loadData` 將舊值 `en-US` 遷移為 `en`。
+- **主題 token 未隨深色模式切換**：組合陰影變數若只宣告於 `:root`，會以淺色值解析後被繼承。→ 組合 token 宣告於 `:root, [data-theme]`，於主題範圍內重新解析。
+- **浮層白色光暈**：凸起陰影的亮面在暗色遮罩上形成光暈。→ 浮層改用獨立的 `--modal-shadow`。
+- **全域樣式污染**：`ReminderModal.css` 的 `.btn`、`@keyframes pulse` 影響全 App。→ 改為 `.reminder-actions .btn` 與 `reminder-pulse`。
+- **字級低於 13px**：手機底部導覽列以 inline style 寫死 10px。→ 移至 CSS，改為 13px。
+
+### 4. 驗收確認 (Check)
+- [x] 所有頁面淺色／深色：0 Console 錯誤
+- [x] 腳本檢測文字對比 ≥ 4.5:1（僅其他月份的淡化日期例外，屬 WCAG 豁免的非作用中元素）
+- [x] 桌面與 375px 手機寬度：0 個低於 13px 的文字、無水平捲動
+- [x] 英文模式下掃描所有頁面與對話框：0 個中文字串（語言選單「繁體中文」為刻意保留）
+- [x] 舊資料遷移實測：`en-US` → `en`、玻璃欄位被清除
+- [x] `npm run build` 成功
+- [ ] `tsc --noEmit` 仍有 44 個既有型別錯誤（變更前基準 45，未新增）；ESLint 設定本身無法執行，需另行處理
+
+### 5. 後續行動 (Act)
+- 修復既有 TypeScript 型別錯誤與 ESLint 設定，使型別檢查可納入驗收標準。
+
 ## [2026-09-17d] Documentation SSOT Sync (v1.4.0)
 
 ### 更新清單

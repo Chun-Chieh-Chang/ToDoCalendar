@@ -83,3 +83,32 @@ const TW_HOLIDAYS: Record<string, TaiwanHoliday> = {
 export function getTWHoliday(dateStr: string): TaiwanHoliday | null {
   return TW_HOLIDAYS[dateStr] ?? null;
 }
+
+// English names for the base holidays; combined ("A・B") and observed ("…補假")
+// names are derived from these, so each holiday is listed only once.
+const HOLIDAY_NAMES_EN: Record<string, string> = {
+  '開國紀念日': "New Year's Day",
+  '農曆除夕': "Lunar New Year's Eve",
+  '春節': 'Lunar New Year',
+  '和平紀念日': 'Peace Memorial Day',
+  '兒童節': "Children's Day",
+  '清明節': 'Tomb Sweeping Day',
+  '勞動節': 'Labor Day',
+  '端午節': 'Dragon Boat Festival',
+  '中秋節': 'Mid-Autumn Festival',
+  '國慶日': 'National Day',
+};
+
+const OBSERVED_SUFFIX = '補假';
+
+export function getHolidayDisplayName(holiday: TaiwanHoliday, language: string): string {
+  if (language !== 'en') return holiday.name;
+
+  const isObserved = holiday.name.endsWith(OBSERVED_SUFFIX);
+  const baseName = isObserved ? holiday.name.slice(0, -OBSERVED_SUFFIX.length) : holiday.name;
+  const english = baseName
+    .split('・')
+    .map(part => HOLIDAY_NAMES_EN[part] ?? part)
+    .join(' / ');
+  return isObserved ? `${english} (Observed)` : english;
+}

@@ -1,6 +1,7 @@
-/* 
+/*
  * ToDoCalendar - Design System Variables
- * Based on UI_Improved designs (Light & Dark Theme)
+ * Soft Neumorphism ("Inset Focus"): surfaces share the page colour and are
+ * shaped only by paired light/dark shadows. Raised = idle, inset = pressed/input.
  */
 
 :root {
@@ -19,32 +20,32 @@
   --font-xl: 42px;
   --font-xxl: 68px;
 
-  /* Artist's Palette (Ethereal Light) - Enhanced Contrast */
-  --bg-color: #f1f5f9; /* Soft Slate background for better glass contrast */
-  --surface-color: rgba(255, 255, 255, 0.8);
-  --primary-color: #3B82F6; /* Royal Blue as per Rule */
-  --primary-color-rgb: 59, 130, 246;
-  --primary-gradient: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  /* Neumorphic Palette (Light) - surface == background */
+  --bg-color: #ECF0F5;
+  --surface-color: #ECF0F5;
+  --primary-color: #3A64C8; /* Soft blue, 4.8:1 on --bg-color */
+  --primary-color-rgb: 58, 100, 200;
+  --primary-gradient: linear-gradient(135deg, #4870CE 0%, #3A64C8 100%); /* fills carrying white text */
+  --primary-gradient-soft: linear-gradient(90deg, #7B9BD1 0%, #5B8DEF 100%); /* bars, no text */
+  --on-primary: #FFFFFF;
+  --danger-gradient: linear-gradient(135deg, #CF3F3F 0%, #B83232 100%); /* fills carrying white text */
+  --success-color: #0B6E4C; /* 5.5:1 on --bg-color */
+  --warning-color: #9A4508; /* 5.7:1 on --bg-color */
+  --danger-color: #C53030;
 
-  --sidebar-bg: rgba(255, 255, 255, 0.85);
-  --text-primary: #111827;
-  --text-secondary: #4B5563; /* Darker secondary text for better readability */
-  --border-color: #E2E8F0;
-  --glass-rgb: 255, 255, 255;
-  --border-rgb: 255, 255, 255;
-  --glass-opacity: 0.18;
-  --border-opacity: 0.6;
-  --glass-bg: rgba(var(--glass-rgb), var(--glass-opacity)); 
-  --glass-bg-dark: rgba(var(--glass-rgb), var(--glass-opacity)); 
-  --glass-blur: 24px;
-  --border-glass: rgba(var(--border-rgb), var(--border-opacity));
-  --border-glass-strong: rgba(var(--border-rgb), calc(var(--border-opacity) + 0.2));
-  --accent-glow: rgba(59, 130, 246, 0.2);
-  /* The "Glass Order" Triple-Layer Edge: Highlight + Border + Subtle Shadow */
-  --inner-glow: 
-    inset 0 1px 1px rgba(255, 255, 255, 0.4),
-    0 0 0 1px var(--border-glass),
-    0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  --sidebar-bg: var(--bg-color);
+  --text-primary: #1F2A3C;
+  --text-secondary: #556072; /* 5.4:1 on --bg-color */
+  --text-tertiary: #8A94A6;
+  --border-color: rgba(163, 177, 198, 0.35);
+
+  /* Neumorphic shadow sources (composites are defined per theme scope below) */
+  --neu-shadow-dark: rgba(163, 177, 198, 0.6);
+  --neu-shadow-light: rgba(255, 255, 255, 0.9);
+  --neu-radius: 16px;
+  --neu-radius-lg: 24px;
+  --overlay-bg: rgba(31, 42, 60, 0.35);
+  --accent-glow: rgba(58, 100, 200, 0.14);
 
   /* Pigment Colors - Task Semantics */
   --task-blue-bg: #EFF6FF;
@@ -57,38 +58,38 @@
   --task-purple-text: #6B21A8;
 
   /* Priority Colors - Light */
+  /* text colours tuned for >= 4.5:1 on their pill backgrounds */
   --priority-high-bg: #fee2e2;
-  --priority-high-text: #dc2626;
+  --priority-high-text: #B91C1C;
   --priority-high-border: #fecaca;
   --priority-medium-bg: #fef3c7;
-  --priority-medium-text: #d97706;
+  --priority-medium-text: #92400E;
   --priority-medium-border: #fde68a;
   --priority-low-bg: #dcfce7;
-  --priority-low-text: #16a34a;
+  --priority-low-text: #166534;
   --priority-low-border: #bbf7d0;
-
-  --shadow-premium:
-    0 10px 30px -5px rgba(0, 0, 0, 0.05),
-    0 5px 15px -5px rgba(0, 0, 0, 0.02);
-
-  --glass-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 /* Dark Theme Variables */
 [data-theme="dark"] {
-  --bg-color: #0F172A; /* Deep Slate 900 */
-  --surface-color: rgba(30, 41, 59, 0.7); /* Slate 800 with glass */
-  --sidebar-bg: rgba(2, 6, 23, 0.85);
+  --bg-color: #1E2636;
+  --surface-color: #1E2636;
+  --sidebar-bg: var(--bg-color);
+  --primary-color: #8AADF4; /* text/accents on dark surfaces */
+  --primary-color-rgb: 138, 173, 244;
+  --success-color: #34D399;
+  --warning-color: #FBBF24;
+  --danger-color: #F87171;
 
   --text-primary: #F1F5F9; /* Slate 100 */
-  --text-secondary: #94A3B8; /* Slate 400 */
-  --border-color: rgba(255, 255, 255, 0.08);
-  --glass-rgb: 30, 41, 59;
-  --glass-bg: rgba(var(--glass-rgb), var(--glass-opacity));
-  --border-rgb: 255, 255, 255;
-  --border-glass: rgba(var(--border-rgb), var(--border-opacity));
-  --accent-glow: rgba(192, 132, 252, 0.15);
-  --inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  --text-secondary: #A3B0C2;
+  --text-tertiary: #6B7890;
+  --border-color: rgba(255, 255, 255, 0.06);
+  --accent-glow: rgba(138, 173, 244, 0.16);
+
+  --neu-shadow-dark: rgba(9, 13, 22, 0.7);
+  --neu-shadow-light: rgba(56, 70, 96, 0.45);
+  --overlay-bg: rgba(0, 0, 0, 0.55);
 
   --task-blue-bg: rgba(30, 58, 138, 0.5);
   --task-blue-text: #C7D2FE;
@@ -110,7 +111,30 @@
   --priority-low-text: #86efac;
   --priority-low-border: rgba(22, 163, 74, 0.4);
 
-  --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
+}
+
+/*
+ * Neumorphic shadow composites. Declared on both :root and [data-theme] so the
+ * var() references resolve against the active theme's shadow sources.
+ */
+:root,
+[data-theme] {
+  --neu-raised-sm: 3px 3px 7px var(--neu-shadow-dark), -3px -3px 7px var(--neu-shadow-light);
+  --neu-raised: 6px 6px 14px var(--neu-shadow-dark), -6px -6px 14px var(--neu-shadow-light);
+  --neu-raised-lg: 12px 12px 28px var(--neu-shadow-dark), -12px -12px 28px var(--neu-shadow-light);
+  --neu-inset-sm: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light);
+  --neu-inset: inset 4px 4px 9px var(--neu-shadow-dark), inset -4px -4px 9px var(--neu-shadow-light);
+  --neu-focus: 0 0 0 3px rgba(var(--primary-color-rgb), 0.35);
+  --neu-pressed-fill: inset 2px 2px 6px rgba(0, 0, 0, 0.25); /* pressed state for coloured fills */
+  /* Floating layers sit above a dim overlay, where a white highlight would read as a halo */
+  --modal-shadow: 0 24px 56px -12px rgba(0, 0, 0, 0.35), inset 1px 1px 0 var(--neu-shadow-light);
+
+  /* Legacy shadow tokens mapped onto the neumorphic scale */
+  --shadow-sm: var(--neu-raised-sm);
+  --shadow-md: var(--neu-raised);
+  --shadow-lg: var(--neu-raised-lg);
+  --shadow-premium: var(--neu-raised-lg);
+  --inner-glow: var(--neu-inset-sm);
 }
 
 :root {
@@ -134,13 +158,9 @@ html {
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
+  line-height: 1.5;
   color: var(--text-primary);
   background: var(--bg-color);
-  background-image:
-    radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.03) 0px, transparent 50%);
-  background-attachment: fixed;
   min-height: 100vh;
 }
 
@@ -182,7 +202,7 @@ h6 {
 
 .btn-primary {
   background: var(--primary-gradient);
-  color: white;
+  color: var(--on-primary);
   border: none;
   padding: 12px 28px;
   border-radius: 14px;
@@ -190,10 +210,8 @@ h6 {
   font-size: 15px;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
-    0 4px 15px var(--accent-glow),
-    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--neu-raised-sm);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -202,50 +220,45 @@ h6 {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px var(--accent-glow);
-  filter: brightness(1.1);
+  box-shadow: var(--neu-raised);
+  filter: brightness(1.06);
 }
 
 .btn-primary:active {
-  transform: translateY(0) scale(0.96);
-  box-shadow: 0 2px 8px var(--accent-glow);
+  box-shadow: var(--neu-pressed-fill);
 }
 
 .btn-secondary {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
+  background: var(--surface-color);
   color: var(--text-primary);
-  border: 1px solid var(--border-glass);
+  border: none;
   padding: 12px 24px;
   border-radius: 14px;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--neu-raised-sm);
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: var(--border-glass-strong);
-  transform: translateY(-1px);
+  color: var(--primary-color);
+  box-shadow: var(--neu-raised);
 }
 
 .btn-secondary:active {
-  transform: scale(0.96);
+  box-shadow: var(--neu-inset-sm);
 }
 
 .action-btn {
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
+  background: var(--surface-color);
   color: var(--text-secondary);
-  border: 1px solid var(--border-color);
+  border: none;
   padding: 8px 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -253,59 +266,54 @@ h6 {
   display: flex;
   align-items: center;
   gap: 8px;
+  box-shadow: var(--neu-raised-sm);
 }
 
 .action-btn:hover {
-  background: var(--surface-color);
-  border-color: var(--primary-color);
   color: var(--primary-color);
-  transform: translateY(-1px);
+  box-shadow: var(--neu-raised);
+}
+
+.action-btn:active {
+  box-shadow: var(--neu-inset-sm);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-  color: white;
-  box-shadow: 0 4px 16px rgba(231, 76, 60, 0.3);
+  background: var(--danger-gradient);
+  color: var(--on-primary);
+  box-shadow: var(--neu-raised-sm);
 }
 
 .btn-danger:hover {
-  background: linear-gradient(135deg, #c0392b, #a93226);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+  filter: brightness(1.06);
+  box-shadow: var(--neu-raised);
 }
 
-/* 表單元素通用樣式 */
+.btn-danger:active {
+  box-shadow: var(--neu-pressed-fill);
+}
+
+/* 表單元素通用樣式 - inset wells */
 .input,
 .select,
 .textarea {
   padding: 12px 16px;
-  border: 1px solid var(--border-glass); /* Standardized glass border */
+  border: none;
   border-radius: 14px;
   font-size: 14px;
-  background: var(--glass-bg); 
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.1); /* Using dynamic blur */
+  background: var(--surface-color);
   color: var(--text-primary);
-  box-shadow: var(--inner-glow);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--neu-inset);
+  transition: box-shadow 0.25s ease;
   font-family: inherit;
   width: 100%;
-}
-
-[data-theme="dark"] .input,
-[data-theme="dark"] .select,
-[data-theme="dark"] .textarea {
-  background: var(--glass-bg-dark);
 }
 
 .input:focus,
 .select:focus,
 .textarea:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 
-    0 0 0 4px var(--accent-glow),
-    var(--inner-glow);
-  background: var(--surface-color);
+  box-shadow: var(--neu-inset), var(--neu-focus);
 }
 
 .textarea {
@@ -315,72 +323,18 @@ h6 {
 
 /* 卡片通用樣式 */
 .card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.1);
+  background: var(--surface-color);
   border: none;
-  box-shadow: var(--inner-glow);
-  border-radius: 16px;
+  box-shadow: var(--neu-raised);
+  border-radius: var(--neu-radius-lg);
   padding: 20px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
 
 .card:hover {
-  border-color: var(--primary-color);
-  transform: translateY(-4px);
-  box-shadow: 
-    var(--shadow-premium),
-    var(--inner-glow);
-}
-
-.card::after {
-  content: "";
-  position: absolute;
-  top: -100%;
-  left: -100%;
-  width: 60px;
-  height: 300%;
-  background: rgba(255, 255, 255, 0.05);
-  transform: rotate(35deg);
-  pointer-events: none;
-}
-
-.card:hover::after {
-  animation: shine 1s ease-in-out;
-}
-
-/* 深色主題媒體查詢同步 */
-@media (prefers-color-scheme: dark) {
-  .input,
-  .select,
-  .textarea {
-    background: var(--glass-bg-dark);
-    border-color: var(--border-glass);
-    color: var(--text-primary);
-  }
-
-  .card {
-    background: var(--glass-bg-dark);
-    border-color: var(--border-glass);
-  }
-
-  .card:hover {
-    border-color: var(--border-glass-strong);
-  }
-}
-
-[data-theme="dark"] .input,
-[data-theme="dark"] .select,
-[data-theme="dark"] .textarea {
-  background: var(--glass-bg-dark);
-  border-color: var(--border-glass);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .card {
-  background: var(--glass-bg-dark);
-  border-color: var(--border-glass);
+  box-shadow: var(--neu-raised-lg);
 }
 
 /* Native Date/Time Picker Indicators Fix */
@@ -404,17 +358,6 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator:hover,
 [data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator:hover {
   filter: invert(1) opacity(1);
-}
-
-[data-theme="dark"] .btn-secondary {
-  background: #1E293B;
-  color: #F1F5F9;
-  border-color: #334155;
-}
-
-[data-theme="dark"] .btn-secondary:hover {
-  background: #334155;
-  color: #FFFFFF;
 }
 
 /* 響應式設計 */
@@ -454,23 +397,12 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--neu-shadow-dark);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-/* 深色主題滾動條 */
-@media (prefers-color-scheme: dark) {
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
+  background: var(--text-tertiary);
 }
 
 /* 動畫效果 */
@@ -537,20 +469,14 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 }
 
 *:focus-visible {
-  outline: 2px solid #667eea;
+  outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
 
 /* 文字選擇樣式 */
 ::selection {
-  background: rgba(102, 126, 234, 0.3);
+  background: rgba(var(--primary-color-rgb), 0.3);
   color: inherit;
-}
-
-@media (prefers-color-scheme: dark) {
-  ::selection {
-    background: rgba(102, 126, 234, 0.4);
-  }
 }
 
 /* 工具類 */
@@ -630,23 +556,24 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   align-items: center;
   gap: 16px;
   padding: 32px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  background: var(--surface-color);
+  border-radius: var(--neu-radius-lg);
+  box-shadow: var(--neu-raised-lg);
 }
 
 .loading-spinner .spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #3498db;
+  border: 4px solid transparent;
+  border-top-color: var(--primary-color);
+  box-shadow: var(--neu-inset-sm);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 .loading-spinner .text {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -661,16 +588,6 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   background: rgba(0, 0, 0, 0.5);
 }
 
-[data-theme="dark"] .loading-spinner {
-  background: #1f2937;
-  color: #e5e7eb;
-}
-
-[data-theme="dark"] .loading-spinner .spinner {
-  border-color: #374151;
-  border-top-color: #64b5f6;
-}
-
 /* 錯誤提示樣式 */
 .error-toast {
   position: fixed;
@@ -680,12 +597,13 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  background: #fee2e2;
-  border: 2px solid #fecaca;
-  border-radius: 12px;
-  color: #991b1b;
+  background: var(--surface-color);
+  border: none;
+  border-left: 4px solid var(--danger-color);
+  border-radius: var(--neu-radius);
+  color: var(--danger-color);
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  box-shadow: var(--neu-raised);
   z-index: 1000;
   animation: slideInRight 0.3s ease-out;
 }
@@ -699,14 +617,14 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: #991b1b;
+  color: var(--danger-color);
   padding: 4px;
   border-radius: 50%;
   transition: all 0.2s;
 }
 
 .error-close:hover {
-  background: rgba(153, 27, 27, 0.2);
+  box-shadow: var(--neu-inset-sm);
 }
 
 @keyframes slideInRight {
@@ -719,21 +637,6 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
     transform: translateX(0);
     opacity: 1;
   }
-}
-
-/* 深色主題錯誤提示 */
-[data-theme="dark"] .error-toast {
-  background: #1f2937;
-  border-color: #374151;
-  color: #fca5a5;
-}
-
-[data-theme="dark"] .error-close {
-  color: #fca5a5;
-}
-
-[data-theme="dark"] .error-close:hover {
-  background: rgba(252, 165, 165, 0.1);
 }
 
 .m-0 {

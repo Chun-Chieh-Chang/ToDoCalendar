@@ -3,6 +3,8 @@ import TaskCard from '../TaskCard/TaskCard';
 import Filter from '../Filter/Filter';
 import { Task } from '../../../../types';
 import { taskUtils } from '../../utils/taskUtils';
+import { useAppStore } from '../../../../store/useAppStore';
+import { useTranslation } from '../../../../utils/i18n';
 import './TaskListView.css';
 import { AnimatePresence } from 'framer-motion';
 
@@ -35,6 +37,8 @@ const TaskListView = ({
     title,
     viewMode = 'list'
 }: TaskListViewProps) => {
+    const language = useAppStore(state => state.settings.language);
+    const t = useTranslation(language);
     const [quickAddTitle, setQuickAddTitle] = (React as any).useState('');
     const [subTab, setSubTab] = (React as any).useState<'all' | 'scheduled' | 'pending'>('all');
 
@@ -62,14 +66,14 @@ const TaskListView = ({
                 <div className="header-info">
                     <h1>{title}</h1>
                     <div className="page-stats">
-                        <span className="stat-pill">總計：{subFilteredTasks.length}</span>
-                        <span className="stat-pill">待處理：{subFilteredTasks.filter(t => !t.completed).length}</span>
+                        <span className="stat-pill">{t('totalCount').replace('{count}', String(subFilteredTasks.length))}</span>
+                        <span className="stat-pill">{t('pendingCount').replace('{count}', String(subFilteredTasks.filter(task => !task.completed).length))}</span>
                     </div>
                 </div>
                 <div className="header-actions">
                     {onClearCompleted && subFilteredTasks.some(t => t.completed) && (
                         <button className="clear-completed-btn" onClick={onClearCompleted}>
-                            <i className="ri-delete-bin-line"></i> 清除已完成
+                            <i className="ri-delete-bin-line"></i> {t('clearCompleted')}
                         </button>
                     )}
                 </div>
@@ -81,19 +85,19 @@ const TaskListView = ({
                     className={`subtab-btn ${subTab === 'all' ? 'active' : ''}`}
                     onClick={() => setSubTab('all')}
                 >
-                    <i className="ri-stack-line"></i> 全部
+                    <i className="ri-stack-line"></i> {t('tabAll')}
                 </button>
                 <button 
                     className={`subtab-btn ${subTab === 'scheduled' ? 'active' : ''}`}
                     onClick={() => setSubTab('scheduled')}
                 >
-                    <i className="ri-calendar-todo-line"></i> 已排程
+                    <i className="ri-calendar-todo-line"></i> {t('tabScheduled')}
                 </button>
                 <button 
                     className={`subtab-btn ${subTab === 'pending' ? 'active' : ''}`}
                     onClick={() => setSubTab('pending')}
                 >
-                    <i className="ri-lightbulb-line"></i> 靈感待辦
+                    <i className="ri-lightbulb-line"></i> {t('pendingList')}
                 </button>
             </div>
 
@@ -109,7 +113,7 @@ const TaskListView = ({
                 <form className="quick-add-form" onSubmit={handleQuickAdd}>
                     <input
                         type="text"
-                        placeholder="快速新增任務... (可使用 !high #work @14:00 等標籤)"
+                        placeholder={t('quickAddTagsPlaceholder')}
                         value={quickAddTitle}
                         onChange={(e) => setQuickAddTitle(e.target.value)}
                     />
@@ -124,10 +128,10 @@ const TaskListView = ({
                             {subTab === 'pending' ? '💡' : subTab === 'scheduled' ? '📅' : '📝'}
                         </div>
                         <h3>
-                            {subTab === 'pending' ? '目前沒有靈感任務' : 
-                             subTab === 'scheduled' ? '尚未排定任何日程' : '目前沒有任務'}
+                            {subTab === 'pending' ? t('emptyPendingTitle') :
+                             subTab === 'scheduled' ? t('emptyScheduledTitle') : t('emptyAllTitle')}
                         </h3>
-                        <p>開始規劃您的第一項任務吧！</p>
+                        <p>{t('emptyStartHint')}</p>
                     </div>
                 ) : (
                     <div className={`task-grid ${viewMode === 'sticky' ? 'sticky-wall' : 'list-view'}`}>
