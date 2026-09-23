@@ -13,6 +13,7 @@
 - `fix(pwa)`（Service Worker）：**RCA** — `main.tsx` 在開發模式也註冊 cache-first 的 Service Worker，攔截並快取 Vite 的原始碼模組，導致修改後重新整理仍執行舊程式碼（本輪驗證中兩度誤判的根因）；Electron 的 file:// 亦無法註冊。**CAPA** — 僅在正式建置且非 file:// 時註冊；開發模式主動解除既有註冊。實測開發模式 0 個註冊、正式建置仍含註冊、Electron 正常掛載。
 - `refactor(version)`：**RCA** — 版本號散落四處且不一致（`package.json` 1.4.0；側欄、設定頁尾、匯出檔寫死 1.3.0）；側欄開發者署名寫死且與 i18n `developer` 鍵內容不同。**CAPA** — `vite.config` 以 `define` 注入 `__APP_VERSION__`（唯一來源：`package.json`），三處改引用；署名統一使用 `developer` 鍵。
 - `chore(i18n)`：移除 44 個無任何引用的翻譯鍵（兩語系各 44 行，含 6 個因此清空的分節註解）；動態引用（優先級、分類）已排除。鍵數 232 → 188，兩語系完全對齊（單元測試守護）。
+- `chore(css)`：以 postcss 解析移除「必要 class 從未出現在程式碼中」的選擇器（`:not()` 內的 class 不計），約 830 行：未使用的工具類（index.css 約 100 個）、已不存在的頭像／分類管理 UI、未使用的 TaskListModal/TaskListView 舊樣式。另移除 17 個未使用的 CSS 變數（含上一輪保留的舊陰影別名）、未使用的 `shine`/`slideIn` 動畫，以及被 `index.css`（最後載入者勝出）遮蔽的重複 `fadeIn`/`pulse` 定義（視覺零變化）。**順帶修正**：空狀態引用未定義的 `--space-xxxl`（整條宣告失效），改為 `--space-xxl`。瀏覽器核心流程＋各頁新擬態陰影探針全數通過。
 
 ## [2026-09-23] Neumorphic UI Redesign + Full zh-TW / en Localization
 

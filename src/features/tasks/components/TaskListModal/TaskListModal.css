@@ -35,12 +35,6 @@
   margin: 0 0 var(--space-lg);
 }
 
-.task-modal-body {
-  padding: 20px 28px 28px;
-  overflow-y: auto;
-  flex: 1;
-}
-
 /* Inset well, like the reference search field */
 .task-modal-quick-add {
   display: flex;
@@ -145,28 +139,6 @@
   margin-right: auto;
 }
 
-.empty-add-btn {
-  padding: var(--space-md) var(--space-xl);
-  background: var(--primary-gradient);
-  color: var(--on-primary);
-  border: none;
-  border-radius: 14px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--neu-raised);
-}
-
-.empty-add-btn:hover {
-  box-shadow: var(--neu-raised-lg);
-  filter: brightness(1.06);
-}
-
-.empty-add-btn:active {
-  box-shadow: var(--neu-pressed-fill);
-}
-
 .task-modal-items {
   display: flex;
   flex-direction: column;
@@ -195,21 +167,6 @@
 
 /* 響應式設計 */
 @media (max-width: 768px) {
-  .task-modal-overlay {
-    padding: 12px;
-  }
-
-  .task-modal-content {
-    max-height: 90vh;
-    border-radius: 20px;
-  }
-
-  .task-modal-header {
-    padding: 20px;
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
-  }
 
   .task-modal-header-actions {
     width: 100%;
@@ -225,36 +182,10 @@
     background-image: none;
   }
 
-  .task-modal-body {
-    padding: 16px 20px 24px;
-  }
-
   .task-modal-stats {
     flex-direction: column;
     gap: 8px;
   }
 }
 
-@media (max-width: 480px) {
-  .task-modal-add-btn span {
-    display: none;
-  }
-
-  .task-modal-add-btn {
-    padding: 10px 14px;
-  }
-}
-
 /* 滾動條樣式 */
-.task-modal-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.task-modal-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.task-modal-body::-webkit-scrollbar-thumb {
-  background: var(--neu-shadow-dark);
-  border-radius: 3px;
-}

@@ -80,15 +80,6 @@
     min-height: 100px; /* Ensure drop target is always visible */
 }
 
-.draggable-task:active {
-    cursor: grabbing;
-}
-
-.draggable-task .task-card {
-    margin: 0;
-    pointer-events: auto;
-}
-
 @media (max-width: 1024px) {
     .kanban-board {
         grid-template-columns: 1fr;

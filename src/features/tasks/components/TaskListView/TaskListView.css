@@ -44,21 +44,6 @@
     box-shadow: var(--neu-inset-sm);
 }
 
-.add-task-btn {
-    padding: var(--space-sm) var(--space-lg);
-    background: var(--primary-gradient);
-    color: var(--on-primary);
-    border: none;
-    border-radius: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: var(--neu-raised-sm);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 .header-actions {
     display: flex;
     gap: var(--space-md);
@@ -87,15 +72,6 @@
 
 .clear-completed-btn:active {
     box-shadow: var(--neu-inset-sm);
-}
-
-.add-task-btn:hover {
-    box-shadow: var(--neu-raised);
-    filter: brightness(1.06);
-}
-
-.add-task-btn:active {
-    box-shadow: var(--neu-pressed-fill);
 }
 
 /* 子分頁切換器 - raised tray, active tab pressed in (reference "All / Active / Done") */
@@ -248,7 +224,7 @@
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: var(--space-xxxl) 0;
+    padding: var(--space-xxl) 0;
 }
 
 .empty-illustration {

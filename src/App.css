@@ -228,14 +228,6 @@ body {
   gap: 20px;
 }
 
-.month-title {
-  font-size: var(--font-lg);
-  /* Golden Ratio */
-  font-weight: 800;
-  color: var(--text-primary);
-  letter-spacing: -0.03em;
-}
-
 .date-dropdowns {
   display: flex;
   gap: 12px;
@@ -324,21 +316,6 @@ body {
 
 .btn-today:active {
   box-shadow: var(--neu-inset-sm);
-}
-
-.btn-add {
-  background: var(--primary-gradient);
-  color: var(--on-primary);
-  box-shadow: var(--neu-raised-sm);
-  padding: 12px 28px;
-  font-size: 15px;
-  border-radius: 14px;
-}
-
-.btn-add:hover {
-  color: var(--on-primary);
-  box-shadow: var(--neu-raised);
-  filter: brightness(1.06);
 }
 
 /* Calendar Wrapper */
@@ -450,18 +427,6 @@ body {
 /* ============================================
    Animations
    ============================================ */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .calendar-wrapper {
   animation: fadeIn 0.5s ease-out;
 }
@@ -525,39 +490,6 @@ body {
 }
 
 /* Loading overlay / spinner styles live in index.css */
-
-@keyframes shine {
-  0% {
-    left: -100%;
-    top: -100%;
-  }
-
-  100% {
-    left: 100%;
-    top: 100%;
-  }
-}
-
-.shine-effect {
-  position: relative;
-  overflow: hidden;
-}
-
-.shine-effect::after {
-  content: "";
-  position: absolute;
-  top: -100%;
-  left: -100%;
-  width: 40px;
-  height: 300%;
-  background: rgba(255, 255, 255, 0.1);
-  transform: rotate(35deg);
-  pointer-events: none;
-}
-
-.shine-effect:hover::after {
-  animation: shine 0.8s ease-in-out;
-}
 
 .text {
   font-weight: 500;
@@ -648,10 +580,6 @@ body {
     padding-bottom: 80px; /* Space for mobile nav */
   }
 
-  .app-container {
-    padding-bottom: 70px;
-  }
-
   .calendar-header {
     flex-direction: column;
     gap: 16px;
@@ -660,10 +588,6 @@ body {
 
   .month-selector {
     justify-content: space-between;
-  }
-
-  .month-title {
-    font-size: 24px;
   }
 
   .header-actions {
@@ -693,10 +617,6 @@ body {
 @media (max-width: 480px) {
   .main-content {
     padding: 12px;
-  }
-
-  .month-title {
-    font-size: 20px;
   }
 
   .calendar-wrapper {
