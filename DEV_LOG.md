@@ -12,6 +12,7 @@
 - `fix(task-form)`：**RCA** — (1) `TaskForm` 的重設只在 `initialTask`/`selectedDate` 改變時執行且僅重設部分欄位，儲存後再按「新增任務」會帶入上一筆的標題、描述、優先級、時間與記事；(2) 關閉表單未清除 `editingTask`，取消編輯後按「新增任務」或快速新增會開成「編輯任務」並覆寫舊任務。**CAPA** — 每次開啟表單都以 `emptyForm()` 重新初始化；App 統一以 `closeTaskForm()`（一律清除編輯目標）與 `openNewTaskForm()` 開關表單（側欄、手機底欄、N 快捷鍵、Esc、儲存後）。瀏覽器實測三種情境皆正確。
 - `fix(pwa)`（Service Worker）：**RCA** — `main.tsx` 在開發模式也註冊 cache-first 的 Service Worker，攔截並快取 Vite 的原始碼模組，導致修改後重新整理仍執行舊程式碼（本輪驗證中兩度誤判的根因）；Electron 的 file:// 亦無法註冊。**CAPA** — 僅在正式建置且非 file:// 時註冊；開發模式主動解除既有註冊。實測開發模式 0 個註冊、正式建置仍含註冊、Electron 正常掛載。
 - `refactor(version)`：**RCA** — 版本號散落四處且不一致（`package.json` 1.4.0；側欄、設定頁尾、匯出檔寫死 1.3.0）；側欄開發者署名寫死且與 i18n `developer` 鍵內容不同。**CAPA** — `vite.config` 以 `define` 注入 `__APP_VERSION__`（唯一來源：`package.json`），三處改引用；署名統一使用 `developer` 鍵。
+- `chore(i18n)`：移除 44 個無任何引用的翻譯鍵（兩語系各 44 行，含 6 個因此清空的分節註解）；動態引用（優先級、分類）已排除。鍵數 232 → 188，兩語系完全對齊（單元測試守護）。
 
 ## [2026-09-23] Neumorphic UI Redesign + Full zh-TW / en Localization
 
