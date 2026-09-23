@@ -6,6 +6,7 @@
 - `chore(repo)`：**資安／隱私** — `backup/todo_calendar_backup.json`（1.5MB 真實使用者任務資料）在 `backup/` 納入 `.gitignore` 之前已被追蹤入庫，存在個資外洩風險。以 `git rm --cached` 解除追蹤（本地檔案保留），後續受 `.gitignore` 保護。註：歷史版本中仍可取得該檔，如需徹底抹除須另行 rewrite history（本次保留歷史以維持可回溯基準）。
 - `fix(contrast)`：**RCA** — `parseHexColor` 的 8 位 hex（RRGGBBAA）分支解析了 RGB 卻直接丟棄 alpha 通道，半透明 hex 色會被視為全不透明。**CAPA** — 解析第 7-8 位為 alpha（0-1，精度至小數三位）；回歸測試同步由「忽略 alpha」行為錨點改為驗證正確解析。
 - `fix(settings)`：**RCA** — `storageService.importData` 為 async 函數，但 Settings 的匯入 handler 未 `await`，回傳的 Promise 恆為 truthy，導致（1）匯入失敗（格式錯誤）也誤報「匯入成功」；（2）`window.location.reload()` 在 IndexedDB 寫入完成前觸發，存在資料遺失風險。**CAPA** — `reader.onload` 改為 async 並 await 實際結果，成功才提示並 reload，失敗顯示失敗訊息。
+- `fix(kanban)`：**RCA** — Framer Motion 將 `onDragStart` / `onDragEnd` 視為自家手勢 props 攔截，僅在設定 `drag` prop 時才會觸發；看板卡片未啟用 framer 拖曳，導致這兩個 handler 從不綁定到 DOM，原生 HTML5 拖放（拖卡片改狀態）靜默失效，連帶造成 `React.DragEvent` 與 framer `PointerEvent` 的型別衝突。**CAPA** — 改用 capture 階段 handler（`onDragStartCapture` / `onDragEndCapture`），非 framer 保留字，會正常轉發為原生 React 事件，`dataTransfer` 型別亦同時吻合；欄位側的 `onDragOver` / `onDrop` 本為原生 div，不受影響。
 
 ## [2026-09-23b] Project-Wide Audit, Cleanup & Security Pass
 

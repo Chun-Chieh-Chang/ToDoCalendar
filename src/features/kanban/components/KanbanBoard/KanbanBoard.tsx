@@ -126,8 +126,8 @@ const KanbanBoard = ({
                                             layout: { duration: 0.3 }
                                         }}
                                         draggable
-                                        onDragStart={(e) => handleDragStart(e, task.id)}
-                                        onDragEnd={handleDragEnd}
+                                        onDragStartCapture={(e) => handleDragStart(e, task.id)}
+                                        onDragEndCapture={handleDragEnd}
                                         className="draggable-task-container"
                                     >
                                         <TaskCard
