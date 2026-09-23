@@ -7,6 +7,7 @@
 
 ### 原子提交紀錄
 - `test`：導入 Vitest，新增 6 個測試檔（NLP 解析、任務篩選／排序、日期、i18n 鍵對齊、國定假日、Store 動作與資料遷移）；基準 58 通過 + 1 個已知缺陷（`it.fails`）。瀏覽器核心流程 15 項基準全數通過。
+- `fix(electron)`：**RCA** — `vite.config` 的 `base: '/ToDoCalendar/'` 使產出的 `index.html` 以絕對路徑引用資源，Electron 以 `loadFile`（file://）載入時解析到磁碟根目錄，JS/CSS 全數 404，桌面版白畫面。**CAPA** — 改為相對 `base: './'`，Pages 與 Electron 共用同一份建置（無客戶端路由，相對路徑安全）。以隱藏 Electron 視窗實測：修正前 React 未掛載、2 個請求失敗；修正後掛載成功、35 格日曆、0 失敗請求。
 
 ## [2026-09-23] Neumorphic UI Redesign + Full zh-TW / en Localization
 
