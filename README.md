@@ -63,6 +63,14 @@ release\ToDoCalendar-Portable.exe
    ```
    不設定 `.env` 時，應用程式以純離線模式運行。
 
+6. **品質檢查（提交前必跑）**
+   ```bash
+   npm test          # Vitest 測試（8 檔 85 項）
+   npm run lint      # ESLint（0 錯誤 0 警告為通過門檻）
+   npx tsc --noEmit  # TypeScript 型別檢查（0 錯誤為通過門檻）
+   npm run build     # 生產建置
+   ```
+
 ## 🛠 技術棧
 
 | 層級 | 技術 |
@@ -75,7 +83,9 @@ release\ToDoCalendar-Portable.exe
 | Desktop | Electron 33 + Electron Builder |
 | Animations | Framer Motion 12 |
 | Icons | Remixicon 4 |
-| i18n | 自建（zh-TW / en，230+ keys） |
+| i18n | 自建（zh-TW / en，270+ keys） |
+| Testing | Vitest + Testing Library（85 tests） |
+| Lint | ESLint 8（legacy `.eslintrc.cjs`） |
 
 ## 📁 專案結構
 
@@ -91,7 +101,7 @@ ToDoCalendar/
 │   ├── data/
 │   │   └── twHolidays.ts           # Taiwan national holidays 2024–2027
 │   ├── utils/
-│   │   ├── i18n.ts                 # Translation (230+ keys, zh-TW / en)
+│   │   ├── i18n.ts                 # Translation (270+ keys, zh-TW / en)
 │   │   └── nlpUtils.ts             # NLP task parsing
 │   ├── services/
 │   │   ├── storage.ts              # Dexie CRUD + localStorage migration + Supabase sync
@@ -101,7 +111,7 @@ ToDoCalendar/
 │   │   └── useKeyboardShortcuts.ts # Global shortcuts
 │   ├── shared/
 │   │   ├── components/Modal/       # Reusable modal with spring animations
-│   │   └── utils/                  # dateUtils, contrastUtils, notificationUtils
+│   │   └── utils/                  # dateUtils, contrastUtils, notificationUtils (+ unit tests)
 │   └── features/
 │       ├── calendar/               # Month grid + task previews + holiday markers
 │       ├── tasks/                  # Task CRUD, filter, cards, list views

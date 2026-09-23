@@ -1,7 +1,7 @@
 # ToDoCalendar Consolidated Documentation
 
 > **Current Version:** v1.4.0 (2026-09-17)
-> **Latest Update:** 2026-09-23 — Neumorphic UI redesign, full zh-TW / en localization, glass settings removed
+> **Latest Update:** 2026-09-23 — Repo hygiene audit: quality gates restored (tsc/lint clean, 85 tests), Kanban drag fix, user backup untracked
 
 ## Table of Contents
 1. [Current Architecture Overview](#current-architecture-overview)
@@ -26,7 +26,9 @@
 | Desktop | Electron 33 |
 | Animations | Framer Motion 12 |
 | Icons | Remixicon 4 |
-| i18n | Custom (zh-TW / en) |
+| i18n | Custom (zh-TW / en, 270+ keys) |
+| Testing | Vitest + Testing Library (85 tests) |
+| Lint | ESLint 8 (legacy `.eslintrc.cjs`) |
 
 ### Project Structure
 ```
@@ -39,7 +41,7 @@ ToDoCalendar/
 │   ├── store/useAppStore.ts        # Zustand store: tasks, settings, filter
 │   ├── types/index.ts              # Core type definitions
 │   ├── utils/
-│   │   ├── i18n.ts                 # Translation (230+ keys, zh-TW / en)
+│   │   ├── i18n.ts                 # Translation (270+ keys, zh-TW / en)
 │   │   └── nlpUtils.ts             # NLP task parsing (priority, category, time, date)
 │   ├── services/
 │   │   ├── storage.ts              # Dexie CRUD + localStorage migration + Supabase sync
@@ -49,7 +51,7 @@ ToDoCalendar/
 │   │   └── useKeyboardShortcuts.ts # Global shortcuts (1-4, N, /, T, Esc)
 │   ├── shared/
 │   │   ├── components/Modal/       # Reusable modal with spring animations
-│   │   └── utils/                  # Date, contrast, notification utilities
+│   │   └── utils/                  # Date, contrast, notification utilities (+ unit tests)
 │   ├── data/
 │   │   └── twHolidays.ts           # Taiwan national holidays 2024–2027
 │   └── features/
@@ -66,6 +68,18 @@ ToDoCalendar/
 ├── backup/                         # JSON data backup files
 └── docs/                           # Documentation
 ```
+
+### Quality Gates
+Local gate that must pass before every commit / deploy (`deploy.yml` runs tests + build on push to `main`):
+| Command | Pass Criteria |
+|---------|---------------|
+| `npm test` | Vitest — 8 files / 85 tests, all green |
+| `npx tsc --noEmit` | 0 type errors (strict) |
+| `npm run lint` | 0 errors, 0 warnings (`--max-warnings 0`) |
+| `npm run build` | Vite production build succeeds |
+
+Test suites: `contrastUtils`, `dateUtils`, `taskUtils`, `i18n`, `nlpUtils`, `storage`, `db`, `useAppStore`.
+Pre-commit hook additionally requires a `DEV_LOG.md` entry per commit.
 
 ### Neumorphic Design System ("Inset Focus")
 - **Principle**: surfaces share the page colour (`--surface-color` = `--bg-color`) and are shaped only by paired light/dark shadows. Raised = idle; inset = pressed, selected, inputs and progress tracks.
@@ -655,6 +669,27 @@ ToDo/
 ## Recent Updates Log
 
 # 近期更新日誌
+
+## 2026-09-23: Repo Hygiene Audit — Dead-Code Cleanup, Quality Gates Restored
+
+### 死碼與隱私清理
+- 移除 `contrastUtils.ts` 11 個無引用匯出（HSLColor、checkContrastCompliance 等）；補上 19 項回歸測試，測試總數 66 → 85。
+- 移除死引用：App 未使用的 `storageService` import 與 `handleReorderTasks`、Calendar 未使用的 `onMonthChange` prop、Kanban 未使用的 `onReorder` prop、`storage.ts` 死屬性 `storageKey`。
+- `git rm --cached backup/todo_calendar_backup.json` — 1.5MB 使用者資料本應被 `backup/` gitignore 規則排除卻長期被追蹤，存在隱私風險；已取消追蹤（歷史中仍存，完整抹除需 rewrite history，暫緩執行）。
+
+### 潛在 Bug 修復
+- `parseHexColor` 8 位 hex（`#RRGGBBAA`）先前靜默丟棄 alpha 通道，現正確解析。
+- `Settings.tsx` 資料匯入未 `await` 非同步的 `importData`：匯入永遠回報成功且在 IndexedDB 寫入完成前就重載資料，已修正。
+- 看板拖曳失效：framer-motion `motion.div` 的 `onDragStart`/`onDragEnd` props 攔截原生 HTML5 DnD 事件，改掛 `onDragStartCapture`/`onDragEndCapture` 恢復拖曳。
+
+### 品質閘門恢復
+- `tsc --noEmit`：45 → 0 錯誤（移除 `(React as any)` 反模式 ×6、對齊 `Date`/`string` 事件型別、收窄 `TaskCard.onDelete` 為 `string`、收窄 `catch` unknown）。
+- ESLint：flat `eslint.config.js` 引用未安裝套件且與 `--ext` 不相容，完全無法執行；改用 legacy `.eslintrc.cjs`（零新增依賴），`npm run lint` 現為 0 錯誤 0 警告。
+
+### 驗證
+- ✅ 85 tests all pass / ✅ tsc 0 errors / ✅ lint 0 problems / ✅ `vite build` 成功。
+
+---
 
 ## 2026-09-23: Neumorphic UI Redesign + Full Localization
 
