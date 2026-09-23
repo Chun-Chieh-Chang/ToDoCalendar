@@ -270,6 +270,8 @@ const App = () => {
         };
         dispatch({ type: 'ADD_TASK', payload: newTask });
       }
+      // Timed tasks trigger reminders; ask for permission inside this user gesture
+      if (taskData.time) void notificationUtils.requestPermission();
       setShowTaskForm(false);
       setEditingTask(undefined);
     } catch (err) {

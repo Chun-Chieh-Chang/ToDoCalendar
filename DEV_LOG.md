@@ -8,6 +8,7 @@
 ### 原子提交紀錄
 - `test`：導入 Vitest，新增 6 個測試檔（NLP 解析、任務篩選／排序、日期、i18n 鍵對齊、國定假日、Store 動作與資料遷移）；基準 58 通過 + 1 個已知缺陷（`it.fails`）。瀏覽器核心流程 15 項基準全數通過。
 - `fix(electron)`：**RCA** — `vite.config` 的 `base: '/ToDoCalendar/'` 使產出的 `index.html` 以絕對路徑引用資源，Electron 以 `loadFile`（file://）載入時解析到磁碟根目錄，JS/CSS 全數 404，桌面版白畫面。**CAPA** — 改為相對 `base: './'`，Pages 與 Electron 共用同一份建置（無客戶端路由，相對路徑安全）。以隱藏 Electron 視窗實測：修正前 React 未掛載、2 個請求失敗；修正後掛載成功、35 格日曆、0 失敗請求。
+- `fix(pwa)`：**RCA** — `notificationUtils.requestPermission` 從未被呼叫，網頁／PWA 版權限永遠停在 `default`，提醒只出現在 App 內彈窗、不會推送桌面通知；通知圖示使用 `/icon-512.png` 絕對路徑，在 Pages 子路徑下 404；`send()` 直接讀取 `Notification.permission`，在無 Notification API 的瀏覽器會拋錯。**CAPA** — 儲存「有設定時間」的任務時（使用者手勢內）請求權限；已拒絕則不再詢問；Electron 直接走原生通知；圖示改相對路徑；`send()` 加上 API 存在檢查。新增 7 個單元測試。
 
 ## [2026-09-23] Neumorphic UI Redesign + Full zh-TW / en Localization
 
