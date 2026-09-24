@@ -11,7 +11,7 @@
     ],
     "win": {
         "target": "portable",
-        "icon": "electron/icon.ico",
+        "icon": "public/icon-512.png",
         "signAndEditExecutable": false
     },
     "portable": {
