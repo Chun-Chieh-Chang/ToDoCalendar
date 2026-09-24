@@ -12,6 +12,7 @@
 - `fix(i18n)`：**RCA** — 介面文案與實際行為矛盾：提示列、月曆 tooltip、使用說明與小撇步皆寫「雙擊／Double-click」，但日期格實為**單擊**即開啟當日任務清單；使用說明宣稱「資料絕不流向雲端」，與選用的 Supabase 雲端同步不符；歡迎任務誤寫「編輯此地標」。**CAPA** — 兩語系文案改為與行為一致；鍵名 `doubleClickToTaskList` → `clickToTaskList`、App/Calendar 的 `onDateDoubleClick` → `onDateOpen`，避免命名再誤導；移除 i18n 檔頭過期的「Last Updated」日期（以 git 為準）。
 - `fix(dates)`：**RCA** — 多處以 `toISOString().split('T')[0]` 取「今天」，得到的是 **UTC** 日期；在台灣（UTC+8）00:00–08:00 之間會變成昨天：影響任務卡「排到今日／明天」、表單取消待辦時的預設日期、NLP `^today`/`^tomorrow`。`T` 快捷鍵更把完整 ISO 時間戳（含時分秒）寫入 `selectedDate`，與其餘 `yyyy-MM-dd` 格式不一致。NLP 日期正規式 `\^(\w+|20\d{2}-…)` 先嘗試 `\w+`，只吃到年份，`^2025-01-01` 永遠無法解析。循環任務以 `new Date('YYYY-MM-DD')`（UTC 午夜）推算下一次日期，雖因兩次 UTC 轉換互相抵銷而結果正確，但屬脆弱寫法。**CAPA** — 日曆日期一律改用本地的 `dateUtils.dateToString`；循環任務改以本地年月日建構 Date；正規式改為日期優先。原 `it.fails` 已知缺陷轉為正式測試，新增 01:00 邊界測試（兩者在舊程式碼上確認會失敗）。瀏覽器實測：`T` 後 selectedDate 為 `yyyy-MM-dd`、「排到今日」寫入本地日期、看板拖放可正確改變狀態。
 - `chore(pwa)`：PWA manifest 與 `<meta theme-color>` 仍為舊主題色（`#3B82F6` / 深色 `#0F172A` 啟動畫面），與新擬態淺色主題不一致；改為 `--primary-color` `#3A64C8` 與 `--bg-color` `#ECF0F5`。
+- `ci`：**RCA** — 文件宣稱「`deploy.yml` 在推送 `main` 時執行測試＋建置」，實際工作流程只有 `npm ci` 與 `build`，品質閘門未進入 CI，失敗的變更仍會部署上線。**CAPA** — 部署前依序執行 `npm test`、`tsc --noEmit`、`npm run lint`，任一失敗即中止部署；使文件描述成為事實。
 
 ## [2026-09-23c] Type Safety, Lint Restoration, Privacy & Final Doc Sync
 
