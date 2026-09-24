@@ -4,8 +4,8 @@
   "description": "Premium Productivity Calendar & Task Manager",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0F172A",
-  "theme_color": "#3B82F6",
+  "background_color": "#ECF0F5",
+  "theme_color": "#3A64C8",
   "icons": [
     {
       "src": "icon-512.png",
