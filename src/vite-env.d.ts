@@ -12,3 +12,6 @@ interface ImportMeta {
 
 /** App version injected from package.json by vite.config.ts */
 declare const __APP_VERSION__: string;
+
+/** Unique per build (version + timestamp), used to version the service worker cache */
+declare const __BUILD_ID__: string;

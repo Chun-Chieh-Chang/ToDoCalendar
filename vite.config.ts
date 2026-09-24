@@ -8,6 +8,8 @@ export default defineConfig({
   // package.json is the single source of truth for the app version
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
+    // Unique per build: versions the service worker so every deploy replaces its cache
+    __BUILD_ID__: JSON.stringify(`${pkg.version}-${Date.now().toString(36)}`),
   },
   // Relative base: the same build works under GitHub Pages (/ToDoCalendar/)
   // and in Electron, which loads dist/index.html via file://
