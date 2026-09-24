@@ -11,12 +11,15 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      await cache.addAll(ASSETS_TO_CACHE);
+      // cache: 'reload' bypasses the HTTP cache (GitHub Pages sends max-age=600),
+      // which could otherwise hand the new worker the previous build's index.html
+      const fresh = (url) => new Request(url, { cache: 'reload' });
+      await cache.addAll(ASSETS_TO_CACHE.map(fresh));
       // Precache this build's hashed entry JS/CSS. Old caches are deleted on
       // activate, so the new cache must be complete for offline use on its own.
-      const html = await (await fetch('./index.html', { cache: 'no-store' })).text();
+      const html = await (await cache.match('./index.html')).text();
       const assets = [...html.matchAll(/(?:src|href)="(\.\/assets\/[^"]+)"/g)].map((m) => m[1]);
-      await cache.addAll(assets);
+      await cache.addAll(assets.map(fresh));
     })
   );
   self.skipWaiting();
