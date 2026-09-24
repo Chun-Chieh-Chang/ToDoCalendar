@@ -48,8 +48,13 @@ describe('parseTaskTitle', () => {
     });
   });
 
-  // Known bug: the \w+ alternative matches "2025" before the date pattern is tried.
-  it.fails('parses explicit ^YYYY-MM-DD dates (known bug)', () => {
-    expect(parseTaskTitle('Trip ^2025-01-01').date).toBe('2025-01-01');
+  it('parses explicit ^YYYY-MM-DD dates and strips them from the title', () => {
+    expect(parseTaskTitle('Trip ^2025-01-01')).toEqual({ title: 'Trip', date: '2025-01-01' });
+  });
+
+  it('uses the local calendar date early in the morning (east of UTC)', () => {
+    vi.setSystemTime(new Date(2026, 8, 23, 1, 0, 0)); // 01:00 local = previous day in UTC for UTC+N
+    expect(parseTaskTitle('Gym ^today').date).toBe('2026-09-23');
+    expect(parseTaskTitle('Gym ^tomorrow').date).toBe('2026-09-24');
   });
 });

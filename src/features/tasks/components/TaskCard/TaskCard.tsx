@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import { Task } from '../../../../types';
 import { useAppStore } from '../../../../store/useAppStore';
 import { useTranslation } from '../../../../utils/i18n';
+import { dateUtils } from '../../../../shared/utils/dateUtils';
 import './TaskCard.css';
 import { motion } from 'framer-motion';
 
@@ -93,13 +94,13 @@ const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(({
 
       {!task.date && onSchedule && (
         <div className="task-quick-schedule">
-          <button onClick={() => onSchedule(task.id, new Date().toISOString().split('T')[0])}>
+          <button onClick={() => onSchedule(task.id, dateUtils.dateToString(new Date()))}>
             {t('scheduledToToday')}
           </button>
           <button onClick={() => {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
-            onSchedule(task.id, tomorrow.toISOString().split('T')[0]);
+            onSchedule(task.id, dateUtils.dateToString(tomorrow));
           }}>
             {t('scheduledToTomorrow')}
           </button>

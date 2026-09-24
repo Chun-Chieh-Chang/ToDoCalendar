@@ -129,7 +129,7 @@ const App = () => {
     },
     onGoToToday: () => {
       setCurrentMonth(new Date());
-      state.setSelectedDate(new Date().toISOString());
+      state.setSelectedDate(dateUtils.dateToString(new Date()));
       setActiveView('calendar');
     }
   });

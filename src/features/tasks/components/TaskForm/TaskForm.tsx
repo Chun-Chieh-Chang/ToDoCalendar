@@ -5,6 +5,7 @@ import { useAppStore } from '../../../../store/useAppStore';
 import { useTranslation } from '../../../../utils/i18n';
 import { parseTaskTitle } from '../../../../utils/nlpUtils';
 import { taskUtils } from '../../utils/taskUtils';
+import { dateUtils } from '../../../../shared/utils/dateUtils';
 import './TaskForm.css';
 
 interface TaskFormProps {
@@ -231,7 +232,7 @@ const TaskForm = ({
                     if (e.target.checked) {
                       setFormData(prev => ({ ...prev, date: '' }));
                     } else {
-                      setFormData(prev => ({ ...prev, date: selectedDate || new Date().toISOString().split('T')[0] }));
+                      setFormData(prev => ({ ...prev, date: selectedDate || dateUtils.dateToString(new Date()) }));
                     }
                   }}
                 />

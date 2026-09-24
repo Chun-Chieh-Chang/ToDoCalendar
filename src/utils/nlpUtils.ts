@@ -1,4 +1,5 @@
 import { Priority } from '../types';
+import { dateUtils } from '../shared/utils/dateUtils';
 
 export interface ParsedTask {
     title: string;
@@ -72,18 +73,19 @@ export const parseTaskTitle = (input: string): ParsedTask => {
     }
 
     // 4. Parse Date (e.g., ^today, ^tomorrow, ^2025-01-01)
-    const dateRegex = /\^(\w+|(?:20\d{2}-\d{2}-\d{2}))/i;
+    // Explicit dates must be tried first, otherwise \w+ matches just the year
+    const dateRegex = /\^(20\d{2}-\d{2}-\d{2}|\w+)/i;
     const dateMatch = title.match(dateRegex);
     if (dateMatch) {
         const val = dateMatch[1].toLowerCase();
         const today = new Date();
 
         if (val === 'today') {
-            result.date = today.toISOString().split('T')[0];
+            result.date = dateUtils.dateToString(today);
         } else if (val === 'tomorrow') {
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
-            result.date = tomorrow.toISOString().split('T')[0];
+            result.date = dateUtils.dateToString(tomorrow);
         } else if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
             result.date = val;
         }
