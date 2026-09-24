@@ -14,6 +14,7 @@
 - `chore(pwa)`：PWA manifest 與 `<meta theme-color>` 仍為舊主題色（`#3B82F6` / 深色 `#0F172A` 啟動畫面），與新擬態淺色主題不一致；改為 `--primary-color` `#3A64C8` 與 `--bg-color` `#ECF0F5`。
 - `ci`：**RCA** — 文件宣稱「`deploy.yml` 在推送 `main` 時執行測試＋建置」，實際工作流程只有 `npm ci` 與 `build`，品質閘門未進入 CI，失敗的變更仍會部署上線。**CAPA** — 部署前依序執行 `npm test`、`tsc --noEmit`、`npm run lint`，任一失敗即中止部署；使文件描述成為事實。
 - `docs`：**RCA** — 文件與程式碼不一致：i18n 鍵數寫 270+（實為 188）、宣稱使用未安裝的 Testing Library、測試清單列出不存在的 `storage`/`db` 並漏列 `twHolidays`/`notificationUtils`、測試數 85（現為 86）；使用手冊描述已不存在的 UI（頂部工具列、「➕ 新增當日任務／新增待辦」按鈕、「📊 顯示設定」的每頁數量／日期格式／預設優先級）、按鈕名稱錯誤、Node 版本需求過期（18+ → 20.19+）；Consolidated 更新日誌缺少 2026-09-23 同輪 7 個提交的紀錄。**CAPA** — 逐項更正；使用手冊第 2–6 節依現行 UI 重寫（含手機版缺少設定入口的已知限制）；新增 2026-09-24 日誌並補記缺漏節點與待辦清單；README「最新更新」補上 v1.4.0 之後的變更。
+- `docs`（gh-pages）：**RCA** — 遠端存在兩個 Pages 部署來源：舊的 `gh-pages` 分支（2026-02 後未更新）與 GitHub Actions，違反單一來源。**CAPA** — 確認線上站台提供的是 Actions 最新建置（含 `f012d1a` 才有的文案）後，刪除遠端 `gh-pages` 分支；站台刪除後仍回應 200；分支內容保留於還原 bundle。文件待辦清單同步移除此項。
 
 ## [2026-09-23c] Type Safety, Lint Restoration, Privacy & Final Doc Sync
 

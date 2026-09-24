@@ -663,6 +663,7 @@ ToDo/
 - Electron 圖示原指向不存在的 `electron/icon.ico`，改用 `icon-512.png`。
 - PWA manifest 與 `theme-color` 改為新擬態主色。
 - CI：`deploy.yml` 部署前執行 test / tsc / lint，任一失敗即中止部署。
+- 刪除遠端舊的 `gh-pages` 分支（2026-02 起未更新的舊部署來源）；Pages 唯一部署來源為 GitHub Actions（`deploy.yml`）。刪除前確認線上站台提供的是 Actions 最新建置內容，刪除後站台正常；分支內容保留於還原 bundle。
 
 ### 補記：2026-09-23 同輪其他提交
 - **Electron 白畫面**：`base: '/ToDoCalendar/'` 使 `file://` 載入時資源路徑錯誤；改為相對 `base: './'`，Pages 與 Electron 共用同一建置。
@@ -679,7 +680,6 @@ ToDo/
 - 手機版底部導覽列缺少設定、使用說明與退出入口。
 - 桌面版同時寫入 IndexedDB 與本機 JSON 檔，非管理員載入時以 JSON 檔為準（雙資料源），需另行設計單一資料源。
 - 備份檔 `backup/todo_calendar_backup.json` 仍存在於 Git 歷史（公開 repo），需 rewrite history 才能完全移除。
-- 舊的 `gh-pages` 分支（2026-02 起未更新）待確認 Pages 來源後刪除。
 
 ---
 
