@@ -1,6 +1,6 @@
 # ToDoCalendar Consolidated Documentation
 
-> **Current Version:** v1.4.0 (2026-09-17)
+> **Current Version:** v1.5.0 (2026-09-24)
 > **Latest Update:** 2026-09-24 — Review follow-up: local-date fixes, UI copy matches behaviour, CI quality gates, remaining dead code removed
 
 ## Table of Contents
@@ -651,7 +651,7 @@ ToDo/
 
 # 近期更新日誌
 
-## 2026-09-24: Review Follow-up — Dates, UI Copy, CI Gates, Remaining Dead Code
+## 2026-09-24: v1.5.0 — Dates, UI Copy, CI Gates, PWA Updates, Privacy Purge
 
 ### Bug 修復
 - **本地日期**：「今天」原以 `toISOString()`（UTC）計算，台灣 00:00–08:00 會變成昨天；影響「排到今日／明天」、NLP `^today`/`^tomorrow`、表單預設日期。`T` 快捷鍵原寫入完整 ISO 時間戳。全部改用本地 `dateUtils.dateToString`。
@@ -662,9 +662,11 @@ ToDo/
 - 移除 12 個無引用的 `dateUtils` 函式、`storageService.clearAll`、未被呼叫的 Electron `restoreWindow` IPC、損壞的 6 bytes `favicon.ico`、無 import 的 `postcss` 依賴。
 - Electron 圖示原指向不存在的 `electron/icon.ico`，改用 `icon-512.png`。
 - PWA manifest 與 `theme-color` 改為新擬態主色。
-- CI：`deploy.yml` 部署前執行 test / tsc / lint，任一失敗即中止部署。
-- 刪除遠端舊的 `gh-pages` 分支（2026-02 起未更新）。**事後修正**：Pages 設定當時仍為「Deploy from a branch: gh-pages」（Actions 部署仍可上線，因此從線上內容誤判來源已是 Actions），刪除該分支使 GitHub 自動停用 Pages，下一次部署於 `configure-pages` 步驟失敗（`Get Pages site failed`）。修正方式：Settings → Pages → Source 改為「GitHub Actions」。教訓：部署設定須在 Settings 直接確認，不可由線上內容間接推論。分支內容保留於還原 bundle。
-- **Git 歷史隱私清除**：以 `git filter-repo` 從全部 114 個提交中移除 6 個個人資料匯出檔（`backup/`、`backups/` 與根目錄下的備份 JSON，含 24–208 筆任務與頭像圖片），並 force push `main` 與標籤；HEAD 檔案樹與清除前完全相同。`.gitignore` 補上 `backups/`。GitHub 伺服器端可能仍保留舊提交快取，需向 GitHub Support 申請清除；本機仍保留含原始資料的還原 bundle（見 DEV_LOG）。
+- CI：deploy.yml 部署前執行 test / tsc / lint，任一失敗即中止部署；actions 升級至最新主版本（node24 runtime），建置改用 Node 24 LTS。
+- **PWA 更新機制**：Service Worker 以每次建置唯一的 ID 版本化快取、頁面導覽 network-first、安裝時繞過 HTTP 快取預快取本次建置；部署後重新整理一次即為新版，離線仍可開啟（正式站已實測）。
+- 版本號 1.4.0 → **1.5.0**。
+- 刪除遠端舊的 `gh-pages` 分支（2026-02 起未更新）。**事後修正**：Pages 設定當時仍為「Deploy from a branch: gh-pages」（Actions 部署仍可上線，因此從線上內容誤判來源已是 Actions），刪除該分支使 GitHub 自動停用 Pages，下一次部署於 `configure-pages` 步驟失敗（`Get Pages site failed`）。修正方式：Settings → Pages → Source 改為「GitHub Actions」。教訓：部署設定須在 Settings 直接確認，不可由線上內容間接推論。
+- **Git 歷史隱私清除**：以 `git filter-repo` 從全部 114 個提交中移除 6 個個人資料匯出檔（`backup/`、`backups/` 與根目錄下的備份 JSON，含 24–208 筆任務與頭像圖片），並 force push `main` 與標籤；HEAD 檔案樹與清除前完全相同。`.gitignore` 補上 `backups/`。GitHub 伺服器端仍保留舊提交快取，需向 GitHub Support 申請清除。含原始資料的還原 bundle 已刪除；歷史中的 6 個匯出檔已抽出保存於 repo 外的私人資料夾。
 
 ### 補記：2026-09-23 同輪其他提交
 - **Electron 白畫面**：`base: '/ToDoCalendar/'` 使 `file://` 載入時資源路徑錯誤；改為相對 `base: './'`，Pages 與 Electron 共用同一建置。

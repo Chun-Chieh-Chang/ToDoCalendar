@@ -12,7 +12,7 @@
     "win": {
         "target": "portable",
         "icon": "public/icon-512.png",
-        "signAndEditExecutable": false
+        "signAndEditExecutable": true
     },
     "portable": {
         "artifactName": "${productName}-Portable.${ext}"
