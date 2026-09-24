@@ -1,4 +1,4 @@
-// 國際化語言檔案 - Last Updated: 2026-03-20T03:00:00Z
+// 國際化語言檔案（zh-TW / en 鍵集必須一致，由 i18n.test.ts 守護）
 export const translations = {
   'zh-TW': {
     // 工具列
@@ -66,9 +66,9 @@ export const translations = {
     close: '關閉',
 
     // 提示與提醒
-    hint: '提示：雙擊日期可查看該日任務詳情',
+    hint: '提示：點擊日期可查看並新增該日任務',
     tasksOnThisDay: '此日有 {count} 個任務',
-    doubleClickToTaskList: '雙擊查看任務列表',
+    clickToTaskList: '點擊查看任務列表',
     reminderTitle: '任務提醒',
     reminderComplete: '完成任務',
 
@@ -177,7 +177,7 @@ export const translations = {
     guideSubtitle: '探索 ToDoCalendar 的核心概念與操作流暢度',
     guidePagesTitle: '頁面功能詳細說明',
     guideCalendarTitle: '月曆視圖 (Calendar)',
-    guideCalendarDesc: '這是您的時間地圖。雙擊日期可快速新增當日任務，單擊可查看當日摘要。適合規劃具有明確截止日期的項目。',
+    guideCalendarDesc: '這是您的時間地圖。點擊日期即可開啟當日任務清單，並直接快速新增當日任務。適合規劃具有明確截止日期的項目。',
     guideKanbanTitle: '看板視圖 (Kanban)',
     guideKanbanDesc: '專注於「流程管理」。將任務分為「待處理」、「進行中」與「已完成」。透過拖拽卡片，您可以視覺化地掌握工作流程的瓶頸。',
     guideTaskListTitle: '我的任務 (Task List)',
@@ -201,13 +201,13 @@ export const translations = {
     shortcutClose: '關閉彈窗 / 取消',
     guideTipsTitle: '進階操作小撇步',
     tipQuickAddTitle: '快速新增：',
-    tipQuickAddDesc: '在月曆上連按兩下，系統會自動填入該日期的預設值。快捷鍵「N」可隨時喚起表單。',
+    tipQuickAddDesc: '點擊月曆上的日期，在當日清單輸入標題即可新增並自動帶入該日期。快捷鍵「N」可隨時喚起完整表單。',
     tipNlpTitle: 'NLP 智慧：',
     tipNlpDesc: '在標題中使用 `!h` (高優先)、`#work` (類別)、`@14:00` (時間) 即可快速解析任務屬性。',
     tipAutoSaveTitle: '自動存檔：',
     tipAutoSaveDesc: '您的每一筆異動都會即時同步到本地 IndexedDB，無需手動點擊，保證效能與數據安全。',
     tipDataTitle: '數據主權：',
-    tipDataDesc: '本工具採 100% 本地存儲，您的資料絕不流向雲端，保障隱私安全。',
+    tipDataDesc: '資料預設 100% 儲存在本機（瀏覽器 IndexedDB／桌面版本機檔案）；僅在您自行設定並登入選用的 Supabase 雲端同步時才會上傳。',
     guideCtaTitle: '準備好開始規劃了嗎？',
     guideCtaDesc: '現在就回到月曆，開啟您高效的一天！',
     guideCtaButton: '立即開始使用',
@@ -243,7 +243,7 @@ export const translations = {
     closeLabel: '關閉',
     welcomeTaskTitle: '✨ 歡迎使用 ToDoCalendar',
     welcomeTaskDesc: '您的所有紀錄都會自動儲存在本地電腦中。您可以點擊左側導覽列開始規劃任務。',
-    welcomeTaskNotes: '您可以點擊右側的鉛筆圖示編輯此地標。',
+    welcomeTaskNotes: '您可以點擊右側的鉛筆圖示編輯此任務。',
     
     // View Titles
     completionRate: '本月完成率',
@@ -316,9 +316,9 @@ export const translations = {
     close: 'Close',
 
     // Hints
-    hint: 'Tip: Double-click on a date to view tasks for that day',
+    hint: 'Tip: Click a date to view and add tasks for that day',
     tasksOnThisDay: '{count} tasks on this day',
-    doubleClickToTaskList: 'Double-click to view task list',
+    clickToTaskList: 'Click to view task list',
     reminderTitle: 'Task Reminder',
     reminderComplete: 'Complete Task',
 
@@ -427,7 +427,7 @@ export const translations = {
     guideSubtitle: 'Explore the core concepts and workflow of ToDoCalendar',
     guidePagesTitle: 'Pages in Detail',
     guideCalendarTitle: 'Calendar',
-    guideCalendarDesc: 'Your map of time. Double-click a date to add a task for that day, single-click to see its summary. Best for work with clear deadlines.',
+    guideCalendarDesc: 'Your map of time. Click a date to open its task list and quick-add tasks for that day. Best for work with clear deadlines.',
     guideKanbanTitle: 'Kanban',
     guideKanbanDesc: 'Focused on workflow. Tasks are split into To Do, In Progress and Done. Drag cards between columns to spot bottlenecks at a glance.',
     guideTaskListTitle: 'My Tasks',
@@ -451,13 +451,13 @@ export const translations = {
     shortcutClose: 'Close dialog / Cancel',
     guideTipsTitle: 'Pro Tips',
     tipQuickAddTitle: 'Quick add:',
-    tipQuickAddDesc: 'Double-click a date on the calendar to pre-fill that date. Press "N" anytime to open the form.',
+    tipQuickAddDesc: 'Click a date on the calendar and type a title in the day list to add a task for that date. Press "N" anytime to open the full form.',
     tipNlpTitle: 'Smart parsing:',
     tipNlpDesc: 'Use `!h` (high priority), `#work` (category) and `@14:00` (time) in the title to set task properties instantly.',
     tipAutoSaveTitle: 'Auto-save:',
     tipAutoSaveDesc: 'Every change is saved to local IndexedDB immediately, with no save button needed.',
     tipDataTitle: 'Your data, your device:',
-    tipDataDesc: 'Everything is stored 100% locally and never sent to the cloud, keeping your data private.',
+    tipDataDesc: 'By default everything stays on your device (browser IndexedDB, or a local file in the desktop app). Data is only uploaded if you set up and sign in to the optional Supabase cloud sync.',
     guideCtaTitle: 'Ready to start planning?',
     guideCtaDesc: 'Head back to the calendar and make today productive!',
     guideCtaButton: 'Get Started',

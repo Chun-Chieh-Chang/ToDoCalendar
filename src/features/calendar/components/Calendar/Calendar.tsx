@@ -12,7 +12,7 @@ interface CalendarProps {
   selectedDate: string;
   tasks: Task[];
   onDateSelect: (date: Date) => void;
-  onDateDoubleClick: (date: Date) => void;
+  onDateOpen: (date: Date) => void;
   categories: any[];
   theme?: string;
 }
@@ -23,7 +23,7 @@ const Calendar = ({
   selectedDate,
   tasks,
   onDateSelect,
-  onDateDoubleClick,
+  onDateOpen,
   categories,
   theme: propTheme
 }: CalendarProps) => {
@@ -144,7 +144,7 @@ const Calendar = ({
               } ${holidayName ? 'is-holiday' : ''}`}
               onClick={() => {
                 onDateSelect(day);
-                if (isCurrentMonth) onDateDoubleClick(day);
+                if (isCurrentMonth) onDateOpen(day);
               }}
               title={
                 holidayName
@@ -153,7 +153,7 @@ const Calendar = ({
                     : `🎌 ${holidayName}`
                   : tasksForDay.length > 0
                     ? `${t('tasksOnThisDay').replace('{count}', tasksForDay.length.toString())}\n${taskListTooltip}`
-                    : t('doubleClickToTaskList')
+                    : t('clickToTaskList')
               }
             >
               <div className="day-number">{day.getDate()}</div>

@@ -9,6 +9,7 @@
 ### 原子提交紀錄
 - `chore(dead-code)`：移除 12 個無引用的 `dateUtils` 成員（僅保留 `formatDate`、`dateToString`）、無引用的 `storageService.clearAll`，以及 Electron 未被呼叫的 `restoreWindow` IPC（preload 暴露＋main handler；通知點擊聚焦已由 main 內 `notification.on('click')` 處理），縮小 IPC 攻擊面。驗證：85 測試、tsc 0、lint 0、build 成功、隱藏 Electron 視窗掛載正常。
 - `chore(build)`：**RCA** — `public/favicon.ico` 僅 6 bytes（內容為 BOM＋換行，非有效圖示且無引用）；`electron-builder.json` 與 `main.cjs` 皆指向不存在的 `electron/icon.ico`（打包與視窗皆無自訂圖示）；`postcss` 為無任何 import 的直接依賴。**CAPA** — 刪除損壞的 favicon；兩處圖示改用既有 `icon-512.png`（1024×1024，electron-builder 自動轉 .ico）；移除 `postcss` 直接依賴（Vite 內建）。
+- `fix(i18n)`：**RCA** — 介面文案與實際行為矛盾：提示列、月曆 tooltip、使用說明與小撇步皆寫「雙擊／Double-click」，但日期格實為**單擊**即開啟當日任務清單；使用說明宣稱「資料絕不流向雲端」，與選用的 Supabase 雲端同步不符；歡迎任務誤寫「編輯此地標」。**CAPA** — 兩語系文案改為與行為一致；鍵名 `doubleClickToTaskList` → `clickToTaskList`、App/Calendar 的 `onDateDoubleClick` → `onDateOpen`，避免命名再誤導；移除 i18n 檔頭過期的「Last Updated」日期（以 git 為準）。
 
 ## [2026-09-23c] Type Safety, Lint Restoration, Privacy & Final Doc Sync
 

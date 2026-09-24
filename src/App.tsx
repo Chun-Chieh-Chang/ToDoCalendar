@@ -140,8 +140,8 @@ const App = () => {
     dispatch({ type: 'SET_SELECTED_DATE', payload: dateStr });
   };
 
-  // 雙擊日期 - 打開任務列表彈窗
-  const handleDateDoubleClick = (date: Date) => {
+  // 點擊日期 - 打開當日任務列表彈窗
+  const handleDateOpen = (date: Date) => {
     const dateStr = dateUtils.dateToString(date);
     dispatch({ type: 'SET_SELECTED_DATE', payload: dateStr });
     // 自動清除過濾條件，避免使用者因為之前的搜尋字詞而看不到任務
@@ -557,7 +557,7 @@ const App = () => {
               currentMonth={currentMonth}
               selectedDate={state.selectedDate}
               onDateSelect={handleDateSelect}
-              onDateDoubleClick={handleDateDoubleClick}
+              onDateOpen={handleDateOpen}
               tasks={state.tasks}
               categories={state.settings.categories}
               theme={state.settings.theme}
