@@ -4,6 +4,11 @@
 ### 原子提交紀錄
 - `fix(calendar)`：**RCA** — 月曆日期格的任務預覽 pill 文字被垂直截半：`.task-preview` 以 `max-height: 60px` 限高（設計前提為單行 pill：2 × ~27px + 6px gap），但 `.task-time` 設為 `display: block` 使含時間的任務 pill 變成兩行（~44px），兩顆 pill 加 gap ≈ 94px 超出限高，`overflow: hidden` 將第二顆從字形中間截斷（截圖：「14:00」可見、其下「品檢員面談」被切半）。**CAPA** — `.task-time` 改為 inline 前綴（`display: inline; margin-right: 6px`，移除 `margin-bottom`），pill 恢復單行「14:00 品檢員面談…」格式；`.task-preview-item` 補 `line-height: 1.4` 使 pill 高度可預期（13px × 1.4 + 8px padding = ~26px，兩顆 + gap = 58px ≤ 60px 限高）；水平過長沿用既有 `text-overflow: ellipsis`；CSS 註解寫明單行不變式防回歸。行為不變：仍顯示前 2 筆、超過以 `+N` 徽章提示、480px 以下照舊隱藏預覽。驗證：85 測試全過、lint 0 問題、`vite build` 成功。
 
+## [2026-09-24] Review Follow-up: Remaining Dead Code, Wording & Bug Fixes
+
+### 原子提交紀錄
+- `chore(dead-code)`：移除 12 個無引用的 `dateUtils` 成員（僅保留 `formatDate`、`dateToString`）、無引用的 `storageService.clearAll`，以及 Electron 未被呼叫的 `restoreWindow` IPC（preload 暴露＋main handler；通知點擊聚焦已由 main 內 `notification.on('click')` 處理），縮小 IPC 攻擊面。驗證：85 測試、tsc 0、lint 0、build 成功、隱藏 Electron 視窗掛載正常。
+
 ## [2026-09-23c] Type Safety, Lint Restoration, Privacy & Final Doc Sync
 
 ### 原子提交紀錄

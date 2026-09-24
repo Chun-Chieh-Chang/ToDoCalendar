@@ -59,16 +59,6 @@ export const storageService = {
     };
   },
 
-  // Clear all data
-  async clearAll(): Promise<void> {
-    try {
-      await db.tasks.clear();
-      await db.appData.clear();
-    } catch (error) {
-      console.error('Failed to clear data:', error);
-    }
-  },
-
   // Export/Import
   async exportData(): Promise<string> {
     const data = await this.getLocalData();

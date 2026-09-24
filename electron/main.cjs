@@ -148,19 +148,6 @@ ipcMain.handle('quit-app', () => {
     app.quit();
 });
 
-// Handle requests to restore the window
-ipcMain.on('restore-window', () => {
-    if (mainWindow) {
-        if (mainWindow.isMinimized()) {
-            mainWindow.restore();
-        }
-        mainWindow.show();
-        mainWindow.focus();
-        // Bring window to front (higher z-order)
-        mainWindow.moveTop();
-    }
-});
-
 app.whenReady().then(() => {
     createWindow();
 
