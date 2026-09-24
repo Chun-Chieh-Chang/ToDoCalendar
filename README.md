@@ -2,8 +2,15 @@
 
 一款現代化的桌面任務管理應用程式，結合月曆視圖與待辦清單功能，幫助您有效管理時間與任務。
 
-## 🚀 最新更新 (v1.4.0 - 2026-09-17)
+## 🚀 最新更新
 
+**main（v1.4.0 之後，尚未發佈新版號）**
+- ✅ **新擬態介面**：全介面改為「Inset Focus」新擬態設計，淺色／深色兩套配色。
+- ✅ **完整中英雙語**：所有介面文字、使用說明與國定假日名稱皆可切換。
+- ✅ **桌面版修復**：修正 Electron 打包後白畫面；網頁版可推送桌面通知。
+- ✅ **可靠性**：修正新增任務沿用上一筆內容、清晨「今天」誤判為昨天等問題；部署前自動執行測試、型別檢查與 lint。
+
+**v1.4.0（2026-09-17）**
 - ✅ **台灣國定假日顯示**：月曆自動標記 2024–2027 年全部國定假日（含補假），琥珀色標籤直觀識別。
 
 ## 📋 主要功能
@@ -65,7 +72,7 @@ release\ToDoCalendar-Portable.exe
 
 6. **品質檢查（提交前必跑）**
    ```bash
-   npm test          # Vitest 測試（8 檔 85 項）
+   npm test          # Vitest 測試（8 檔 86 項）
    npm run lint      # ESLint（0 錯誤 0 警告為通過門檻）
    npx tsc --noEmit  # TypeScript 型別檢查（0 錯誤為通過門檻）
    npm run build     # 生產建置
@@ -83,8 +90,8 @@ release\ToDoCalendar-Portable.exe
 | Desktop | Electron 33 + Electron Builder |
 | Animations | Framer Motion 12 |
 | Icons | Remixicon 4 |
-| i18n | 自建（zh-TW / en，270+ keys） |
-| Testing | Vitest + Testing Library（85 tests） |
+| i18n | 自建（zh-TW / en，各 188 keys，鍵集由測試守護一致） |
+| Testing | Vitest（8 files / 86 tests） |
 | Lint | ESLint 8（legacy `.eslintrc.cjs`） |
 
 ## 📁 專案結構
@@ -101,7 +108,7 @@ ToDoCalendar/
 │   ├── data/
 │   │   └── twHolidays.ts           # Taiwan national holidays 2024–2027
 │   ├── utils/
-│   │   ├── i18n.ts                 # Translation (270+ keys, zh-TW / en)
+│   │   ├── i18n.ts                 # Translation (188 keys each, zh-TW / en)
 │   │   └── nlpUtils.ts             # NLP task parsing
 │   ├── services/
 │   │   ├── storage.ts              # Dexie CRUD + localStorage migration + Supabase sync

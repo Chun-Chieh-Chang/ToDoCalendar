@@ -1,7 +1,7 @@
 # ToDoCalendar Consolidated Documentation
 
 > **Current Version:** v1.4.0 (2026-09-17)
-> **Latest Update:** 2026-09-23 — Repo hygiene audit: quality gates restored (tsc/lint clean, 85 tests), Kanban drag fix, user backup untracked
+> **Latest Update:** 2026-09-24 — Review follow-up: local-date fixes, UI copy matches behaviour, CI quality gates, remaining dead code removed
 
 ## Table of Contents
 1. [Current Architecture Overview](#current-architecture-overview)
@@ -26,8 +26,8 @@
 | Desktop | Electron 33 |
 | Animations | Framer Motion 12 |
 | Icons | Remixicon 4 |
-| i18n | Custom (zh-TW / en, 270+ keys) |
-| Testing | Vitest + Testing Library (85 tests) |
+| i18n | Custom (zh-TW / en, 188 keys each, parity guarded by tests) |
+| Testing | Vitest (8 files / 86 tests) |
 | Lint | ESLint 8 (legacy `.eslintrc.cjs`) |
 
 ### Project Structure
@@ -41,7 +41,7 @@ ToDoCalendar/
 │   ├── store/useAppStore.ts        # Zustand store: tasks, settings, filter
 │   ├── types/index.ts              # Core type definitions
 │   ├── utils/
-│   │   ├── i18n.ts                 # Translation (270+ keys, zh-TW / en)
+│   │   ├── i18n.ts                 # Translation (188 keys each, zh-TW / en)
 │   │   └── nlpUtils.ts             # NLP task parsing (priority, category, time, date)
 │   ├── services/
 │   │   ├── storage.ts              # Dexie CRUD + localStorage migration + Supabase sync
@@ -70,15 +70,15 @@ ToDoCalendar/
 ```
 
 ### Quality Gates
-Local gate that must pass before every commit / deploy (`deploy.yml` runs tests + build on push to `main`):
+Gate that must pass before every commit; `deploy.yml` runs test, type check, lint and build on every push to `main` and aborts the deployment on any failure:
 | Command | Pass Criteria |
 |---------|---------------|
-| `npm test` | Vitest — 8 files / 85 tests, all green |
+| `npm test` | Vitest — 8 files / 86 tests, all green |
 | `npx tsc --noEmit` | 0 type errors (strict) |
 | `npm run lint` | 0 errors, 0 warnings (`--max-warnings 0`) |
 | `npm run build` | Vite production build succeeds |
 
-Test suites: `contrastUtils`, `dateUtils`, `taskUtils`, `i18n`, `nlpUtils`, `storage`, `db`, `useAppStore`.
+Test suites: `contrastUtils`, `dateUtils`, `notificationUtils`, `taskUtils`, `i18n`, `nlpUtils`, `twHolidays`, `useAppStore`.
 Pre-commit hook additionally requires a `DEV_LOG.md` entry per commit.
 
 ### Neumorphic Design System ("Inset Focus")
@@ -130,95 +130,76 @@ Pre-commit hook additionally requires a `DEV_LOG.md` entry per commit.
 
 ### 開發者模式
 如果您希望進行開發或修改：
-1. 確保已安裝 Node.js 18+。
-2. 執行 `npm run dev` 啟動開發伺服器。
+1. 確保已安裝 Node.js 20.19+（Vite 7 的最低需求）。
+2. 執行 `npm run dev` 啟動開發伺服器（`http://localhost:5173/`）。
 3. 執行 `npm run build` 構建生產版本。
 4. 執行 `npm run pack` 打包為 Electron 獨立執行檔。
 
 ## 3. 介面概覽
 
-應用程式主要分為三個區域：
-- **頂部工具列**：包含標題、日期顯示、功能按鈕（今天、待辦清單、設定）。
-- **中央月曆區**：顯示當月日期，每個日期格子內會顯示當天的任務數量提示。
-- **彈出視窗**：用於顯示任務列表、新增/編輯任務、設定等。
+- **左側導覽列（桌面）**：新增任務、月曆視圖、我的任務、看板視圖、數據洞察、使用說明、設定、退出系統，底部為使用者資訊與版本。
+- **底部導覽列（手機，寬度 ≤ 768px）**：月曆、我的任務、新增任務、看板、數據洞察。
+- **主內容區**：依所選視圖顯示；月曆與看板視圖上方有年份／月份選單、上下月箭頭與「今天」按鈕；最下方為狀態列（進行中／已完成／待處理數量與本月完成率）。
+- **彈出視窗**：當日任務清單、新增／編輯任務、設定、提醒、退出確認。
 
 ## 4. 核心功能
 
 ### 📅 月曆視圖
-- **切換月份**：點擊月曆左右兩側的箭頭切換月份。
-- **回到今天**：點擊頂部的「📅 今天」按鈕快速跳轉至當前日期。
-- **查看詳情**：**點擊**任意日期格子，即可進入該日期並顯示任務清單。
+- **切換月份**：使用上方的年份／月份選單，或左右箭頭。
+- **回到今天**：點擊「今天」按鈕，或按快捷鍵 `T`。
+- **查看詳情**：**點擊**當月任一日期格子，開啟該日任務清單。
+- **國定假日**：自動標示台灣國定假日（含補假），切換為英文時顯示英文名稱。
 - **週起始日**：月曆以「星期天」為每週第一天，星期列順序為「日、一、二、三、四、五、六」。
 
 ### 📝 任務管理
-在任務列表彈窗中，您可以：
-- **新增**：日期清單使用「➕ 新增當日任務」，待辦清單使用「➕ 新增待辦」。
+- **新增**：側欄「新增任務」或快捷鍵 `N` 開啟完整表單；在當日任務清單或「我的任務」頁上方的快速新增欄輸入標題後按 Enter，可直接新增。
+- **智慧標籤**：標題可加 `!high`/`!medium`/`!low`（優先級）、`#work`/`#study`/`#life`/`#other`（分類）、`@14:00` 或 `@9pm`（時間）、`^today`/`^tomorrow`/`^2026-10-01`（日期）；完整表單中可按 🪄 解析。
 - **編輯**：點擊任務卡片上的 ✏️ 按鈕。
 - **刪除**：點擊任務卡片上的 🗑️ 按鈕。
-- **完成**：勾選任務前的方框，完成後會顯示刪除線。
-- *提示*：空清單僅顯示引導文案，不重複提供第二個新增按鈕。
+- **完成**：勾選任務前的方框；設定了重複頻率（每日／每週／每月）的任務完成時會自動產生下一次。
 
 ### 📋 待辦清單 (Backlog)
-專門用於存放尚未確定日期的任務：
-1. 點擊頂部工具列的「📋 待辦清單」按鈕。
-2. 此處顯示所有未設定日期的任務。
-3. 新增待辦：點擊清單標題列右側的「➕ 新增待辦」，或於表單勾選「待辦清單 (無日期)」。
+尚未確定日期的任務稱為「靈感待辦」：
+1. 進入「我的任務」，切換至「靈感待辦」分頁即可看到所有未設定日期的任務。
+2. 新增：在該分頁用快速新增欄輸入，或於完整表單勾選「待辦清單 (無日期)」。
+3. 排程：點擊任務卡片上的「📅 排到今日」或「⏭️ 明天」，任務即移至月曆與「已排程」分頁。
 
 ### ⏰ 提醒功能
-- **設定提醒**：在新增或編輯任務時，設定具體的「時間」。
-- **彈窗通知**：當設定的時間到達時，系統會自動彈出提醒視窗。
-- **自動聚焦**：當提醒觸發時，應用程式會自動跳至最上層顯示，確保您不會錯過重要任務。
-- **跨平台通知**：支援桌面和網頁版本的通知系統。
-- **操作**：您可以選擇「完成任務」或關閉已讀。
+- **設定提醒**：新增或編輯任務時設定「時間」；儲存有時間的任務時，網頁版會請求桌面通知權限（拒絕後不再詢問）。
+- **觸發時機**：任務時間前 10 分鐘起，App 內彈出提醒視窗，並推送系統通知（桌面版為原生通知，網頁版需已允許通知）。
+- **操作**：可選擇「完成任務」或「我知道了」。
 - *注意：應用程式必須保持開啟狀態才能接收提醒。*
 
 ## 5. 設定與個性化
 
-點擊頂部的「⚙️ 設定」按鈕，您可以調整：
+點擊側欄的「設定」，設定分為兩個分頁：
 
-### 🌐 語言設定
-- **支援語言**：中文（繁體）與 English
-- **切換方式**：在設定中選擇「語言」下拉選單
-- **即時生效**：選擇後立即切換界面語言
-- **自動保存**：語言設定會自動保存，下次開啟時保持選擇
+### 常規
+- **顯示語言**：繁體中文 / English，選擇後立即切換並自動保存。
+- **主題模式**：淺色主題 / 深色主題；兩種主題的文字對比皆符合 WCAG 4.5:1。
+- **使用者個人資料**：使用者名稱（顯示於側欄）與裝置 ID。
 
-### 🎨 主題設定
-- **淺色主題**：適合白天使用的明亮界面
-- **深色主題**：適合夜間使用的暗色界面
-- **文字對比度**：已優化兩種主題下的文字可讀性
-
-### 📊 顯示設定
-- **每頁顯示數量**：可調整列表顯示的任務數量（5-50項）
-- **日期格式**：支援多種日期顯示格式
-- **預設優先級**：設定新任務的預設優先級
-
-### 💾 數據管理
-- **匯出數據**：將所有任務數據匯出為 JSON 格式
-- **匯入數據**：從 JSON 檔案匯入任務數據
-- **本地儲存**：所有數據安全儲存在本機，保護隱私
+### 數據
+- **立即備份數據**：將所有任務與設定匯出為 JSON 檔案。
+- **還原備份檔案**：從 JSON 檔案匯入（會覆蓋目前資料，成功後自動重新載入）。
+- **儲存路徑管理**（僅桌面版）：變更本機資料檔的存放目錄。
 
 ## 6. 常見問題
 
 **Q: 任務資料儲存在哪裡？**
-A: 所有資料都儲存在您的本機電腦中（IndexedDB / Dexie.js），不會上傳至任何伺服器，確保隱私安全。可選開啟 Supabase 雲端同步。
+A: 預設全部儲存在本機：網頁版為瀏覽器 IndexedDB，桌面版另存一份本機 JSON 檔。只有在您自行設定並登入選用的 Supabase 雲端同步時，資料才會上傳。
 
 **Q: 如何備份資料？**
-A: 在設定中點擊「匯出數據 (JSON)」即可備份所有任務資料。匯入時選擇「匯入數據 (JSON)」並選擇備份檔案。
+A: 設定 →「數據」分頁 →「立即備份數據」；還原時使用「還原備份檔案」並選擇備份檔。
 
-**Q: 為什麼提醒沒有響？**
-A: 請確認您設定了正確的時間，並且應用程式處於開啟狀態。提醒會在預定時間前10分鐘開始觸發，並持續到任務時間結束。
-
-**Q: 為什麼提醒視窗沒有自動彈出？**
-A: 當提醒觸發時，應用程式會自動跳至最上層顯示。如果此功能未正常工作，請檢查您的作業系統設定，確保應用程式有權限顯示通知並獲取焦點。
+**Q: 為什麼沒有收到系統通知？**
+A: 請確認任務設定了時間、應用程式保持開啟，且瀏覽器或作業系統允許本 App 顯示通知。App 內的提醒視窗不受通知權限影響。
 
 **Q: 如何切換語言？**
-A: 點擊「⚙️ 設定」→「語言」，選擇「中文（繁體）」或「English」，界面會立即切換。
+A: 設定 →「常規」→「顯示語言」，選擇「繁體中文」或「English」，介面會立即切換。
 
-**Q: 深色主題下文字看不清楚怎麼辦？**
-A: 最新版本已優化深色主題的文字對比度，確保在兩種主題下都有良好的可讀性。
-
-**Q: 任務文字太小怎麼辦？**
-A: 最新版本已增加任務文字大小，提升可讀性。如仍有問題，可在設定中調整顯示選項。
+**Q: 手機上找不到設定？**
+A: 目前手機版底部導覽列未包含設定、使用說明與退出；請在寬度大於 768px 的視窗中開啟（已列為待辦改善項目）。
 
 ---
 *Generated by Wesley Chang @ Mouldex, 2026*
@@ -669,6 +650,38 @@ ToDo/
 ## Recent Updates Log
 
 # 近期更新日誌
+
+## 2026-09-24: Review Follow-up — Dates, UI Copy, CI Gates, Remaining Dead Code
+
+### Bug 修復
+- **本地日期**：「今天」原以 `toISOString()`（UTC）計算，台灣 00:00–08:00 會變成昨天；影響「排到今日／明天」、NLP `^today`/`^tomorrow`、表單預設日期。`T` 快捷鍵原寫入完整 ISO 時間戳。全部改用本地 `dateUtils.dateToString`。
+- **NLP 明確日期**：`^2026-10-01` 過去永遠無法解析（正規式先比對 `\w+`），已修正並納入正式測試。
+- **介面文案**：提示列、tooltip、使用說明原寫「雙擊」，實際為單擊開啟當日清單；「資料絕不流向雲端」與選用的 Supabase 同步矛盾。兩語系已修正。
+
+### 清理與一致性
+- 移除 12 個無引用的 `dateUtils` 函式、`storageService.clearAll`、未被呼叫的 Electron `restoreWindow` IPC、損壞的 6 bytes `favicon.ico`、無 import 的 `postcss` 依賴。
+- Electron 圖示原指向不存在的 `electron/icon.ico`，改用 `icon-512.png`。
+- PWA manifest 與 `theme-color` 改為新擬態主色。
+- CI：`deploy.yml` 部署前執行 test / tsc / lint，任一失敗即中止部署。
+
+### 補記：2026-09-23 同輪其他提交
+- **Electron 白畫面**：`base: '/ToDoCalendar/'` 使 `file://` 載入時資源路徑錯誤；改為相對 `base: './'`，Pages 與 Electron 共用同一建置。
+- **網頁通知**：原本從未請求通知權限；儲存含時間的任務時請求，圖示改相對路徑。
+- **任務表單**：儲存後「新增任務」會帶入上一筆內容；取消編輯後「新增任務」會覆寫舊任務。已修正。
+- **Service Worker**：開發模式也註冊 cache-first 快取，導致修改後仍執行舊碼；改為僅正式建置註冊。
+- **版本單一來源**：`package.json` 經 `__APP_VERSION__` 注入，取代 3 處寫死的 1.3.0。
+- **死碼**：移除 44 個無引用翻譯鍵（232 → 188）、約 930 行不可達 CSS、17 個未使用 CSS 變數；新增 Vitest 回歸測試。
+
+### 驗證
+- ✅ 86 tests / ✅ tsc 0 errors / ✅ lint 0 problems / ✅ `vite build` / ✅ Electron 隱藏視窗掛載 / ✅ 瀏覽器實測 `T` 快捷鍵、排到今日、看板拖放。
+
+### 待辦（尚未處理）
+- 手機版底部導覽列缺少設定、使用說明與退出入口。
+- 桌面版同時寫入 IndexedDB 與本機 JSON 檔，非管理員載入時以 JSON 檔為準（雙資料源），需另行設計單一資料源。
+- 備份檔 `backup/todo_calendar_backup.json` 仍存在於 Git 歷史（公開 repo），需 rewrite history 才能完全移除。
+- 舊的 `gh-pages` 分支（2026-02 起未更新）待確認 Pages 來源後刪除。
+
+---
 
 ## 2026-09-23: Repo Hygiene Audit — Dead-Code Cleanup, Quality Gates Restored
 
