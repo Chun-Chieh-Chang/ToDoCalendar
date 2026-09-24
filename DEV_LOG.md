@@ -17,6 +17,7 @@
 - `docs`（gh-pages）：**RCA** — 遠端存在兩個 Pages 部署來源：舊的 `gh-pages` 分支（2026-02 後未更新）與 GitHub Actions，違反單一來源。**CAPA** — 確認線上站台提供的是 Actions 最新建置（含 `f012d1a` 才有的文案）後，刪除遠端 `gh-pages` 分支；站台刪除後仍回應 200；分支內容保留於還原 bundle。文件待辦清單同步移除此項。
 - **事後更正（gh-pages）**：上一條「站台刪除後仍回應 200」屬 CDN 快取假象。**RCA** — Pages 設定實為「Deploy from a branch: gh-pages」；Actions 的 `deploy-pages` 在此設定下仍能上線，因此以線上內容推論「來源已是 Actions」是錯誤的間接推論。刪除來源分支後 GitHub 自動停用 Pages（`has_pages: false`），`e1189da` 的部署在 `configure-pages` 失敗。**CAPA** — Settings → Pages → Source 改為 GitHub Actions；此後部署設定一律於 Settings 直接確認，不以線上內容間接推論。
 - **Pages 重新啟用**：使用者於 Settings → Pages 將 Source 設為 GitHub Actions；以本條紀錄提交觸發部署驗證。
+- **Pages 確認生效**：前一次設定未儲存成功（`f20276d` 部署仍於 `configure-pages` 失敗、站台 404）；使用者重新設定後 API 回報 `has_pages: true`，以本條提交重新部署。
 - `chore(privacy)`：**RCA** — 公開 repo 的 Git 歷史含 6 個個人資料匯出檔（`backup/todo_calendar_backup.json`、`backup/ToDoCalendar_Backup_20260615_160701.json`、`…_164239.json`、`…_20260616_085143.json`、`backups/todo_backup_2025-12-17.json`、根目錄 `todo_backup_2025-12-17.json`；各含 24–208 筆任務與頭像圖片）；`git rm --cached` 只停止追蹤、不移除歷史。第一輪清除僅依「新增」事件列檔，漏掉經改名進入歷史的 2 個檔案，由全物件庫掃描頭像資料發現後補清。**CAPA** — `git filter-repo --invert-paths` 移除 `backup/`、`backups/` 與上述檔案；驗證：歷史中 0 個備份路徑、物件庫 0 個頭像資料 blob、114 個提交全數保留、HEAD 樹與清除前完全相同；同時移除 `7eb559f` 提交標題的 BOM。`.gitignore` 補上 `backups/`。清除前完整備份：`../ToDoCalendar-restore-2026-09-24-prepurge.bundle`（**含原始個資**，確認不需要後應自行刪除；`../ToDoCalendar-restore-2026-09-23.bundle` 亦同）。
 
 ## [2026-09-23c] Type Safety, Lint Restoration, Privacy & Final Doc Sync
